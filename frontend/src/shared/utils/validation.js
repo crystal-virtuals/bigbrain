@@ -2,22 +2,38 @@
                         Validate Input
 ***************************************************************/
 export const isEmpty = (value) => {
-  return value === undefined || value === null || value === '';
+  return value === undefined || value === null || value === '' || !value;
 };
 
-export const validateInput = (name, value) => {
-  if (isEmpty(value)) return 'This field is required';
+const validatePasswordMatch = (password, confirmPassword) => {
+  if (password !== confirmPassword) return 'Both passwords must match';
   return '';
 };
 
-export const validateForm = (formData) => {
-  const errors = {};
-  Object.entries(formData).forEach(([name, value]) => {
-    errors[name] = validateInput(name, value);
+const validateInput = (name, value, password = '') => {
+  if (isEmpty(value)) return 'This field is required';
+  if (name === 'confirmPassword') return validatePasswordMatch(value, password);
+  return '';
+}
+
+export const getInputErrors = (name, value, formData, errors) => {
+  const newErrors = new Map(errors);
+  let errorMessage = validateInput(name, value, formData.password);
+  !isEmpty(errorMessage) ? newErrors.set(name, errorMessage) : newErrors.delete(name);
+  return newErrors;
+}
+
+export const getFormErrors = (formData) => {
+  const errors = new Map();
+
+  Object.keys(formData).forEach((name) => {
+    const errorMessage = validateInput(name, formData[name], formData.password);
+    if (errorMessage) {
+      errors.set(name, errorMessage);
+    } else {
+      errors.delete(name);
+    }
   });
-  const { password, confirmPassword } = formData;
-  if (password && confirmPassword && password !== confirmPassword) {
-    errors.confirmPassword = 'Passwords do not match';
-  }
+
   return errors;
 };

@@ -6,7 +6,7 @@ import { Input } from '@components/input'
 import { Strong, Text } from '@components/text'
 import { api } from '@utils/api.js';
 import { storeAuthToken } from '@utils/auth';
-import { validateInput, validateForm } from '@utils/validation.js';
+import { getInputErrors, getFormErrors } from '@utils/validation.js';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -20,18 +20,15 @@ export default function Login() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setPerson({
-      ...person,
-      [name]: value,
-    });
-    const newErrors = validateInput(name, value, errors);
-    setErrors(newErrors)
+    setPerson({ ...person, [name]: value });
+    const newErrors = getInputErrors(name, value, person, errors);
+    setErrors(newErrors);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const newErrors = validateForm(person);
+    const newErrors = getFormErrors(person);
     setErrors(newErrors);
     if (newErrors.size > 0) return;
 
@@ -48,7 +45,6 @@ export default function Login() {
 
   const onError = (error) => {
     console.error('Invalid credentials', error);
-
     // Handle error
     const newErrors = new Map();
     newErrors.set('email', error);

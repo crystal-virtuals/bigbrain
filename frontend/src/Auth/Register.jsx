@@ -6,7 +6,7 @@ import { Input } from '@components/input';
 import { Strong, Text } from '@components/text';
 import { api } from '@utils/api.js';
 import { storeAuthToken } from '@utils/auth';
-import { validateInput, validateForm } from '@utils/validation.js';
+import { getInputErrors, getFormErrors } from '@utils/validation.js';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -20,34 +20,19 @@ export default function Register() {
     confirmPassword: '',
   });
 
-  const doPasswordsMatch = () => person.password !== person.confirmPassword;
-
   const handleChange = (e) => {
+    // set value
     const { name, value } = e.target;
-    setPerson({
-      ...person,
-      [name]: value,
-    });
-
-    let newErrors = validateInput(name, value, errors);
-    if (name === 'confirmPassword' && doPasswordsMatch()) {
-      newErrors.set('confirmPassword', 'Both passwords must match');
-    } else {
-      newErrors.delete('confirmPassword');
-    }
-
+    setPerson({ ...person, [name]: value });
+    // update errors
+    const newErrors = getInputErrors(name, value, person, errors);
     setErrors(newErrors);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const newErrors = validateForm(person);
-
-    if (doPasswordsMatch()) {
-      newErrors.set('confirmPassword', 'Both passwords must match');
-    }
-
+    const newErrors = getFormErrors(person);
     setErrors(newErrors);
     if (newErrors.size > 0) return;
 
@@ -120,7 +105,6 @@ export default function Register() {
             value={person.password}
             invalid={errors.has('password')}
             onChange={handleChange}
-            autoComplete="new-password"
           />
           {errors.has('password') && (
             <ErrorMessage>{errors.get('password')}</ErrorMessage>
