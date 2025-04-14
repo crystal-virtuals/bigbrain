@@ -3,12 +3,13 @@ import { Button } from '@components/button'
 import { ErrorMessage, Field, Label } from '@components/fieldset'
 import { Heading } from '@components/heading'
 import { Input } from '@components/input'
+import { Link } from '@components/link'
 import { Strong, Text } from '@components/text'
-import { api } from '@utils/api.js';
-import { storeAuthToken } from '@utils/auth';
-import { getInputErrors, getFormErrors } from '@utils/validation.js';
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { api } from '@utils/api.js'
+import { storeAuthToken } from '@utils/auth'
+import { getFormErrors, getInputErrors } from '@utils/validation.js'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 export default function Login() {
   const navigate = useNavigate();
@@ -95,7 +96,7 @@ export default function Login() {
 
         <Text>
           Don’t have an account?{' '}
-          <Link to="/register" className="link">
+          <Link to="/register">
             <Strong>Sign up now</Strong>
           </Link>
         </Text>

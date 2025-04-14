@@ -1,13 +1,9 @@
 import { Routes, Route } from "react-router-dom"
-import Login from '@auth/Login.jsx'
-import Register from '@auth/Register.jsx'
+import { Login, Register } from "@/auth"
+import { Dashboard } from '@/dashboard'
 
 function Home() {
   return <h2>Home</h2>
-}
-
-function Dashboard() {
-  return <h2>Dashboard</h2>
 }
 
 function NotFound() {

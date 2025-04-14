@@ -3,12 +3,13 @@ import { Button } from '@components/button';
 import { ErrorMessage, Field, Label } from '@components/fieldset';
 import { Heading } from '@components/heading';
 import { Input } from '@components/input';
+import { Link } from '@components/link';
 import { Strong, Text } from '@components/text';
 import { api } from '@utils/api.js';
 import { storeAuthToken } from '@utils/auth';
-import { getInputErrors, getFormErrors } from '@utils/validation.js';
+import { getFormErrors, getInputErrors } from '@utils/validation.js';
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export default function Register() {
   const navigate = useNavigate();
@@ -131,7 +132,7 @@ export default function Register() {
 
         <Text>
           Already have an account?{' '}
-          <Link to="/login" className="link">
+          <Link to="/login">
             <Strong>Sign in here</Strong>
           </Link>
         </Text>
