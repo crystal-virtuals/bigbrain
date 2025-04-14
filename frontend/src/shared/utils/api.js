@@ -2,7 +2,7 @@
                          API Calls
 ***************************************************************/
 import axios from 'axios'
-import { BACKEND_PORT } from '../../../backend.config.json'
+import { BACKEND_PORT } from '@frontend/backend.config.json'
 import { getAuthToken, removeAuthToken } from './auth.js'
 
 const instance = axios.create({
