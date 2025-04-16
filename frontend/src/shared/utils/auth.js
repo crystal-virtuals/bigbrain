@@ -1,14 +1,15 @@
 /***************************************************************
-                         Auth Functions
+    Token in Local Storage (User is stored in React Context)
 ***************************************************************/
-export const storeAuthToken = (authToken) => {
-  localStorage.setItem('authToken', authToken);
+export const setAuthToken = (token) => {
+  localStorage.setItem('token', token);
 }
 
 export const getAuthToken = () => {
-  return localStorage.getItem('authToken');
+  const token = localStorage.getItem('token');
+  return token ? token : null;
 }
 
 export const removeAuthToken = () => {
-  localStorage.removeItem('authToken');
+  localStorage.clear();
 }

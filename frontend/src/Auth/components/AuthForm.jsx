@@ -2,17 +2,21 @@ import { Button } from '@components/button';
 import { ErrorMessage, Field, Label } from '@components/fieldset';
 import { Heading } from '@components/heading';
 import { Input } from '@components/input';
+import { Link } from '@components/link';
 import { Strong, Text } from '@components/text';
+import { useToast } from '@hooks/toast';
 import { getFormErrors, getInputErrors } from '@utils/validation.js';
 import { useState } from 'react';
-import { Alert } from '@components/toast';
-import { Link } from '@components/link';
 
 export default function AuthForm({ isLogin, onSubmit }) {
+  const toastify = useToast();
   const [errors, setErrors] = useState(new Map());
-  const [showError, setShowError] = useState(false);
-  const [status, setStatus] = useState('typing');
-  const [formData, setFormData] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState(
+    isLogin
+      ? { email: '', password: '' }
+      : { email: '', password: '', name: '', confirmPassword: '' }
+  );
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -23,32 +27,31 @@ export default function AuthForm({ isLogin, onSubmit }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setStatus('submitting');
+    setLoading(true);
 
     // validate the form
     const newErrors = getFormErrors(formData);
     setErrors(newErrors);
     if (newErrors.size > 0) {
-      setStatus('typing');
+      setLoading(false);
       return;
     }
 
+    // send the form data to the server
     onSubmit(formData)
-      .then(() => {
-        // clear the form
-        setFormData({});
+      .then((response) => {
+        setFormData(null);
         setErrors(new Map());
-        setShowError(false);
+        toastify.success(response.message, response.description);
       })
       .catch((error) => {
-        // show the error
         const newErrors = new Map();
-        newErrors.set('email', error);
+        newErrors.set('email', error.data);
         setErrors(newErrors);
-        setShowError(true);
+        toastify.error(error.message, error.description);
       })
       .finally(() => {
-        setStatus('typing');
+        setLoading(false);
       });
   };
 
@@ -58,15 +61,9 @@ export default function AuthForm({ isLogin, onSubmit }) {
       className="grid w-full max-w-sm grid-cols-1 gap-8"
       noValidate
     >
-      <Heading>Create your account</Heading>
-
-      {/* Alert placeholder */}
-      {showError && errors.size > 0 && (
-        <Alert
-          data={errors}
-          onDismiss={setShowError(false)}
-        />
-      )}
+      <Heading>
+        {isLogin ? 'Sign in to your account' : 'Create your account'}
+      </Heading>
 
       {/* Email Field (always shown) */}
       <Field>
@@ -126,6 +123,7 @@ export default function AuthForm({ isLogin, onSubmit }) {
             value={formData.confirmPassword}
             invalid={errors.has('confirmPassword')}
             onChange={handleChange}
+            disabled={isLogin}
           />
           {errors.has('confirmPassword') && (
             <ErrorMessage>{errors.get('confirmPassword')}</ErrorMessage>
@@ -136,10 +134,11 @@ export default function AuthForm({ isLogin, onSubmit }) {
       {/* Submit Button */}
       <Button
         type="submit"
-        className="w-full"
-        disabled={status === 'submitting'}
+        className="w-full items-center"
+        disabled={loading}
       >
-        {isLogin ? 'Login' : 'Create account'}
+        {loading && <span className="loading loading-spinner"></span> }
+        <span>{isLogin ? 'Login' : 'Create account'}</span>
       </Button>
 
       {/* Toggle between login and register */}
@@ -149,7 +148,6 @@ export default function AuthForm({ isLogin, onSubmit }) {
           <Strong>Sign {isLogin ? 'up' : 'in'}</Strong>
         </Link>
       </Text>
-
     </form>
   );
 }

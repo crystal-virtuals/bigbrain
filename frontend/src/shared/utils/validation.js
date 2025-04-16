@@ -25,13 +25,11 @@ export const getInputErrors = (name, value, formData, errors) => {
 
 export const getFormErrors = (formData) => {
   const errors = new Map();
-
-  Object.keys(formData).forEach((name) => {
-    const errorMessage = validateInput(name, formData[name], formData.password);
-    if (errorMessage) {
+  // iterate through object
+  Object.entries(formData).forEach(([name, value]) => {
+    const errorMessage = validateInput(name, value, formData.password);
+    if (!isEmpty(errorMessage)) {
       errors.set(name, errorMessage);
-    } else {
-      errors.delete(name);
     }
   });
 
