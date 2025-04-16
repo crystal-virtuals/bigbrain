@@ -24,6 +24,7 @@ export default defineConfig({
       '@frontend': path.resolve(__dirname, '../frontend'),
       '@utils': path.resolve(__dirname, '/src/shared/utils'),
       '@components': path.resolve(__dirname, '/src/shared/components'),
+      '@hooks': path.resolve(__dirname, '/src/shared/hooks'),
     }
   }
 })
