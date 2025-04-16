@@ -3,28 +3,37 @@
 ***************************************************************/
 import axios from 'axios'
 import { BACKEND_PORT } from '@frontend/backend.config.json'
-import { getAuthToken, removeAuthToken } from './auth.js'
+import { getAuthToken } from './auth.js'
 
 const instance = axios.create({
   baseURL: `http://localhost:${BACKEND_PORT}`,
   headers: {
-    'Content-Type': 'application/json',
-    'Authorization': getAuthToken() ? `Bearer ${getAuthToken()}` : undefined,
+    'Content-Type': 'application/json'
   }
 });
 
+// Intercept the request before it is sent and use the latest token
+instance.interceptors.request.use((config) => {
+  const token = getAuthToken();
+  if (token) {
+    config.headers['Authorization'] = `Bearer ${token}`;
+  } else {
+    delete config.headers['Authorization'];
+  }
+  return config;
+});
+
+
+// Intercept the response and handle errors
 instance.interceptors.response.use(
   (response) => response.data,
   (error) => {
-    if (error.response?.status === 403) {
-      removeAuthToken();
-      alert('Token removed! Forbidden access.');
-      console.trace('Token Removed');
-    }
-
-    return Promise.reject(
-      error.response?.data?.error || error.response?.data || error.message
-    );
+    console.error('API error:', error);
+    return Promise.reject({
+      status: error.response?.status || 500,
+      data: error.response?.data?.error || null,
+      message: error.message,
+    });
   }
 );
 
@@ -36,6 +45,7 @@ const apiCall = (method, url, payload) => {
     params: ['GET', 'DELETE'].includes(method) ? payload : undefined,
   });
 };
+
 
 export const api = {
   get: (url, payload) => apiCall('GET', url, payload),
