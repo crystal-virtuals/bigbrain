@@ -1,6 +1,6 @@
 import { useAuth } from '@hooks/auth';
 import { api } from '@utils/api';
-import AuthForm from './components/AuthForm';
+import AuthForm from './AuthForm';
 
 export default function Login() {
   const { login } = useAuth();
