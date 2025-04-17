@@ -25,6 +25,10 @@ export default defineConfig({
       '@utils': path.resolve(__dirname, '/src/shared/utils'),
       '@components': path.resolve(__dirname, '/src/shared/components'),
       '@hooks': path.resolve(__dirname, '/src/shared/hooks'),
+      '@pages': path.resolve(__dirname, '/src/shared/pages'),
+      '@layouts': path.resolve(__dirname, '/src/shared/layouts'),
+      '@routes': path.resolve(__dirname, '/src/shared/routes'),
+      '@dashboard': path.resolve(__dirname, '/src/dashboard'),
     }
   }
 })

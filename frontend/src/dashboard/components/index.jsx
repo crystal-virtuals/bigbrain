@@ -1,2 +1,3 @@
-export { DashboardSidebar as Sidebar } from './db-sidebar';
-export { DashboardNavbar as Navbar } from './db-navbar';
+export { default as Sidebar } from './sidebar';
+export { default as Navbar } from './navbar';
+export { NavbarProfileDropdown, SidebarProfileDropdown } from './dropdown';

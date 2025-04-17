@@ -4,8 +4,10 @@
   include: ;
   exclude: ;
   logs: true;
+  themes: false;
 }
 
 @theme {
   --font-sans: Inter, sans-serif;
+  --color-accent: var(--color-pink-500);
 }
