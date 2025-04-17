@@ -6,13 +6,17 @@ const ToastProvider = ({ children }) => {
   const [toasts, setToasts] = useState([]);
 
   const addToast = (type, message, description) => {
-    const id = new Date().getTime();
+    const timestamp = Date.now();
+    const id = `${type}-${timestamp}`;
+    // If toast with same id already exists, remove it (same timestamp + same type)
+    const existingToast = toasts.find((toast) => toast.id === id);
+    if (existingToast) removeToast(id);
     const newToast = {
       id,
       type,
       message,
       description,
-      show: true,
+      timestamp,
     };
     setToasts((prev) => [...prev, newToast]);
 
