@@ -3,7 +3,13 @@
 ***************************************************************/
 import axios from 'axios'
 import { BACKEND_PORT } from '@frontend/backend.config.json'
-import { getAuthToken } from './auth.js'
+import { getAuthToken } from './token.js'
+
+const statusText = {
+  200: 'OK',
+  400: 'Bad Input',
+  403: 'Unauthorized',
+}
 
 const instance = axios.create({
   baseURL: `http://localhost:${BACKEND_PORT}`,
@@ -31,8 +37,9 @@ instance.interceptors.response.use(
     console.error('API error:', error);
     return Promise.reject({
       status: error.response?.status || 500,
-      data: error.response?.data?.error || null,
-      message: error.message,
+      statusText: statusText[error.response?.status] || 'Unknown Error',
+      data: error.response?.data?.error || error.message,
+      request: error.config.data
     });
   }
 );
