@@ -6,7 +6,15 @@ const useAuth = () => {
   if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
-  return context;
+
+  const user = {
+    email: context.user?.email,
+    name: context.user?.name,
+    role: context.user?.role || 'admin',
+    authenticated: !!context.user,
+  }
+
+  return { ...context, user };
 }
 
 export default useAuth;
