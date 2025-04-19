@@ -1,4 +1,3 @@
-import { Link } from '@components/link';
 import {
   Navbar,
   NavbarItem,
@@ -6,18 +5,17 @@ import {
   NavbarSection,
   NavbarSpacer,
 } from '@components/navbar';
-import { NavbarProfileDropdown } from './db-profile-dropdown';
-import { Logo } from '@components/logo';
+import { Branding } from '@/dashboard/components';
+import { NavbarProfileDropdown } from './dropdown';
+import { actions, navigation } from '@/dashboard/constants';
 
-export function DashboardNavbar({ user, actions, navItems }) {
+export default function DashboardNavbar({ user }) {
   return (
     <Navbar>
-      <Link to="/" aria-label="Home">
-        <Logo className="px-2" />
-      </Link>
+      <Branding />
       <NavbarSection className="max-lg:hidden">
         {/* Navigation items */}
-        {navItems.map(({ label, url, current }) => (
+        {navigation.map(({ label, url, current }) => (
           <NavbarItem key={label} href={url} current={current}>
             {label}
           </NavbarItem>

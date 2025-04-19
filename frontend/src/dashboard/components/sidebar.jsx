@@ -1,5 +1,3 @@
-import { Link } from '@components/link';
-import { Logo } from '@components/logo';
 import {
   Sidebar,
   SidebarBody,
@@ -12,22 +10,21 @@ import {
   SidebarSection,
   SidebarSpacer,
 } from '@components/sidebar';
-import { ThemeController } from '@components/theme-controller';
 import { Cog6ToothIcon, QuestionMarkCircleIcon, SparklesIcon } from '@heroicons/react/20/solid';
-import { SidebarProfileDropdown } from './db-profile-dropdown';
+import { SidebarProfileDropdown } from './dropdown';
+import { actions, navigation } from '@/dashboard/constants';
+import { Branding } from '@/dashboard/components';
 
-export function DashboardSidebar({ user, actions, navItems }) {
+export default function DashboardSidebar({ user }) {
   return (
     <Sidebar>
       <SidebarHeader>
-        <Link to="/" aria-label="Home">
-          <Logo className="px-1" />
-        </Link>
+        <Branding />
       </SidebarHeader>
       <SidebarBody>
         <SidebarSection>
           {/* Navigation items */}
-          {navItems.map(({ label, url, Icon, current }) => (
+          {navigation.map(({ label, url, Icon, current }) => (
             <SidebarItem key={label} href={url} current={current}>
               <Icon />
               <SidebarLabel>{label}</SidebarLabel>
@@ -47,10 +44,6 @@ export function DashboardSidebar({ user, actions, navItems }) {
         </SidebarSection>
         <SidebarSpacer />
         <SidebarSection>
-          <SidebarItem>
-            <ThemeController className=""/>
-            <SidebarLabel>Settings</SidebarLabel>
-          </SidebarItem>
           <SidebarItem href="/settings">
             <Cog6ToothIcon />
             <SidebarLabel>Settings</SidebarLabel>

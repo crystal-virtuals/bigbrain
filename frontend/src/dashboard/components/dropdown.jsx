@@ -1,20 +1,14 @@
-import { Dropdown, DropdownButton, DropdownItem, DropdownMenu, DropdownLabel } from '@components/dropdown';
+import { Dropdown, DropdownButton, DropdownItem, DropdownLabel, DropdownMenu } from '@components/dropdown';
 import { NavbarItem } from '@components/navbar';
 import { SidebarItem } from '@components/sidebar';
 import { UserAvatar } from '@components/user-avatar';
 import { ChevronUpIcon } from '@heroicons/react/16/solid';
-import { ArrowRightStartOnRectangleIcon, Cog8ToothIcon, UserIcon } from '@heroicons/react/16/solid';
-
-const userNavItems = [
-  { label: 'My Profile', url: '/my-profile', Icon: UserIcon },
-  { label: 'Settings', url: '/settings', Icon: Cog8ToothIcon },
-  { label: 'Log out', url: '/logout', Icon: ArrowRightStartOnRectangleIcon },
-];
+import { userNavigation } from '@/dashboard/constants';
 
 function ProfileDropdownMenu() {
   return (
     <DropdownMenu className="min-w-64">
-      {userNavItems.map(({ label, url, Icon }) => (
+      {userNavigation.map(({ label, url, Icon }) => (
         <DropdownItem key={label} href={url}>
           <Icon />
           <DropdownLabel>{label}</DropdownLabel>
@@ -52,7 +46,7 @@ export function SidebarProfileDropdown({ user }) {
         </span>
         <ChevronUpIcon />
       </DropdownButton>
-      <ProfileDropdownMenu anchor="top start" navItems={userNavItems} />
+      <ProfileDropdownMenu anchor="top start" navItems={userNavigation} />
     </Dropdown>
   );
 }
