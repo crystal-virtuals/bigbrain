@@ -63,7 +63,7 @@ export default function AuthForm({ isLogin, onSubmit }) {
       className="grid w-full max-w-sm grid-cols-1 gap-8"
       noValidate
     >
-      <Branding className="h-6" />
+      <Branding size="md" className="-ml-3" />
       <Heading>
         {isLogin ? 'Sign in to your account' : 'Create your account'}
       </Heading>

@@ -1,5 +1,5 @@
 import { useAuth } from '@hooks/auth';
-import { api } from '@utils/api';
+import { api } from "@services/api";
 import AuthForm from './AuthForm';
 
 export default function Register() {
