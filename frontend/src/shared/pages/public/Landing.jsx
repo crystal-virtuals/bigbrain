@@ -1,8 +1,44 @@
+import { Branding } from '@components/branding';
 import { TextLink } from '@components/text';
-import { Logo } from '@components/logo';
-import { Button } from '@components/button'
+import { useAuth } from '@hooks/auth';
+import { useNavigate } from 'react-router-dom';
+import clsx from 'clsx';
+
+function ButtonCTA({ children, color, onClick }) {
+  const colors = {
+    white: 'text-pink-500 bg-white hover:bg-pink-100',
+    dark: 'text-white bg-pink-500/60 hover:bg-pink-500/70',
+    gradient:
+      'bg-gradient-to-r from-pink-300 to-pink-600 bg-origin-border text-white hover:from-pink-400 hover:to-pink-700',
+  };
+
+  return (
+    <button
+      type="button"
+      className={clsx(
+        colors[color],
+        'flex items-center justify-center rounded-md border border-transparent px-4 py-3 text-base font-medium shadow-xs sm:px-8'
+      )}
+      onClick={onClick}
+    >
+      {children}
+    </button>
+  );
+}
 
 export default function Landing() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const authenticate = () => {
+    // Redirect to dashboard if logged in
+    if (user && user.authenticated) {
+      return navigate('/dashboard');
+    }
+    // Else, show the public landing page
+    return navigate('/login');
+  };
+
   return (
     <div className="bg-white dark:bg-gray-900 h-full min-h-full">
       <header className="absolute inset-x-0 top-0 z-50">
@@ -16,16 +52,13 @@ export default function Landing() {
               aria-label="Home"
               className="-m-1.5 p-1.5 flex items-center gap-2 py-1.5 w-full justify-start"
             >
-              <Logo className="size-10" />
-              <span className="text-base font-bold leading-none tracking-wider hidden sm:block text-zinc-950 dark:text-zinc-100">
-                BigBrain
-              </span>
+              <Branding size="sm" />
             </TextLink>
           </div>
 
           <div className="lg:flex lg:flex-1 lg:justify-end">
             <TextLink to="/login" className="text-sm/6 font-semibold">
-              Get Started <span aria-hidden="true">&rarr;</span>
+              Log in <span aria-hidden="true">&rarr;</span>
             </TextLink>
           </div>
         </nav>
@@ -53,21 +86,14 @@ export default function Landing() {
               Anim aute id magna aliqua ad ad non deserunt sunt. Qui irure qui
               lorem cupidatat commodo. Elit sunt amet fugiat veniam occaecat.
             </p>
-            <div className="mt-10 flex items-center justify-center gap-x-6">
-              <Button
-                href="/login"
-                color="dark/white"
-                className="h-12 w-32 flex items-center justify-center"
-              >
-                Log In
-              </Button>
-              <Button
-                href="/register"
-                color="light"
-                className="h-12 w-32 flex items-center justify-center"
-              >
-                Sign Up
-              </Button>
+
+            <div className="mt-10 flex items-center justify-center gap-x-8">
+              <ButtonCTA color="gradient" onClick={authenticate}>
+                Get started
+              </ButtonCTA>
+              <TextLink to="/register" className="text-sm/6 font-semibold">
+                Sign up today <span aria-hidden="true">&rarr;</span>
+              </TextLink>
             </div>
           </div>
         </div>
@@ -86,7 +112,6 @@ export default function Landing() {
       </main>
 
       {/* Footer */}
-      {/* <footer className="mt-32 bg-gray-900 sm:mt-56"> */}
       <footer className="bg-white dark:bg-gray-900 fixed inset-x-0 bottom-0 z-50">
         <div className="px-16 border-t border-gray-900/10 dark:border-white/10 py-10 md:flex md:items-center md:justify-between">
           <p className="mt-8 text-center text-sm/6 text-gray-600 dark:text-gray-400 md:order-1 md:mt-0">
