@@ -40,10 +40,10 @@ export default function GameMenu({ game, onDelete }) {
         description="You are about to delete this game and all of its data. No one will be able to access this game ever again."
         isOpen={isOpen}
         setIsOpen={setIsOpen}
-        handleConfirm={deleteGame}
         isLoading={isLoading}
         error={error}
         confirmText="Delete"
+        onConfirm={deleteGame}
       />
       {/* <Alert open={isOpen} onClose={setIsOpen}>
         <div className="flex items-start">

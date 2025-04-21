@@ -3,21 +3,21 @@ import { Heading } from '@components/heading';
 import { SidebarLayout } from '@components/sidebar-layout';
 import { useOutletContext } from 'react-router-dom';
 import { Navbar, Sidebar } from '@/admin/components';
-
+import { Divider } from '@components/divider';
 function DashboardLayout({ user, children }) {
   return (
     <SidebarLayout
       navbar={<Navbar user={user} />}
       sidebar={<Sidebar user={user} />}
     >
-      <div className="container mx-auto mt-6">{children}</div>;
+      <div className="container mx-auto mt-6">{children}</div>
     </SidebarLayout>
   );
 }
 
 function DashboardHeading({ createGame }) {
   return (
-    <div className="flex w-full flex-wrap items-end justify-between gap-4 border-b border-zinc-950/10 pb-6 dark:border-white/10">
+    <div className="flex w-full flex-wrap items-end justify-between gap-4">
       <Heading>Dashboard</Heading>
       <CreateGameButton onCreate={createGame} />
     </div>
@@ -29,6 +29,7 @@ export default function Dashboard() {
   return (
     <DashboardLayout user={user}>
       <DashboardHeading createGame={createGame} />
+      <Divider className="my-6" />
       <GameCardList games={games} onDelete={deleteGame} onCreate={createGame}/>
     </DashboardLayout>
   );

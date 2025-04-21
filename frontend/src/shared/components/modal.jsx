@@ -32,7 +32,7 @@ export function AlertModal( { style = 'error', title, description, confirmText =
         <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
           <AlertTitle>{title}</AlertTitle>
           <AlertDescription className="flex flex-col gap-2">
-            <Text>{description}</Text>
+            {description}
             <span className="font-semibold text-gray-900 dark:text-zinc-300">Are you sure? This action cannot be undone.</span>
           </AlertDescription>
         </div>
