@@ -1,21 +1,12 @@
 import {
-  Alert,
-  AlertActions,
-  AlertDescription,
-  AlertTitle,
-} from '@components/alert';
-import { Button, ButtonSubmit } from '@components/button';
-import {
   Dropdown,
   DropdownButton,
   DropdownItem,
   DropdownMenu,
 } from '@components/dropdown';
-import { ErrorMessage } from '@components/fieldset';
-import { Text } from '@components/text';
 import { EllipsisVerticalIcon } from '@heroicons/react/20/solid';
 import { useState } from 'react';
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { AlertModal } from '@components/modal';
 
 export default function GameMenu({ game, onDelete }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -34,17 +25,27 @@ export default function GameMenu({ game, onDelete }) {
       {/* Menu Button */}
       <Dropdown>
         <DropdownButton plain aria-label="More options">
-          <EllipsisVerticalIcon aria-hidden="true" className="size-8" />
+          <EllipsisVerticalIcon aria-hidden="true" className="size-6 text-zinc-600"/>
         </DropdownButton>
         <DropdownMenu className="hover:cursor-pointer">
           <DropdownItem href={`/game/${game.id}`}>View</DropdownItem>
-          <DropdownItem href={`/game/${game.id}/edit`}>Edit</DropdownItem>
+          <DropdownItem href={`/game/${game.id}`}>Edit</DropdownItem>
           <DropdownItem onClick={() => setIsOpen(true)}>Delete</DropdownItem>
         </DropdownMenu>
       </Dropdown>
 
       {/* Delete Confirmation Alert */}
-      <Alert open={isOpen} onClose={setIsOpen}>
+      <AlertModal
+        title="Delete this game?"
+        description="You are about to delete this game and all of its data. No one will be able to access this game ever again."
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        handleConfirm={deleteGame}
+        isLoading={isLoading}
+        error={error}
+        confirmText="Delete"
+      />
+      {/* <Alert open={isOpen} onClose={setIsOpen}>
         <div className="flex items-start">
           <div className="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:size-10">
             <ExclamationTriangleIcon
@@ -72,7 +73,7 @@ export default function GameMenu({ game, onDelete }) {
           </ButtonSubmit>
         </AlertActions>
         {!!error && <ErrorMessage>{error}</ErrorMessage>}
-      </Alert>
+      </Alert> */}
     </>
   );
 }

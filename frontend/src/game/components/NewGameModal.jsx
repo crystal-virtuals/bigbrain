@@ -1,10 +1,9 @@
-import { Button } from '@components/button';
+import { Button, SubmitButton } from '@components/button';
 import { Dialog, DialogActions, DialogBody, DialogDescription, DialogTitle } from '@components/dialog';
 import { ErrorMessage, Field, Label } from '@components/fieldset';
 import { Input } from '@components/input';
 import { isEmptyString } from '@utils/helpers';
 import { useState } from 'react';
-import { ButtonSubmit } from '../../shared/components/button';
 
 export default function NewGameModal({ isOpen, setIsOpen, onSubmit }) {
   const [name, setName] = useState('');
@@ -67,9 +66,9 @@ export default function NewGameModal({ isOpen, setIsOpen, onSubmit }) {
             <Button plain onClick={reset}>
               Cancel
             </Button>
-            <ButtonSubmit onClick={handleSubmit} loading={isLoading}>
+            <SubmitButton onClick={handleSubmit} loading={isLoading}>
               Create
-            </ButtonSubmit>
+            </SubmitButton>
           </DialogActions>
         </form>
       </Dialog>
