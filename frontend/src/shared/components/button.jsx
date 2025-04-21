@@ -197,3 +197,16 @@ export function TouchTarget({ children }) {
     </>
   )
 }
+
+export function SubmitButton({ children, onClick, loading, ...props }) {
+  return (
+    <Button type="submit" onClick={onClick} disabled={loading} {...props}>
+      <div className="flex items-center gap-2">
+        {loading && (
+          <span className="loading loading-spinner loading-sm"></span>
+        )}
+        {children}
+      </div>
+    </Button>
+  );
+}
