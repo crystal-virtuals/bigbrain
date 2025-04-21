@@ -7,6 +7,7 @@ import {
   InformationCircleIcon,
   ExclamationTriangleIcon,
 } from '@heroicons/react/20/solid';
+import clsx from 'clsx';
 
 const toastMap = {
   success: {
@@ -39,7 +40,7 @@ const toastMap = {
   },
 };
 
-function ToastWrapper({ type, message, description, onDismiss }) {
+function ToastWrapper({ type, message, description, onDismiss, className }) {
   const toast = toastMap[type];
   const bgClass = 'rounded-md p-4 ' + toast.bg;
   const messageClass = 'text-sm font-medium ' + toast.message;
@@ -47,7 +48,7 @@ function ToastWrapper({ type, message, description, onDismiss }) {
   const btnClass = 'inline-flex rounded-md p-1.5 focus:ring-2 focus:ring-offset-2 focus:outline-hidden ' + toast.btn;
 
   return (
-    <div className={bgClass}>
+    <div className={clsx(bgClass, className)}>
       <div className="flex">
         <div className="shrink-0">
           {toast.icon}
@@ -72,24 +73,25 @@ function ToastWrapper({ type, message, description, onDismiss }) {
   );
 }
 
-export default function Toast({ type, message, description = '', onDismiss }) {
+export default function Toast({ type, message, description = '', onDismiss, className }) {
   const [show, setShow] = useState(true);
 
   const handleDismiss = () => {
     setShow(false);
-    onDismiss();
+    if (onDismiss) onDismiss();
   };
 
   return (
     <>
       {/* ToastWrapper panel, dynamically insert this into the live region when it needs to be displayed */}
       <Transition show={show}>
-        <div className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg bg-white shadow-lg ring-1 ring-black/5 transition data-closed:opacity-0 data-enter:transform data-enter:duration-300 data-enter:ease-out data-closed:data-enter:translate-y-2 data-leave:duration-100 data-leave:ease-in data-closed:data-enter:sm:translate-x-2 data-closed:data-enter:sm:translate-y-0">
+        <div className='pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg bg-white shadow-lg ring-1 ring-black/5 transition data-closed:opacity-0 data-enter:transform data-enter:duration-300 data-enter:ease-out data-closed:data-enter:translate-y-2 data-leave:duration-100 data-leave:ease-in data-closed:data-enter:sm:translate-x-2 data-closed:data-enter:sm:translate-y-0'>
           <ToastWrapper
             type={type}
             message={message}
             description={description}
             onDismiss={handleDismiss}
+            className={className}
           />
         </div>
       </Transition>
