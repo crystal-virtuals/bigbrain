@@ -1,24 +1,20 @@
+import { AdminLayout } from '@/admin';
 import { AuthLayout, Login, Logout, Register } from '@/auth';
-import { Dashboard, DashboardHome } from '@/dashboard';
+import { Dashboard } from '@/dashboard';
+import EditGame from '@/game/EditGame';
+import { PrivateRoute } from '@/routes';
 import { AuthProvider } from '@hooks/auth';
 import { ToastProvider } from '@hooks/toast';
 import { NotFound, Unauthorized } from '@pages/errors';
-import { Landing, Home } from '@pages/public';
-import { Route, Routes, Outlet } from 'react-router-dom';
-import { PrivateRoute } from '@/routes';
-
-function EditGame() {
-  return (
-    <div>
-      <h1>Edit Game</h1>
-    </div>
-  );
-}
+import { Home, Landing } from '@pages/public';
+import { Outlet, Route, Routes, useParams } from 'react-router-dom';
 
 function EditQuestion() {
+  const { gameId, questionId } = useParams();
+
   return (
     <div>
-      <h1>Edit Question</h1>
+      Editing question {questionId} of game {gameId}
     </div>
   );
 }
@@ -42,6 +38,7 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<AppLayout />}>
+
         <Route index element={<Landing />} />
         <Route path="home" element={<Home />} />
         <Route path="403" element={<Unauthorized />} />
@@ -56,13 +53,10 @@ function App() {
 
         {/* Private routes (user must be authorised) */}
         <Route element={<PrivateRoute />}>
-          <Route path="dashboard" element={<Dashboard />}>
-            <Route index element={<DashboardHome />} />
+          <Route element={<AdminLayout />}>
+            <Route path="dashboard" element={<Dashboard />} />
             <Route path="game/:gameId" element={<EditGame />} />
-            <Route
-              path="game/:gameId/question/:questionId"
-              element={<EditQuestion />}
-            />
+            <Route path="game/:gameId/question/:questionId" element={<EditQuestion />} />
           </Route>
         </Route>
 

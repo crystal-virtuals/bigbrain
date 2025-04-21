@@ -23,12 +23,13 @@ export default defineConfig({
       '@': path.resolve(__dirname, '/src'),
       '@frontend': path.resolve(__dirname, '../frontend'),
       '@utils': path.resolve(__dirname, '/src/shared/utils'),
+      '@services': path.resolve(__dirname, '/src/shared/services'),
       '@components': path.resolve(__dirname, '/src/shared/components'),
       '@hooks': path.resolve(__dirname, '/src/shared/hooks'),
       '@pages': path.resolve(__dirname, '/src/shared/pages'),
       '@layouts': path.resolve(__dirname, '/src/shared/layouts'),
       '@routes': path.resolve(__dirname, '/src/shared/routes'),
-      '@dashboard': path.resolve(__dirname, '/src/dashboard'),
+      '@assets': path.resolve(__dirname, '/src/shared/assets'),
     }
   }
 })
