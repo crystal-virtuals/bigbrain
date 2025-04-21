@@ -1,7 +1,7 @@
-import * as Headless from '@headlessui/react'
-import clsx from 'clsx'
-import React, { forwardRef } from 'react'
-import { Link } from './link'
+import * as Headless from '@headlessui/react';
+import clsx from 'clsx';
+import React, { forwardRef } from 'react';
+import { Link } from './link';
 
 const styles = {
   base: [
@@ -156,32 +156,77 @@ const styles = {
       '[--btn-icon:var(--color-rose-300)] data-active:[--btn-icon:var(--color-rose-200)] data-hover:[--btn-icon:var(--color-rose-200)]',
     ],
   },
-}
+};
 
-export function Spinner ({ loading }) {
+export function Spinner({ loading }) {
   return loading ? (
     <span className="loading loading-spinner loading-sm" />
-  ) : null
+  ) : null;
 }
 
-export const Button = forwardRef(function Button({ color, outline, plain, loading, className, children, ...props }, ref) {
+// export const Button = forwardRef(function Button({ color, outline, plain, className, children, ...props }, ref) {
+//   let classes = clsx(
+//     styles.base,
+//     outline ? styles.outline : plain ? styles.plain : clsx(styles.solid, styles.colors[color ?? 'dark/zinc']),
+//     className,
+//   )
+
+//   return 'href' in props ? (
+//     <Link {...props} className={classes} ref={ref}>
+//       <TouchTarget>{children}</TouchTarget>
+//     </Link>
+//   ) : (
+//     <Headless.Button {...props} className={clsx(classes, 'cursor-pointer')} ref={ref}>
+//       <TouchTarget>{children}</TouchTarget>
+//     </Headless.Button>
+//   )
+// })
+
+export const Button = forwardRef(function Button({ color, outline, plain, loading = false, disabled = false, className, children, ...props }, ref) {
+  const isDisabled = disabled || loading;
   let classes = clsx(
     styles.base,
     outline ? styles.outline : plain ? styles.plain : clsx(styles.solid, styles.colors[color ?? 'dark/zinc']),
+    isDisabled && 'cursor-not-allowed',
+    loading && 'cursor-progress',
     className,
   )
 
+  const content = (
+    <TouchTarget>
+      {loading ? (
+        <span className="flex items-center gap-2">
+          <span className="loading loading-spinner loading-sm" />
+          {children}
+        </span>
+      ) : (
+        children
+      )}
+    </TouchTarget>
+  )
 
   return 'href' in props ? (
-    <Link {...props} className={classes} ref={ref}>
-      <TouchTarget>{children}</TouchTarget>
+    <Link
+      {...props}
+      ref={ref}
+      className={classes}
+      aria-disabled={isDisabled || undefined}
+    >
+      {content}
     </Link>
   ) : (
-    <Headless.Button {...props} className={clsx(classes, 'cursor-default')} ref={ref}>
-      <TouchTarget>{children}</TouchTarget>
+    <Headless.Button
+      {...props}
+      ref={ref}
+      disabled={isDisabled}
+      className={classes}
+      aria-disabled={isDisabled || undefined}
+      aria-busy={loading || undefined}
+    >
+      {content}
     </Headless.Button>
-  )
-})
+  );
+});
 
 /**
  * Expand the hit area to at least 44×44px on touch devices
@@ -195,7 +240,7 @@ export function TouchTarget({ children }) {
       />
       {children}
     </>
-  )
+  );
 }
 
 export function SubmitButton({ children, onClick, loading, ...props }) {
