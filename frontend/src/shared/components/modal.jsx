@@ -1,5 +1,5 @@
 import { Alert, AlertActions, AlertDescription, AlertTitle } from '@components/alert';
-import { Button, SubmitButton } from '@components/button';
+import { Button } from '@components/button';
 import { Dialog, DialogActions, DialogDescription, DialogTitle } from '@components/dialog';
 import { ErrorMessage } from '@components/fieldset';
 import { CheckIcon, ExclamationTriangleIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
@@ -41,9 +41,9 @@ export function AlertModal( { style = 'error', title, description, confirmText =
         <Button plain onClick={() => setIsOpen(false)} disabled={isLoading}>
           Cancel
         </Button>
-        <SubmitButton color={styles.color} onClick={onConfirm} loading={isLoading}>
+        <Button type="submit" color={styles.color} onClick={onConfirm} loading={isLoading}>
           {confirmText}
-        </SubmitButton>
+        </Button>
       </AlertActions>
       {!!error && <ErrorMessage>{error}</ErrorMessage>}
     </Alert>
