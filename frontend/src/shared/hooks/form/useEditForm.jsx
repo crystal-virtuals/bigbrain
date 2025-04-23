@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 
-export function useEditForm(initialData, onSubmit) {
+function useEditForm(initialData, onSubmit) {
   const [formData, setFormData] = useState(initialData);
   const [isDirty, setIsDirty] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -15,12 +15,15 @@ export function useEditForm(initialData, onSubmit) {
 
   // Check if form is dirty whenever formData changes
   useEffect(() => {
+    console.log('Checking if form is dirty');
     const dirty = !isEqual(formData, initialRef.current);
     setIsDirty(dirty);
   }, [formData]);
 
-  // Update initialData ref if game prop changes
+  // Update initialData ref if it changes
   useEffect(() => {
+    if (isEqual(initialData, initialRef.current)) return;
+    console.log('Updating initialRef with new initialData');
     initialRef.current = initialData;
     setFormData(initialData);
   }, [initialData]);
@@ -54,6 +57,7 @@ export function useEditForm(initialData, onSubmit) {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -70,6 +74,8 @@ export function useEditForm(initialData, onSubmit) {
         setError(err.message || 'Failed to save changes.');
       })
       .finally(() => {
+        console.log('Form submission completed');
+        console.log('New formData:', formData);
         setIsSubmitting(false);
       });
   };
@@ -91,3 +97,5 @@ export function useEditForm(initialData, onSubmit) {
     handleChange,
   };
 }
+
+export default useEditForm;
