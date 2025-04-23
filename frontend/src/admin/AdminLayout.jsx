@@ -1,61 +1,71 @@
-import { fetchGames, updateGames } from '@/game/utils/api';
-import { newGame, isEqual } from '@/game/utils/helpers';
 import { useAuth } from '@hooks/auth';
-import { useToast } from '@hooks/toast';
+import { fetchGames, updateGames } from '@services/api';
+import { isEqual, newGame } from '@utils/game';
 import { useEffect, useState } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Navigate, Outlet, useNavigate } from 'react-router-dom';
+
+const Authenticate = ({ user, redirectPath="/login", children }) => {
+  // wait for user to be set
+  if (user === null) return null;
+
+  if (user && !user.authenticated) {
+    console.log('User is not authenticated, redirecting to login');
+    return <Navigate to={redirectPath} replace />;
+  }
+
+  return children ? children : <Outlet />;
+};
 
 function AdminLayout() {
-  const [games, setGames] = useState([]);
+  const [games, setGames] = useState(null);
   const { user } = useAuth();
-  const toastify = useToast();
   const navigate = useNavigate();
 
-  // Fetch games on mount
   useEffect(() => {
+    let isMounted = true;
+
+    // fetch games on first render
     fetchGames()
       .then((games) => {
-        console.log('Got all games:', games);
+        if (!isMounted) return;
+        console.log('Running useEffect to fetch games in AdminLayout:', games);
         setGames(games);
       })
       .catch((error) => {
+        if (!isMounted) return;
         console.error('Error fetching games:', error);
-        toastify.error(error.data);
-        (error.status === 403) && navigate('/403');
+        setGames(null);
+        if (error.status === 403) navigate('/403');
       });
+
+    // cleanup after the component unmounts
+    return () => {
+      isMounted = false;
+    }
+
   }, []);
 
   const createGame = (name) => {
     const updatedGames = [...games, newGame(name, user)];
-    return updateGames(updatedGames)
-      .then(() => {
-        toastify.success('Successfully created game');
-        setGames(updatedGames);
-      })
-      .catch((error) => {
-        toastify.error('Failed to create game. Please try again later.');
-        return Promise.reject(error);
-      });
+    return updateGames(updatedGames).then(() => setGames(updatedGames));
   };
 
   const deleteGame = (gameId) => {
-    const updatedGames = games.filter((game) => game.id !== gameId);
-    return updateGames(updatedGames)
-      .then(() => {
-        toastify.success('Successfully deleted game');
-        setGames(updatedGames);
-      })
-      .catch((err) => {
-        console.error('Error deleting game:', err);
-        toastify.error('Failed to delete game. Please try again later.');
-        return Promise.reject(err);
-      });
+    const updatedGames = games.filter((game) => !isEqual(game, gameId));
+    return updateGames(updatedGames).then(() => setGames(updatedGames));
   }
 
+  const updateGame = (editedGame) => {
+    const updatedGames = games.map((game) =>
+      isEqual(game, editedGame.id) ? editedGame : game
+    );
+    return updateGames(updatedGames).then(() => setGames(updatedGames));
+  };
+
   return (
-    <>
-      <Outlet context={{ user, games, setGames, createGame, deleteGame }} />
-    </>
+    <Authenticate>
+      <Outlet context={{ user, games, setGames, createGame, deleteGame, updateGame }} />
+    </Authenticate>
   );
 }
 
