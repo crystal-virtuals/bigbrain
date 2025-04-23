@@ -15,6 +15,8 @@ const styles = {
     'data-disabled:opacity-50',
     // Icon
     '*:data-[slot=icon]:-mx-0.5 *:data-[slot=icon]:my-0.5 *:data-[slot=icon]:size-5 *:data-[slot=icon]:shrink-0 *:data-[slot=icon]:self-center *:data-[slot=icon]:text-(--btn-icon) sm:*:data-[slot=icon]:my-1 sm:*:data-[slot=icon]:size-4 forced-colors:[--btn-icon:ButtonText] forced-colors:data-hover:[--btn-icon:ButtonText]',
+    // Cursor
+    'cursor-pointer touch-manipulation pointer-events-auto',
   ],
   solid: [
     // Optical border, implemented as the button background to avoid corner artifacts
@@ -154,7 +156,7 @@ const styles = {
     rose: [
       'text-white [--btn-hover-overlay:var(--color-white)]/10 [--btn-bg:var(--color-rose-500)] [--btn-border:var(--color-rose-600)]/90',
       '[--btn-icon:var(--color-rose-300)] data-active:[--btn-icon:var(--color-rose-200)] data-hover:[--btn-icon:var(--color-rose-200)]',
-    ],
+    ]
   },
 };
 
@@ -192,9 +194,10 @@ export const Button = forwardRef(function Button({ color, outline, plain, loadin
     className,
   )
 
+
   const content = (
     <TouchTarget>
-      {loading ? (
+      {(loading !== undefined && loading) ? (
         <span className="flex items-center gap-2">
           <span className="loading loading-spinner loading-sm" />
           {children}
@@ -240,18 +243,5 @@ export function TouchTarget({ children }) {
       />
       {children}
     </>
-  );
-}
-
-export function SubmitButton({ children, onClick, loading, ...props }) {
-  return (
-    <Button type="submit" onClick={onClick} disabled={loading} {...props}>
-      <div className="flex items-center gap-2">
-        {loading && (
-          <span className="loading loading-spinner loading-sm"></span>
-        )}
-        {children}
-      </div>
-    </Button>
   );
 }

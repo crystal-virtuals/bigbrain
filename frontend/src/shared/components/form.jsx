@@ -187,7 +187,7 @@ export function TextInput({ value, onChange, readOnly, ...props }) {
         invalid={error}
         readOnly={readOnly}
         aria-readonly={readOnly}
-        inputClassName='w-full'
+        inputClassName='w-full truncate'
         {...props}
       />
       {error && <ErrorMessage>{error}</ErrorMessage>}
