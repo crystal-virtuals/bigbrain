@@ -27,7 +27,7 @@ function EditGameForm({ game, onSubmit }) {
       <Card>
         <EditForm {...rest}>
           {/* Game name */}
-          <Field className="sm:col-span-4">
+          <Field className="col-span-full">
             <Label htmlFor="gameName">Game name</Label>
             <TextInput
               id="gameName"

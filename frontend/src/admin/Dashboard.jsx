@@ -1,9 +1,11 @@
-import { CreateGameButton, GameCardList } from '@/game/components';
+import { Navbar, Sidebar } from '@components/dashboard';
+import { Divider } from '@components/divider';
+import { CreateGameButton, GameCardList } from '@components/game';
 import { Heading } from '@components/heading';
 import { SidebarLayout } from '@components/sidebar-layout';
+import { useAuth } from '@hooks/auth';
 import { useOutletContext } from 'react-router-dom';
-import { Navbar, Sidebar } from '@/admin/components';
-import { Divider } from '@components/divider';
+
 function DashboardLayout({ user, children }) {
   return (
     <SidebarLayout
@@ -15,22 +17,24 @@ function DashboardLayout({ user, children }) {
   );
 }
 
-function DashboardHeading({ createGame }) {
+function DashboardHeading({ games, createGame }) {
   return (
     <div className="flex w-full flex-wrap items-end justify-between gap-4">
       <Heading>Dashboard</Heading>
-      <CreateGameButton onCreate={createGame} />
+      {!!games && <CreateGameButton onCreate={createGame} />}
     </div>
   );
 }
 
 export default function Dashboard() {
-  const { user, games, createGame, deleteGame } = useOutletContext();
+  const { user } = useAuth();
+  const { games, createGame, deleteGame } = useOutletContext();
+
   return (
     <DashboardLayout user={user}>
-      <DashboardHeading createGame={createGame} />
+      <DashboardHeading games={games} createGame={createGame} />
       <Divider className="my-6" />
-      <GameCardList games={games} onDelete={deleteGame} onCreate={createGame}/>
+      <GameCardList games={games} onDelete={deleteGame} />
     </DashboardLayout>
   );
 }
