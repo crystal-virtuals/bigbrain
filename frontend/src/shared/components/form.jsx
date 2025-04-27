@@ -9,21 +9,40 @@ import { fileToDataUrl } from '@utils/helpers';
 import clsx from 'clsx';
 import { useRef, useState } from 'react';
 
-export function ControlledTextarea({ value, onChange, required=false, readOnly=false, ...props }) {
-  const [error, setError] = useState(null);
+export function ControlledTextarea({
+  name,
+  value,
+  setValue,
+  errors,
+  setErrors,
+  required,
+  readOnly = false,
+  errorMessage = '',
+  ...props
+}) {
   const [touched, setTouched] = useState(false);
 
   const validate = (value) => {
     if (!value || value.trim() === '') {
-      return 'This field is required';
+      return errorMessage || 'This field is required';
     }
     return null;
   };
 
+  const setError = (error) => {
+    const newErrors = new Map(errors);
+    if (error) {
+      newErrors.set(name, error);
+    } else {
+      newErrors.delete(name);
+    }
+    setErrors(newErrors);
+  };
+
   const handleChange = (e) => {
-    if (onChange) onChange(e);
+    if (setValue) setValue(e.target.value);
     if (touched && required) setError(validate(e.target.value));
-  }
+  };
 
   const handleBlur = (e) => {
     setTouched(true);
@@ -31,7 +50,7 @@ export function ControlledTextarea({ value, onChange, required=false, readOnly=f
   };
 
   return (
-    <div className="w-full flex flex-col gap-1">
+    <>
       <Textarea
         dark={false}
         value={value}
@@ -40,32 +59,45 @@ export function ControlledTextarea({ value, onChange, required=false, readOnly=f
         readOnly={readOnly}
         aria-readonly={readOnly}
         placeholder={required ? 'Required' : 'Optional'}
-        invalid={error}
         {...props}
       />
-      {error && <ErrorMessage>{error}</ErrorMessage>}
-    </div>
-  )
+    </>
+  );
 }
 
-export function ControlledInput({ type='text', value, onChange, required=false, readOnly=false, dark=false, ...props }) {
-  const [error, setError] = useState(null);
+export function ControlledInput({
+  name,
+  value,
+  setValue,
+  errors,
+  setErrors,
+  required = false,
+  readOnly = false,
+  errorMessage = '',
+  correct,
+  ...props
+}) {
   const [touched, setTouched] = useState(false);
-
-  const style = {
-    correct: 'sm:focus-within:after:ring-emerald-500',
-    false: 'sm:focus-within:after:ring-pink-500',
-  }[props.correct !== undefined && props.correct ? 'correct' : 'false'];
 
   const validate = (value) => {
     if (!value || value.trim() === '') {
-      return 'This field is required';
+      return errorMessage || 'This field is required';
     }
     return null;
   };
 
+  const setError = (error) => {
+    const newErrors = new Map(errors);
+    if (error) {
+      newErrors.set(name, error);
+    } else {
+      newErrors.delete(name);
+    }
+    setErrors(newErrors);
+  };
+
   const handleChange = (e) => {
-    if (onChange) onChange(e);
+    if (setValue) setValue(e.target.value); // onChange receives the new value
     if (touched && required) setError(validate(e.target.value));
   };
 
@@ -74,27 +106,30 @@ export function ControlledInput({ type='text', value, onChange, required=false, 
     if (required) setError(validate(e.target.value));
   };
 
+  let key = correct === true ? 'true' : correct === false ? 'false' : 'neutral';
+  const styles = {
+    true: 'sm:focus-within:after:ring-emerald-600',
+    false: 'sm:focus-within:after:ring-pink-600',
+    neutral: 'sm:focus-within:after:ring-blue-500',
+  }[key];
+
   return (
-    <div className="w-full flex flex-col gap-1">
+    <>
       <Input
-        dark={dark}
-        focus={false}
-        className={style}
+        dark={false}
+        className={styles}
         placeholder={required ? 'Required' : 'Optional'}
-        type={type}
         value={value}
         onChange={handleChange}
         onBlur={handleBlur}
-        invalid={error}
         readOnly={readOnly}
         aria-readonly={readOnly}
+        inputclassname="sm:px-[calc(--spacing(3)-1px)] px-[calc(--spacing(3.5)-1px)]"
         {...props}
       />
-      {error && <ErrorMessage>{error}</ErrorMessage>}
-    </div>
-  )
+    </>
+  );
 }
-
 
 export function CheckboxButton({ checked, setChecked }) {
   return (
@@ -122,8 +157,17 @@ export function CheckboxButton({ checked, setChecked }) {
   );
 }
 
+function LabelError() {
+  const classes = [
+    'absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 z-1',
+    'flex flex-col items-center justify-center',
+    'bg-red-400 rounded-full size-5 text-sm font-bold text-white',
+  ];
+  return <div className={clsx(classes)}>!</div>;
+}
 
-export function LabelTab({ type, label, children, ...props }) {
+
+export function LabelTab({ type, label, children, invalid = false, ...props }) {
   // type is either 'correct' or 'false'
   const styles = {
     correct: 'bg-emerald-500',
@@ -131,22 +175,27 @@ export function LabelTab({ type, label, children, ...props }) {
     neutral: 'bg-[var(--color-cyan)]',
     dark: 'bg-[var(--color-dark)]',
   };
-
   const bgColor = styles[type] || styles.neutral;
-  const labelClasses = clsx(
+  const style = clsx(
     'relative rounded-t-md inline-block px-3 py-2 leading-none select-none',
     bgColor
   );
 
   return (
     <div className="flex flex-col w-full rounded-lg">
-      <div className="flex flex-row justify-start w-full text-sm font-bold text-white -mb-1 transform translate-y-[1px] h-[31px]">
-        <label className={labelClasses} {...props}>
-          {label}
-        </label>
-        <div className="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 z-1 flex flex-col items-center justify-center bg-error w-5 h-5 text-sm font-bold rounded-full text-white" title="Required field">!</div>
+      <div className="flex flex-row justify-start w-full text-sm font-bold text-white -mb-1">
+        <span className={style}>
+          <label {...props}>{label}</label>
+          {invalid && <LabelError />}
+        </span>
       </div>
-      <div className={clsx(bgColor, 'rounded-b-xl rounded-tr-xl gap-y-2 flex flex-col w-full p-1.5')}>
+
+      <div
+        className={clsx(
+          bgColor,
+          'rounded-b-xl rounded-tr-xl gap-y-2 flex flex-col w-full p-1.5'
+        )}
+      >
         {children}
       </div>
     </div>
@@ -168,7 +217,7 @@ export function TextInput({ value, onChange, readOnly, ...props }) {
   };
 
   const handleChange = (e) => {
-    if (onChange) onChange(e.target.value);  // onChange receives the new value
+    if (onChange) onChange(e.target.value); // onChange receives the new value
     if (touched) setError(validate(e.target.value));
   };
 
@@ -187,7 +236,7 @@ export function TextInput({ value, onChange, readOnly, ...props }) {
         invalid={error}
         readOnly={readOnly}
         aria-readonly={readOnly}
-        inputClassName='w-full truncate'
+        inputclassname="w-full truncate"
         {...props}
       />
       {error && <ErrorMessage>{error}</ErrorMessage>}
