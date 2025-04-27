@@ -25,6 +25,7 @@ export default defineConfig({
       '@utils': path.resolve(__dirname, '/src/shared/utils'),
       '@services': path.resolve(__dirname, '/src/shared/services'),
       '@components': path.resolve(__dirname, '/src/shared/components'),
+      '@constants': path.resolve(__dirname, '/src/shared/constants'),
       '@hooks': path.resolve(__dirname, '/src/shared/hooks'),
       '@pages': path.resolve(__dirname, '/src/shared/pages'),
       '@layouts': path.resolve(__dirname, '/src/shared/layouts'),
