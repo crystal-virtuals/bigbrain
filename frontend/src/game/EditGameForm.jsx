@@ -4,9 +4,18 @@ import { EditForm, useEditForm } from '@hooks/form';
 import { FileInput, TextInput } from '@components/form';
 import { isNullOrUndefined } from '@utils/helpers';
 import { Skeleton } from '@components/loading';
+import { mapToGame } from '../shared/utils/game';
+
+const validate = (game) => {
+  if (!game.name || game.name.trim() === '') {
+    return 'Game name is required';
+  }
+  return null;
+}
+
 
 function EditGameForm({ game, onSubmit }) {
-  const props = useEditForm(game, onSubmit);
+  const props = useEditForm(mapToGame(game), validate, onSubmit);
   const { formData, setFormData, ...rest } = props;
 
   const handleChange = (field, value) => {
