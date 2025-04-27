@@ -3,7 +3,7 @@ import SingleChoice from './SingleChoice';
 import MultipleChoice from './MultipleChoice';
 import Judgement from './Judgement';
 
-function InputQuestionAnswers( { question, answers, setAnswers, readOnly, errors, setErrors }) {
+function InputQuestionAnswers( { question, setQuestion, answers, setAnswers, readOnly, errors, setErrors }) {
   if (!question || !question.answers) {
     return null;
   }
@@ -16,6 +16,8 @@ function InputQuestionAnswers( { question, answers, setAnswers, readOnly, errors
 
   return (
     <AnswerComponent
+      question={question}
+      setQuestion={setQuestion}
       answers={answers}
       setAnswers={setAnswers}
       readOnly={readOnly}

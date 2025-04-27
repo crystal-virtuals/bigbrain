@@ -1,4 +1,4 @@
-export { InputQuestionName, SelectQuestionType, SelectTimeLimit } from './QuestionControls'
+export { InputQuestionName, SelectQuestionType, SelectDuration } from './QuestionControls'
 export { default as InputQuestionAnswers } from './InputQuestionAnswers'
 export { default as Judgement } from './Judgement'
 export { default as MultipleChoice } from './MultipleChoice'
