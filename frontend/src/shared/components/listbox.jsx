@@ -4,7 +4,7 @@ import * as Headless from '@headlessui/react'
 import clsx from 'clsx'
 import { Fragment } from 'react'
 
-export function Listbox({ className, placeholder, autoFocus, 'aria-label': ariaLabel, children: options, ...props }) {
+export function Listbox({ className, placeholder, autoFocus, dark, 'aria-label': ariaLabel, children: options, ...props }) {
   return (
     <Headless.Listbox {...props} multiple={false}>
       <Headless.ListboxButton
@@ -43,11 +43,13 @@ export function Listbox({ className, placeholder, autoFocus, 'aria-label': ariaL
             // Border
             'border border-zinc-950/10 group-data-active:border-zinc-950/20 group-data-hover:border-zinc-950/20 dark:border-white/10 dark:group-data-active:border-white/20 dark:group-data-hover:border-white/20',
             // Background color
-            'bg-transparent dark:bg-white/5',
+            !dark && 'bg-transparent dark:bg-white/5',
             // Invalid state
             'group-data-invalid:border-red-500 group-data-hover:group-data-invalid:border-red-500 dark:group-data-invalid:border-red-600 dark:data-hover:group-data-invalid:border-red-600',
             // Disabled state
             'group-data-disabled:border-zinc-950/20 group-data-disabled:opacity-100 dark:group-data-disabled:border-white/15 dark:group-data-disabled:bg-white/[2.5%] dark:group-data-disabled:data-hover:border-white/15',
+            // Dark mode
+            dark && 'text-white forced-colors:text-white bg-[#113034] rounded-lg border-white/10 group-data-active:border-white/20 group-data-hover:border-white/20 group-data-disabled:border-white/15 dark:group-data-disabled:bg-white/[2.5%] dark:group-data-disabled:data-hover:border-white/15 dark:group-data-invalid:border-red-600 dark:data-hover:group-data-invalid:border-red-600 ',
           ])}
         />
         <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
@@ -147,8 +149,8 @@ export function ListboxDescription({ className, children, ...props }) {
     <span
       {...props}
       className={clsx(
+        'flex flex-1 overflow-hidden text-zinc-500 group-data-focus/option:text-white before:w-2 before:min-w-0 before:shrink dark:text-zinc-400',
         className,
-        'flex flex-1 overflow-hidden text-zinc-500 group-data-focus/option:text-white before:w-2 before:min-w-0 before:shrink dark:text-zinc-400'
       )}
     >
       <span className="flex-1 truncate">{children}</span>

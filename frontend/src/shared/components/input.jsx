@@ -23,32 +23,32 @@ export function InputGroup({ children, className }) {
 const dateTypes = ['date', 'datetime-local', 'month', 'time', 'week'];
 
 export const Input = forwardRef(function Input(
-  { className, readOnly, ...props },
-
+  { className, readOnly, dark=true, inputclassname='', ...props },
   ref
 ) {
   return (
     <span
       data-slot="control"
       className={clsx([
-        className,
         // Basic layout
         'relative block w-full',
         // Background color + shadow applied to inset pseudo element, so shadow blends with border in light mode
-        'before:absolute before:inset-px before:rounded-[calc(var(--radius-lg)-1px)] before:bg-white before:shadow-sm',
+        !readOnly && 'before:absolute before:inset-px before:rounded-[calc(var(--radius-lg)-1px)] before:shadow-sm before:bg-white',
         // Background color is moved to control and shadow is removed in dark mode so hide `before` pseudo
-        'dark:before:hidden',
+        dark && 'dark:before:hidden',
         // Focus ring
-        'after:pointer-events-none after:absolute after:inset-0 after:rounded-lg after:ring-transparent after:ring-inset sm:focus-within:after:ring-2 sm:focus-within:after:ring-pink-500',
+        'after:pointer-events-none after:absolute after:inset-0 after:rounded-lg after:ring-transparent after:ring-inset sm:focus-within:after:ring-2 sm:focus-within:after:ring-blue-500',
         // Disabled state
         'has-data-disabled:opacity-50 has-data-disabled:before:bg-zinc-950/5 has-data-disabled:before:shadow-none',
         // Invalid state
         'has-data-invalid:before:shadow-red-500/10',
+        className
       ])}
     >
       <Headless.Input
         ref={ref}
         readOnly={readOnly}
+        aria-readonly={readOnly}
         {...props}
         className={clsx([
           // Date classes
@@ -68,13 +68,15 @@ export const Input = forwardRef(function Input(
               '[&::-webkit-datetime-edit-meridiem-field]:p-0',
             ],
           // Basic layout
-          !readOnly && 'relative block w-full appearance-none rounded-lg px-[calc(--spacing(3.5)-1px)] py-[calc(--spacing(2.5)-1px)] sm:px-[calc(--spacing(3)-1px)] sm:py-[calc(--spacing(1.5)-1px)]',
+          'relative block w-full appearance-none rounded-lg py-[calc(--spacing(2.5)-1px)] sm:py-[calc(--spacing(1.5)-1px)]',
+          // Padding
+          !readOnly && 'sm:px-[calc(--spacing(3)-1px)] px-[calc(--spacing(3.5)-1px)]',
           // Typography
-          'text-base/6 text-zinc-950 placeholder:text-zinc-500 sm:text-sm/6 dark:text-white',
+          'text-base/6 text-zinc-950 placeholder:text-zinc-500 sm:text-sm/6',
           // Border
-          !readOnly && 'border border-zinc-950/10 data-hover:border-zinc-950/20 dark:border-white/10 dark:data-hover:border-white/20',
+          !readOnly && 'border border-zinc-950/10 data-hover:border-zinc-950/20',
           // Background color
-          !readOnly && 'bg-transparent dark:bg-white/5',
+          'bg-transparent',
           // Hide default focus styles
           'focus:outline-hidden',
           // Invalid state
@@ -82,9 +84,15 @@ export const Input = forwardRef(function Input(
           // Disabled state
           'data-disabled:border-zinc-950/20 dark:data-disabled:border-white/15 dark:data-disabled:bg-white/[2.5%] dark:data-hover:data-disabled:border-white/15',
           // System icons
-          'dark:[color-scheme:dark]',
+          dark && 'dark:[color-scheme:dark]',
           // Readonly state
           readOnly && 'cursor-default pointer-events-none',
+          // Dark mode
+          dark && 'dark:text-white dark:border-white/10 dark:data-hover:border-white/20',
+          // Readonly state
+          !readOnly && 'dark:bg-white/5',
+          // Input classes
+          inputclassname,
         ])}
       />
     </span>

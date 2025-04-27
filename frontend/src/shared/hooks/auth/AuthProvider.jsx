@@ -1,23 +1,21 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthContext from './AuthContext';
-import { Heading } from '@components/heading';
 
 export default function AuthProvider({ children }) {
   const navigate = useNavigate();
-  const [user, setUser] = useState({});
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
 
-  // on component mount (first render), check if user is logged in
+  // Fetch user on first render
   useEffect(() => {
+    console.log('Running useEffect to fetch user from localStorage');
     const token = localStorage.getItem('token');
     const loggedInUser = localStorage.getItem('user');
-
-    (token && loggedInUser)
-      ? setUser(JSON.parse(loggedInUser))
-      : setUser(null);
-
-    setLoading(false);
+    if (token && loggedInUser) {
+      setUser(JSON.parse(loggedInUser));
+    } else {
+      setUser(null);
+    }
   }, []);
 
   const login = (token, credentials) => {
@@ -34,19 +32,8 @@ export default function AuthProvider({ children }) {
     navigate('/home');
   };
 
-  // if loading, show a loading spinner
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen w-screen">
-        <Heading>Loading {' '}
-          <span className="loading loading-dots loading-sm"></span>
-        </Heading>
-      </div>
-    );
-  }
-
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, setUser, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

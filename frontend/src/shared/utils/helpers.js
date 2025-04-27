@@ -1,4 +1,39 @@
 /***************************************************************
+                      Data Input
+***************************************************************/
+/**
+ * Given a js file object representing a jpg or png image, such as one taken
+ * from a html file input element, return a promise which resolves to the file
+ * data as a data url.
+ * More info:
+ *   https://developer.mozilla.org/en-US/docs/Web/API/File
+ *   https://developer.mozilla.org/en-US/docs/Web/API/FileReader
+ *   https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
+ *
+ * Example Usage:
+ *   const file = document.querySelector('input[type="file"]').files[0];
+ *   console.log(fileToDataUrl(file));
+ * @param {File} file The file to be read.
+ * @return {Promise<string>} Promise which resolves to the file as a data url.
+ */
+export function fileToDataUrl(file) {
+  const validFileTypes = [ 'image/jpeg', 'image/png', 'image/jpg' ]
+  const valid = validFileTypes.find(type => type === file.type);
+  // Bad data, let's walk away.
+  if (!valid) {
+    throw Error('Invalid file type. Please upload a PNG, JPG, or JPEG.');
+  }
+
+  const reader = new FileReader();
+  const dataUrlPromise = new Promise((resolve,reject) => {
+    reader.onerror = reject;
+    reader.onload = () => resolve(reader.result);
+  });
+  reader.readAsDataURL(file);
+  return dataUrlPromise;
+}
+
+/***************************************************************
                        String Processing
 ***************************************************************/
 export const pluralSuffix = (count) => count > 1 ? 's' : '';
@@ -17,6 +52,11 @@ export const isEmptyString = (string) => {
     return true;
   }
   return string.trim() === '';
+}
+
+// Check if a value is null, undefined, or an empty string
+export const isNullOrUndefined = (value) => {
+  return  (value === null || value === undefined || value === '');
 }
 
 /***************************************************************
@@ -82,7 +122,85 @@ export const dateToString = (timestamp) => {
 }
 
 /***************************************************************
-                        React Helpers
+                        Misc
+***************************************************************/
+export const uid = () => {
+  const num = Math.floor(Math.random() * 1000000);
+  return parseInt(num, 10); // return as a 10 digit number
+}
+
+/***************************************************************
+                        Game
+***************************************************************/
+export const newGame = (name, user) => {
+  // generate a random key for the new game
+  const key = uid();
+  // create a new game object
+  const newGame = {
+    id: key,
+    name: name,
+    owner: user.email,
+    thumbnail: '',
+    createdAt: new Date().toISOString(),
+    active: 0, // 0 = inactive, 1 = active
+  };
+  return newGame;
+}
+
+export const getTotalDuration = (questions) => {
+  // if no questions, return 0
+  if (!questions || questions.length === 0) {
+    return '0 min';
+  }
+
+  // if questions exist, sum the duration of each question
+  const total = questions.reduce((acc, question) => {
+    // if question has no duration, return 0
+    if (!question.duration) {
+      return acc;
+    }
+    // if question has duration, add to total
+    return acc + question.duration;
+  }, 0);
+
+  // if total is less than 60, return in minutes
+  if (total < 60) {
+    return `${total} min`;
+  }
+  // if total is greater than 60, return in hours and minutes
+  const hours = Math.floor(total / 60);
+  const minutes = total % 60;
+  return `${hours > 0 ? `${hours}h ` : ''}${minutes}min`;
+};
+
+
+export const getNumberOfQuestions = (questions) => {
+  // if no questions, return 0
+  if (!questions || questions.length === 0) {
+    return '0 questions';
+  }
+  const count = questions.length;
+  return `${count} question${pluralSuffix(count)}`;
+};
+
+export const isActive = (active) => {
+  return active === 1 ? 'Active' : 'Inactive';
+};
+
+export const isEqual = (obj1, obj2) => {
+  if (obj1 === obj2) return true;
+  if (typeof obj1 !== 'object' || typeof obj2 !== 'object' || !obj1 || !obj2) return false;
+  const keys1 = Object.keys(obj1);
+  const keys2 = Object.keys(obj2);
+  if (keys1.length !== keys2.length) return false;
+  return keys1.every(key =>
+    Object.prototype.hasOwnProperty.call(obj2, key) &&
+    isEqual(obj1[key], obj2[key])
+  );
+};
+
+/***************************************************************
+                        Colors
 ***************************************************************/
 export const getRandomBgColor = (key) => {
   const colors = [
@@ -105,33 +223,4 @@ export const getRandomBgColor = (key) => {
     'bg-blue-500',
   ];
   return colors[Number(key) % colors.length];
-}
-
-export const getRandomColor = (key) => {
-  const colors = [
-    'lime',
-    'purple',
-    'red',
-    'orange',
-    'amber',
-    'yellow',
-    'green',
-    'emerald',
-    'teal',
-    'cyan',
-    'sky',
-    'blue',
-    'indigo',
-    'violet',
-    'fuchsia',
-    'pink',
-    'rose',
-  ];
-  return colors[Number(key) % colors.length];
-}
-
-// Takes a list of class names and returns a single string with all the class names joined by a space
-// and filtered to remove any falsy values (e.g. null, undefined, false, etc.)
-export function classNames(...classes) {
-  return classes.filter(Boolean).join(' ');
 }

@@ -60,3 +60,9 @@ export const api = {
   put: (url, payload) => apiCall('PUT', url, payload),
   delete: (url, payload) => apiCall('DELETE', url, payload),
 };
+
+/***************************************************************
+                         Game API
+***************************************************************/
+export const fetchGames = () => api.get('/admin/games').then(res => res.games);
+export const updateGames = (games) => api.put('/admin/games', { games });
