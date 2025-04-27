@@ -1,6 +1,6 @@
 import { useAuth } from '@hooks/auth';
 import { fetchGames, updateGames } from '@services/api';
-import { isEqual, newGame } from '@utils/game';
+import { isEqual, newGame, newQuestion, mapToGames, mapToQuestion } from '@utils/game';
 import { useEffect, useState } from 'react';
 import { Navigate, Outlet, useNavigate } from 'react-router-dom';
 
@@ -62,9 +62,32 @@ function AdminLayout() {
     return updateGames(updatedGames).then(() => setGames(updatedGames));
   };
 
+  const createQuestion = (gameId, questionType) => {
+    const game = games.find((game) => isEqual(game, gameId));
+    if (!game) return;
+    const question = newQuestion(questionType);
+    const updatedQuestions = [...game.questions, question];
+    const updatedGame = { ...game, questions: updatedQuestions };
+    const updatedGames = games.map((g) => isEqual(g, gameId) ? updatedGame : g);
+    console.log('Creating question in this game:', updatedGame);
+    return updateGames(updatedGames).then(() => setGames(updatedGames));
+  }
+
+  const updateQuestion = (gameId, editedQuestion) => {
+    const game = games.find((game) => isEqual(game, gameId));
+    if (!game) return;
+    const updatedQuestions = game.questions.map((question) =>
+      isEqual(question, editedQuestion.id) ? mapToQuestion(editedQuestion) : question
+    );
+    const updatedGame = { ...game, questions: updatedQuestions };
+    const updatedGames = games.map((g) => isEqual(g, gameId) ? updatedGame : g);
+    console.log('Updating question in this game:', updatedGame);
+    return updateGames(updatedGames).then(() => setGames(updatedGames));
+  }
+
   return (
     <Authenticate>
-      <Outlet context={{ user, games, setGames, createGame, deleteGame, updateGame }} />
+      <Outlet context={{ user, games, setGames, createGame, deleteGame, updateGame, createQuestion, updateQuestion }} />
     </Authenticate>
   );
 }
