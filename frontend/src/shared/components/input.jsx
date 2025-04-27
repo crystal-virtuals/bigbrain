@@ -23,7 +23,7 @@ export function InputGroup({ children, className }) {
 const dateTypes = ['date', 'datetime-local', 'month', 'time', 'week'];
 
 export const Input = forwardRef(function Input(
-  { className, readOnly, focus=true, dark=true, ...props },
+  { className, readOnly, dark=true, inputclassname='', ...props },
   ref
 ) {
   return (
@@ -33,12 +33,11 @@ export const Input = forwardRef(function Input(
         // Basic layout
         'relative block w-full',
         // Background color + shadow applied to inset pseudo element, so shadow blends with border in light mode
-        !readOnly && 'before:absolute before:inset-px before:rounded-[calc(var(--radius-lg)-1px)] before:bg-white before:shadow-sm',
+        !readOnly && 'before:absolute before:inset-px before:rounded-[calc(var(--radius-lg)-1px)] before:shadow-sm before:bg-white',
         // Background color is moved to control and shadow is removed in dark mode so hide `before` pseudo
         dark && 'dark:before:hidden',
         // Focus ring
-        'after:pointer-events-none after:absolute after:inset-0 after:rounded-lg after:ring-transparent after:ring-inset sm:focus-within:after:ring-2',
-        focus && 'sm:focus-within:after:ring-blue-500',
+        'after:pointer-events-none after:absolute after:inset-0 after:rounded-lg after:ring-transparent after:ring-inset sm:focus-within:after:ring-2 sm:focus-within:after:ring-blue-500',
         // Disabled state
         'has-data-disabled:opacity-50 has-data-disabled:before:bg-zinc-950/5 has-data-disabled:before:shadow-none',
         // Invalid state
@@ -49,6 +48,7 @@ export const Input = forwardRef(function Input(
       <Headless.Input
         ref={ref}
         readOnly={readOnly}
+        aria-readonly={readOnly}
         {...props}
         className={clsx([
           // Date classes
@@ -68,7 +68,9 @@ export const Input = forwardRef(function Input(
               '[&::-webkit-datetime-edit-meridiem-field]:p-0',
             ],
           // Basic layout
-          !readOnly && 'relative block w-full appearance-none rounded-lg px-[calc(--spacing(3.5)-1px)] py-[calc(--spacing(2.5)-1px)] sm:px-[calc(--spacing(3)-1px)] sm:py-[calc(--spacing(1.5)-1px)]',
+          'relative block w-full appearance-none rounded-lg py-[calc(--spacing(2.5)-1px)] sm:py-[calc(--spacing(1.5)-1px)]',
+          // Padding
+          !readOnly && 'sm:px-[calc(--spacing(3)-1px)] px-[calc(--spacing(3.5)-1px)]',
           // Typography
           'text-base/6 text-zinc-950 placeholder:text-zinc-500 sm:text-sm/6',
           // Border
@@ -90,7 +92,7 @@ export const Input = forwardRef(function Input(
           // Readonly state
           !readOnly && 'dark:bg-white/5',
           // Input classes
-          props.inputClassName !== undefined && props.inputClassName,
+          inputclassname,
         ])}
       />
     </span>
