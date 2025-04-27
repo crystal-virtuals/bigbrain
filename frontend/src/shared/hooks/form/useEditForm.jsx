@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 
-function useEditForm(initialData, onSubmit) {
+function useEditForm(initialData, onSubmit, validate, editable = true) {
   const [formData, setFormData] = useState(initialData);
   const [isDirty, setIsDirty] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [readOnly, setReadOnly] = useState(false);
+  const [readOnly, setReadOnly] = useState(!editable);
   const initialRef = useRef(initialData);
 
   const isEqual = (obj1, obj2) => {
@@ -15,7 +15,6 @@ function useEditForm(initialData, onSubmit) {
 
   // Check if form is dirty whenever formData changes
   useEffect(() => {
-    console.log('Checking if form is dirty');
     const dirty = !isEqual(formData, initialRef.current);
     setIsDirty(dirty);
   }, [formData]);
@@ -23,7 +22,6 @@ function useEditForm(initialData, onSubmit) {
   // Update initialData ref if it changes
   useEffect(() => {
     if (isEqual(initialData, initialRef.current)) return;
-    console.log('Updating initialRef with new initialData');
     initialRef.current = initialData;
     setFormData(initialData);
   }, [initialData]);
@@ -63,6 +61,16 @@ function useEditForm(initialData, onSubmit) {
     setIsSubmitting(true);
     setError('');
 
+    // Validate form data
+    if (validate) {
+      const validationError = validate(formData);
+      if (validationError) {
+        setError(validationError);
+        setIsSubmitting(false);
+        return;
+      }
+    }
+
     return onSubmit(formData)
       .then((updated) => {
         initialRef.current = updated;
@@ -74,8 +82,6 @@ function useEditForm(initialData, onSubmit) {
         setError(err.message || 'Failed to save changes.');
       })
       .finally(() => {
-        console.log('Form submission completed');
-        console.log('New formData:', formData);
         setIsSubmitting(false);
       });
   };
