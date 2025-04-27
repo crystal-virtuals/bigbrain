@@ -1,6 +1,5 @@
-import { questionTypes, timeLimit, points } from '@constants/question';
-import { uid, pluralSuffix } from '@utils/helpers';
-import { isEmptyString } from './helpers';
+import { questionTypes, duration, points } from '@constants/question';
+import { uid, pluralSuffix, isEmptyString } from '@utils/helpers';
 
 /***************************************************************
                         Equality
@@ -22,35 +21,93 @@ const mapToQuestionType = (type) => {
   return questionType;
 }
 
-export const newQuestion = (type) => {
+export const newAnswers = (type) => {
   let answers = [newAnswer(true)];
   if (type !== questionTypes.JUDGEMENT) {
     answers.push(newAnswer(false));
   }
+  return answers;
+}
 
+export const newQuestion = (type) => {
+  let answers = [newAnswer(true)];
+  let correctAnswers = [answers[0].id];
+  if (type !== questionTypes.JUDGEMENT) {
+    answers.push(newAnswer(false));
+  }
   return {
     id: uid(),
     name: '',
     thumbnail: '',
     type: mapToQuestionType(type),
-    timeLimit: timeLimit.NORMAL,
+    duration: duration.NORMAL,
     points: points.STANDARD,
     answers: answers,
+    correctAnswers: correctAnswers,
   };
+}
+
+export const isEmptyQuestion = (question) => {
+  return (
+    isEmptyString(question.name) &&
+    question.answers.filter((a) => !isEmptyString(a.name)).length === 0);
+}
+
+export const validateQuestion = (question) => {
+  const errors = new Map();
+
+  if (isEmptyString(question.name)) {
+    errors.set('name', 'Question cannot be empty');
+  }
+
+  const nonEmptyAnswers = question.answers.filter((a) => !isEmptyString(a.name));
+  const correctAnswers = nonEmptyAnswers.filter((a) => a.correct);
+  const falseAnswers = nonEmptyAnswers.filter((a) => !a.correct);
+
+  if (question.type === questionTypes.JUDGEMENT) {
+    // Judgement question must have one correct answer
+    if (nonEmptyAnswers.length < 1) {
+      errors.set('answers', 'One answer is required');
+    }
+  }
+
+  if (question.type === questionTypes.SINGLE_CHOICE) {
+    // Single choice question must have one correct answer
+    if (correctAnswers.length !== 1) {
+      errors.set('correctAnswer', 'One correct answer is required');
+    }
+    // At least 2 answers are required
+    if (falseAnswers.length < 1) {
+      errors.set('falseAnswers', 'At least one false answer is required');
+    }
+  }
+
+  if (question.type === questionTypes.MULTIPLE_CHOICE) {
+    // Multiple choice question must have at least one correct answer
+    if (correctAnswers.length === 0) {
+      errors.set('answers', 'At least one correct answer is required');
+    }
+    // At least 2 answers are required
+    if (falseAnswers.length < 1) {
+      errors.set('answers', 'At least one false answer is required');
+    }
+  }
+
+  return errors;
 }
 
 export const newAnswer = (isCorrect) => {
   return {
     id: uid(),
     name: '',
-    correct: isCorrect === true,
+    correct: isCorrect,
   };
 }
 
 export const mapToAnswer = (answer) => {
   return {
-    id: Number(answer.id) || uid(),
-    name: answer.name.trim() || '',
+    id: Number(answer.id),
+    name: answer.name.trim(),
     correct: !!answer.correct,
   };
 }
@@ -61,9 +118,25 @@ export const mapToQuestion = (question) => {
     name: question.name.trim(),
     thumbnail: question.thumbnail,
     type: mapToQuestionType(question.type),
-    timeLimit: Number(question.timeLimit),
+    duration: Number(question.duration) || duration.NORMAL,
     points: Number(question.points),
-    answers: question.answers.map((a) => mapToAnswer(a)).filter((a) => !isEmptyString(a.name)),
+    answers: question.answers.filter(a => !isEmptyString(a.name)).map(a => mapToAnswer(a)),
+    correctAnswers: question.answers.filter(a => a.correct && !isEmptyString(a.name)).map(a => Number(a.id)),
+  };
+}
+
+export const convertToQuestion = (question) => {
+  return {
+    id: Number(question.id),
+    name: question.name.trim(),
+    thumbnail: question.thumbnail,
+    type: mapToQuestionType(question.type),
+    duration: Number(question.duration) || duration.NORMAL,
+    points: Number(question.points),
+    answers: question.answers.length > 0
+      ? question.answers.filter(a => !isEmptyString(a.name)).map(a => mapToAnswer(a))
+      : newAnswers(question.type),
+    correctAnswers: question.answers.filter(a => a.correct && !isEmptyString(a.name)).map(a => Number(a.id)),
   };
 }
 
@@ -77,7 +150,7 @@ export const newGame = (name, user) => {
     owner: user.email,
     createdAt: new Date().toISOString(),
     thumbnail: '',
-    active: 0, // 0 = inactive, 1 = active
+    active: null, // the ID of the active session for this game. If no active session, set to null
     questions: [],
   };
   return newGame;

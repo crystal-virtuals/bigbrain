@@ -28,7 +28,7 @@ export const questionTypeOptions = [
 /***************************************************************
   Time limit that users have to answer the question (as a number)
 ***************************************************************/
-export const timeLimit = {
+export const duration = {
   EXTRA_SHORT: 5,
   SHORT: 10,
   NORMAL: 20,
@@ -36,12 +36,12 @@ export const timeLimit = {
   EXTRA_LONG: 80,
 };
 
-export const timeLimitOptions = [
-  { label: 'Extra short time (5s)', value: timeLimit.EXTRA_SHORT },
-  { label: 'Short time (10s)', value: timeLimit.SHORT },
-  { label: 'Normal time (20s)', value: timeLimit.NORMAL },
-  { label: 'Long time (45s)', value: timeLimit.LONG },
-  { label: 'Extra long time (1m20s)', value: timeLimit.EXTRA_LONG },
+export const durationOptions = [
+  { label: 'Extra short time (5s)', value: duration.EXTRA_SHORT },
+  { label: 'Short time (10s)', value: duration.SHORT },
+  { label: 'Normal time (20s)', value: duration.NORMAL },
+  { label: 'Long time (45s)', value: duration.LONG },
+  { label: 'Extra long time (1m20s)', value: duration.EXTRA_LONG },
 ];
 
 /***************************************************************
@@ -68,24 +68,5 @@ export const pointOptions = [
     label: 'No points',
     value: points.NONE,
     description: 'No points for this question',
-  },
-]
-
-// example question data
-const questions = [
-  {
-    id: 1, // Used in JSX as a key
-    thumbnail: '', // dataurl
-    name: 'What is your favorite color?',
-    type: questionTypes.SINGLE_CHOICE,
-    timeLimit: timeLimit.NORMAL, // number
-    points: points.STANDARD, // number
-    answers: [
-      { id: 1, name: 'Red' }, // Unique answer ID; Used in JSX as a key
-      { id: 2, name: 'Green' },
-      { id: 3, name: 'Blue' },
-      { id: 4, name: 'Yellow' },
-    ],
-    correctAnswers: [1, 3], // an array of correct answer IDs
   },
 ]

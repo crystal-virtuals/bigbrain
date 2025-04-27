@@ -20,8 +20,6 @@ export function ControlledTextarea({
   errorMessage = '',
   ...props
 }) {
-  const [touched, setTouched] = useState(false);
-
   const validate = (value) => {
     if (!value || value.trim() === '') {
       return errorMessage || 'This field is required';
@@ -41,11 +39,10 @@ export function ControlledTextarea({
 
   const handleChange = (e) => {
     if (setValue) setValue(e.target.value);
-    if (touched && required) setError(validate(e.target.value));
+    if (required) setError(validate(e.target.value));
   };
 
   const handleBlur = (e) => {
-    setTouched(true);
     if (required) setError(validate(e.target.value));
   };
 
@@ -77,8 +74,6 @@ export function ControlledInput({
   correct,
   ...props
 }) {
-  const [touched, setTouched] = useState(false);
-
   const validate = (value) => {
     if (!value || value.trim() === '') {
       return errorMessage || 'This field is required';
@@ -98,11 +93,10 @@ export function ControlledInput({
 
   const handleChange = (e) => {
     if (setValue) setValue(e.target.value); // onChange receives the new value
-    if (touched && required) setError(validate(e.target.value));
+    if (required) setError(validate(e.target.value));
   };
 
   const handleBlur = (e) => {
-    setTouched(true);
     if (required) setError(validate(e.target.value));
   };
 

@@ -1,6 +1,6 @@
 import clsx from "clsx";
 
-export function Card({ color, children }) {
+export function Card({ className, color, children }) {
   const styles = {
     purple: 'bg-[var(--color-purple-dark)]',
     navy: 'bg-zinc-100 dark:bg-[var(--color-navy-dark)]',
@@ -14,6 +14,7 @@ export function Card({ color, children }) {
       clsx(
         "shadow-xs ring-1 ring-zinc-900/5 sm:rounded-xl md:col-span-2",
         bgColor,
+        className,
       )
     }>
       {children}
