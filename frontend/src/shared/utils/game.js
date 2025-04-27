@@ -1,5 +1,6 @@
 import { questionTypes, timeLimit, points } from '@constants/question';
 import { uid, pluralSuffix } from '@utils/helpers';
+import { isEmptyString } from './helpers';
 
 /***************************************************************
                         Equality
@@ -11,17 +12,22 @@ export const isEqual = (game, id) => {
 /***************************************************************
                         Question
 ***************************************************************/
-
-// reverse mapping from questionTypes.SINGLE_CHOICE to the key
+// Given the value of a question type (e.g. 'singleChoice'),
+// validate it against the questionTypes object and return the value
 const mapToQuestionType = (type) => {
-  const questionType = questionTypes.find((q) => q.value === type);
+  const questionType = Object.values(questionTypes).find((t) => t === type);
   if (!questionType) {
-    return questionTypes.SINGLE_CHOICE;
+    return questionTypes.SINGLE_CHOICE; // default to single choiced
   }
   return questionType;
 }
 
 export const newQuestion = (type) => {
+  let answers = [newAnswer(true)];
+  if (type !== questionTypes.JUDGEMENT) {
+    answers.push(newAnswer(false));
+  }
+
   return {
     id: uid(),
     name: '',
@@ -29,45 +35,37 @@ export const newQuestion = (type) => {
     type: mapToQuestionType(type),
     timeLimit: timeLimit.NORMAL,
     points: points.STANDARD,
-    answers: [],
+    answers: answers,
   };
 }
 
-export const newAnswer = () => {
+export const newAnswer = (isCorrect) => {
   return {
     id: uid(),
     name: '',
-    correct: false,
+    correct: isCorrect === true,
   };
 }
 
+export const mapToAnswer = (answer) => {
+  return {
+    id: Number(answer.id) || uid(),
+    name: answer.name.trim() || '',
+    correct: !!answer.correct,
+  };
+}
 
 export const mapToQuestion = (question) => {
   return {
-    id: question.id,
-    name: question.name,
+    id: Number(question.id),
+    name: question.name.trim(),
     thumbnail: question.thumbnail,
-    type: question.type,
+    type: mapToQuestionType(question.type),
     timeLimit: Number(question.timeLimit),
     points: Number(question.points),
-    answers: question.answers.map((a) => ({ id: a.id, name: a.name, correct: a.correct })),
+    answers: question.answers.map((a) => mapToAnswer(a)).filter((a) => !isEmptyString(a.name)),
   };
 }
-
-export const mapGames = (games) => {
-  return games.map((game) => {
-    return {
-      id: Number(game.id),
-      name: game.name,
-      owner: game.owner,
-      createdAt: game.createdAt,
-      thumbnail: game.thumbnail || '',
-      active: Number(game.active) || 0,
-      questions: game.questions ? game.questions.map((q) => mapToQuestion(q)) : [],
-    };
-  });
-}
-
 
 /***************************************************************
                         Game
@@ -95,6 +93,10 @@ export const mapToGame = (game) => {
     active: Number(game.active),
     questions: game.questions ? game.questions.map((q) => mapToQuestion(q)) : [],
   };
+}
+
+export const mapToGames = (games) => {
+  return games.map((game) => mapToGame(game));
 }
 
 export const getTotalDuration = (questions) => {
