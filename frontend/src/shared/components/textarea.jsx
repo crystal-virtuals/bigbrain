@@ -11,7 +11,7 @@ export const Textarea = forwardRef(function Textarea({ className, readOnly=false
         // Basic layout
         'relative block w-full',
         // Background color + shadow applied to inset pseudo element, so shadow blends with border in light mode
-        !readOnly && 'before:absolute before:inset-px before:rounded-[calc(var(--radius-lg)-1px)] before:bg-white before:shadow-sm',
+        'before:absolute before:inset-px before:rounded-[calc(var(--radius-lg)-1px)] before:bg-white before:shadow-sm',
         // Background color is moved to control and shadow is removed in dark mode so hide `before` pseudo
         dark && 'dark:before:hidden',
         // Focus ring
@@ -22,16 +22,18 @@ export const Textarea = forwardRef(function Textarea({ className, readOnly=false
     >
       <Headless.Textarea
         ref={ref}
+        readOnly={readOnly}
+        aria-readonly={readOnly}
         {...props}
         className={clsx([
           // Basic layout
-          !readOnly && 'relative block h-full w-full appearance-none rounded-lg px-[calc(--spacing(3.5)-1px)] py-[calc(--spacing(2.5)-1px)] sm:px-[calc(--spacing(3)-1px)] sm:py-[calc(--spacing(1.5)-1px)]',
+          'relative block h-full w-full appearance-none rounded-lg px-[calc(--spacing(3.5)-1px)] py-[calc(--spacing(2.5)-1px)] sm:px-[calc(--spacing(3)-1px)] sm:py-[calc(--spacing(1.5)-1px)]',
           // Typography
           'text-base/6 text-zinc-950 placeholder:text-zinc-500 sm:text-sm/6',
           // Border
-          !readOnly && 'border border-zinc-950/10 data-hover:border-zinc-950/20 ',
+          'border border-zinc-950/10 data-hover:border-zinc-950/20 ',
           // Background color
-          !readOnly && 'bg-transparent',
+          'bg-transparent',
           // Hide default focus styles
           'focus:outline-hidden',
           // Invalid state
