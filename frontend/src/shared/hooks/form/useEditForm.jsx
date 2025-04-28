@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 
-function useEditForm(initialData, onSubmit, validate, editable = true) {
+function useEditForm(initialData, onSubmit, validate, isReadOnly) {
   const [formData, setFormData] = useState(initialData);
   const [isDirty, setIsDirty] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [readOnly, setReadOnly] = useState(!editable);
+  const [readOnly, setReadOnly] = useState(isReadOnly);
   const initialRef = useRef(initialData);
 
   const isEqual = (obj1, obj2) => {

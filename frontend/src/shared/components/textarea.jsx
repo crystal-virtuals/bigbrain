@@ -18,12 +18,12 @@ export const Textarea = forwardRef(function Textarea({ className, readOnly=false
         'after:pointer-events-none after:absolute after:inset-0 after:rounded-lg after:ring-transparent after:ring-inset sm:focus-within:after:ring-2 sm:focus-within:after:ring-blue-500',
         // Disabled state
         'has-data-disabled:opacity-50 has-data-disabled:before:bg-zinc-950/5 has-data-disabled:before:shadow-none',
+        // Readonly state (remove background color and shadow)
+        readOnly && 'before:opacity-90',
       ])}
     >
       <Headless.Textarea
         ref={ref}
-        readOnly={readOnly}
-        aria-readonly={readOnly}
         {...props}
         className={clsx([
           // Basic layout

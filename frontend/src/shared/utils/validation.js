@@ -5,6 +5,10 @@ export const isEmpty = (value) => {
   return value === undefined || value === null || value === '' || !value;
 };
 
+export const isEmptyString = (value) => {
+  return !value || value.trim() === '';
+}
+
 const validatePasswordMatch = (password, confirmPassword) => {
   if (password !== confirmPassword) return 'Both passwords must match';
   return '';
@@ -35,3 +39,7 @@ export const getFormErrors = (formData) => {
 
   return errors;
 };
+
+/***************************************************************
+                    Validate Question Input
+***************************************************************/

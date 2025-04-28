@@ -1,6 +1,7 @@
 import { AuthLayout, Login, Logout, Register } from '@/auth';
 import {
   AdminLayout,
+  GameLayout,
   Dashboard,
   EditGame,
   EditQuestion,
@@ -45,8 +46,10 @@ function App() {
         {/* Admin routes (user must be authorised) */}
         <Route element={<AdminLayout />}>
           <Route path="dashboard" element={<Dashboard />} />
-          <Route path="game/:gameId" element={<EditGame />} />
-          <Route path="game/:gameIdquestion/:questionId" element={<EditQuestion />}/>
+          <Route path="game/:gameId" element={<GameLayout />}>
+            <Route index element={<EditGame />} />
+            <Route path="question/:questionId" element={<EditQuestion />}/>
+          </Route>
         </Route>
 
         {/* Fallback */}

@@ -1,12 +1,77 @@
-import { questionTypes, timeLimit, points } from '@constants/question';
-import { uid, pluralSuffix } from '@utils/helpers';
-import { isEmptyString } from './helpers';
+import { questionTypes, duration, points } from '@constants/questions';
+import { uid, pluralSuffix, isEmptyString } from '@utils/helpers';
 
 /***************************************************************
-                        Equality
+                        Validation
 ***************************************************************/
 export const isEqual = (game, id) => {
   return Number(game.id) == Number(id);
+}
+
+const validateSingleChoice = (errors, answers) => {
+  // Validate correct answer
+  const correctAnswer = answers.find(a => a.correct);
+  if (isEmptyString(correctAnswer?.name)) {
+    errors.set('correctAnswer', 'Correct answer cannot be empty');
+  }
+
+  // Validate at least one false answer exists
+  const falseAnswers = answers.filter(a => !a.correct);
+  if (falseAnswers.length === 0) {
+    errors.set('falseAnswers', 'At least one false answer is required');
+  }
+
+  // Validate each false answer (only first one is required)
+  falseAnswers.forEach((answer, index) => {
+    if (index === 0 && isEmptyString(answer.name)) {
+      errors.set(`falseAnswers`, 'First false answer cannot be empty');
+    }
+  });
+};
+
+const validateMultipleChoice = (errors, answers) => {
+  const nonEmptyAnswers = answers.filter(a => !isEmptyString(a.name));
+  const correctAnswers = answers.filter(a => a.correct);
+
+  // At least one correct answer is required
+  if (correctAnswers.length === 0) {
+    errors.set('answers', 'At least one answer must be correct');
+  }
+
+  // If there is only one correct answer, it cannot be empty
+  if (correctAnswers.length === 1 && isEmptyString(correctAnswers[0].name)) {
+    errors.set('answers', 'Correct answer cannot be empty');
+  }
+
+  // First two answers are required
+  answers.forEach((answer, index) => {
+    if (index < 2 && isEmptyString(answer.name)) {
+      errors.set(`answers`, 'First two answers cannot be empty');
+    }
+  });
+
+  // At least two answers are required
+  if (nonEmptyAnswers.length < 2) {
+    errors.set('answers', 'At least two answers are required');
+  }
+}
+
+export function validateQuestion(question) {
+  const errors = new Map();
+
+  // Validate question name
+  if (isEmptyString(question.name)) {
+    errors.set('name', 'Question cannot be empty');
+  }
+
+  // Validate answers
+  if (question.type === questionTypes.SINGLE_CHOICE) {
+    validateSingleChoice(errors, question.answers);
+  } else if (question.type === questionTypes.MULTIPLE_CHOICE) {
+    validateMultipleChoice(errors, question.answers);
+  }
+
+  return errors;
 }
 
 /***************************************************************
@@ -22,35 +87,56 @@ const mapToQuestionType = (type) => {
   return questionType;
 }
 
-export const newQuestion = (type) => {
-  let answers = [newAnswer(true)];
-  if (type !== questionTypes.JUDGEMENT) {
+export const newAnswers = (type) => {
+  let answers = [];
+  if (type === questionTypes.JUDGEMENT) {
+    answers.push({
+      id: 1,
+      name: 'True',
+      correct: true,
+    });
+    answers.push({
+      id: 2,
+      name: 'False',
+      correct: false,
+    });
+  } else {
+    answers.push(newAnswer(true));
     answers.push(newAnswer(false));
   }
+  return answers;
+}
 
+export const newQuestion = (type) => {
   return {
     id: uid(),
     name: '',
     thumbnail: '',
     type: mapToQuestionType(type),
-    timeLimit: timeLimit.NORMAL,
+    duration: duration.NORMAL,
     points: points.STANDARD,
-    answers: answers,
+    answers: newAnswers(type),
   };
+}
+
+export const isEmptyQuestion = (question) => {
+  return (
+    isEmptyString(question.name) &&
+    question.answers.filter((a) => !isEmptyString(a.name)).length === 0);
 }
 
 export const newAnswer = (isCorrect) => {
   return {
     id: uid(),
     name: '',
-    correct: isCorrect === true,
+    correct: isCorrect,
   };
 }
 
 export const mapToAnswer = (answer) => {
   return {
-    id: Number(answer.id) || uid(),
-    name: answer.name.trim() || '',
+    id: Number(answer.id),
+    name: answer.name.trim(),
     correct: !!answer.correct,
   };
 }
@@ -61,10 +147,35 @@ export const mapToQuestion = (question) => {
     name: question.name.trim(),
     thumbnail: question.thumbnail,
     type: mapToQuestionType(question.type),
-    timeLimit: Number(question.timeLimit),
+    duration: Number(question.duration) || duration.NORMAL,
     points: Number(question.points),
-    answers: question.answers.map((a) => mapToAnswer(a)).filter((a) => !isEmptyString(a.name)),
+    answers: question.answers.filter(a => !isEmptyString(a.name)).map(a => mapToAnswer(a)),
+    correctAnswers: question.answers.filter(a => a.correct && !isEmptyString(a.name)).map(a => Number(a.id)),
   };
+}
+
+export const convertToQuestion = (question) => {
+  return {
+    id: Number(question.id),
+    name: question.name.trim(),
+    thumbnail: question.thumbnail,
+    type: mapToQuestionType(question.type),
+    duration: Number(question.duration) || duration.NORMAL,
+    points: Number(question.points),
+    answers: question.answers.length > 0
+      ? question.answers.filter(a => !isEmptyString(a.name)).map(a => mapToAnswer(a))
+      : newAnswers(question.type),
+  };
+}
+
+export const changeQuestionType = (question, type) => {
+  const newType = mapToQuestionType(type);
+  const newQuestion = {
+    ...question,
+    type: newType,
+    answers: newAnswers(newType),
+  };
+  return newQuestion;
 }
 
 /***************************************************************
@@ -77,7 +188,7 @@ export const newGame = (name, user) => {
     owner: user.email,
     createdAt: new Date().toISOString(),
     thumbnail: '',
-    active: 0, // 0 = inactive, 1 = active
+    active: null, // the ID of the active session for this game. If no active session, set to null
     questions: [],
   };
   return newGame;
