@@ -201,7 +201,7 @@ export const mapToGame = (game) => {
     owner: game.owner,
     createdAt: game.createdAt,
     thumbnail: game.thumbnail,
-    active: Number(game.active),
+    active: Number(game.active) || null,
     questions: game.questions ? game.questions.map((q) => mapToQuestion(q)) : [],
   };
 }

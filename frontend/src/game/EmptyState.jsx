@@ -1,7 +1,7 @@
 import { Text } from '@components/text';
 import { QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
-import NewQuestionModal from '../shared/components/questions/NewQuestionModal';
+import { NewQuestionModal } from '@components/questions';
 import clsx from 'clsx';
 
 const styles = {

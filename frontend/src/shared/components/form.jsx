@@ -1,18 +1,17 @@
 import { Button } from '@components/button';
-import { ErrorMessage } from '@components/fieldset';
+import { ErrorMessage, Field } from '@components/fieldset';
 import { Input } from '@components/input';
-import { Text } from '@components/text';
+import { ConfirmModal } from '@components/modal';
+import { Strong, Text } from '@components/text';
 import { Textarea } from '@components/textarea';
 import { CheckIcon, XCircleIcon, XMarkIcon } from '@heroicons/react/20/solid';
-import { PhotoIcon } from '@heroicons/react/24/solid';
-import { fileToDataUrl, pluralSuffix } from '@utils/helpers';
-import clsx from 'clsx';
+import { PencilIcon, PhotoIcon } from '@heroicons/react/24/solid';
+import { fileToDataUrl, isNullOrUndefined, pluralSuffix } from '@utils/helpers';
 import { useRef, useState } from 'react';
-import { Strong } from '@components/text';
-import { Field } from '@components/fieldset';
+import clsx from 'clsx';
 
 /***************************************************************
-                       Edit Form
+                       Form Alert
 ***************************************************************/
 export function FormAlert( { errors, children } ) {
   return (
@@ -210,7 +209,9 @@ export function TextInput({ value, onChange, readOnly, ...props }) {
         inputclassname="w-full truncate"
         {...props}
       />
-      {error && <ErrorMessage>{error}</ErrorMessage>}
+      {error && !readOnly && touched && (
+        <ErrorMessage>{error}</ErrorMessage>)
+      }
     </>
   );
 }
@@ -405,6 +406,76 @@ export function FileInput({ value, onChange, readOnly }) {
         </div>
       </div>
       {error && <ErrorMessage>{error}</ErrorMessage>}
+    </>
+  );
+}
+
+/***************************************************************
+                       Edit Form
+***************************************************************/
+function AlertPlaceholder({ error, readOnly }) {
+  if (isNullOrUndefined(error) || readOnly) return null;
+
+  return (
+    <FormAlert errors={[error]}>
+      {error}
+    </FormAlert>
+  );
+}
+
+export function EditForm({
+  onSubmit,
+  onCancel,
+  error,
+  setError,
+  readOnly=false,
+  setReadOnly,
+  disabled=false,
+  isOpen,
+  setIsOpen,
+  discardChanges,
+  ...props
+}) {
+  return (
+    <>
+      <form onSubmit={onSubmit}>
+        <div className="px-4 py-6 sm:p-8">
+          <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+            <AlertPlaceholder error={error} readOnly={readOnly} />
+            {/* Form fields */}
+            { props.children }
+          </div>
+        </div>
+
+        <div className="flex items-center justify-end gap-x-6 border-t border-zinc-900/10 dark:border-white/10 px-4 py-4 sm:px-8">
+          {readOnly ? (
+            <Button type="button" color='white' onClick={() => setReadOnly(false)}>
+              <PencilIcon aria-hidden="true" />
+              Edit
+            </Button>
+          ) : (
+            <>
+              <Button type="button" onClick={onCancel} disabled={disabled} outline>
+                Cancel
+              </Button>
+              <Button type="submit" loading={disabled} disabled={disabled} color='teal'>
+                Save
+              </Button>
+            </>
+          )}
+        </div>
+      </form>
+
+      {/* Confirm Dialog */}
+      <ConfirmModal
+        title="Unsaved changes"
+        description="You have unsaved changes. Are you sure you want to discard them?"
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        onConfirm={discardChanges}
+        confirmText="Discard"
+        style="warning"
+      />
     </>
   );
 }

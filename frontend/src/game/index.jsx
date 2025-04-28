@@ -1,5 +1,3 @@
 export {default as EditGameForm} from './EditGameForm'
 export {default as EditQuestionForm} from './EditQuestionForm'
 export {default as EmptyState} from './EmptyState'
-export {default as NewQuestionModal} from '../shared/components/questions/NewQuestionModal'
-export {default as InputQuestionAnswers} from '../shared/components/questions/InputQuestionAnswers'

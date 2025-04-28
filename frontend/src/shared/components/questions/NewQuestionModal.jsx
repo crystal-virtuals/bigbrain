@@ -13,6 +13,7 @@ import { Heading } from '@components/heading';
 import { Text } from '@components/text';
 import { questionTypes } from '@constants/questions';
 import clsx from 'clsx';
+import { useToast } from '@hooks/toast';
 
 const styles = {
   default: [
@@ -68,14 +69,18 @@ function QuestionTypeOption({ title, description, icon, onClick, ...props }) {
   )
 }
 
+
+
 export default function NewQuestionModal({ isOpen, setIsOpen, createQuestion }) {
+  const toastify = useToast();
+
   const handleClick = (questionType) => {
     createQuestion(questionType)
       .then(() => {
-        console.log('Question created');
+        toastify.success('Question created');
       })
-      .catch((error) => {
-        console.error('Error creating question:', error);
+      .catch(() => {
+        toastify.error('Failed to create question. Please try again later.');
       })
       .finally(() => {
         setIsOpen(false);

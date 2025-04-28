@@ -1,9 +1,8 @@
 import { Field, Label } from '@components/fieldset';
-import { EditForm, useEditForm } from '@hooks/form';
-import { FileInput, TextInput } from '@components/form';
-import { isNullOrUndefined } from '@utils/helpers';
-import { Skeleton } from '@components/loading';
-import { mapToGame } from '../shared/utils/game';
+import { FileInput, TextInput, EditForm } from '@components/form';
+import { useToast } from '@hooks/toast';
+import { mapToGame } from '@utils/game';
+import { useState } from 'react';
 
 const validate = (game) => {
   if (!game.name || game.name.trim() === '') {
@@ -13,21 +12,94 @@ const validate = (game) => {
 }
 
 function EditGameForm({ game, onSubmit, isReadOnly = false }) {
-  const props = useEditForm(mapToGame(game), onSubmit, validate, isReadOnly);
-  const { formData, setFormData, ...rest } = props;
+  const [prevFormData, setPrevFormData] = useState(mapToGame(game));
+  const [formData, setFormData] = useState(mapToGame(game));
+  const [isOpen, setIsOpen] = useState(false);
+  const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [readOnly, setReadOnly] = useState(isReadOnly);
+  const toastify = useToast();
 
-  const handleChange = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+  const isEqual = (obj1, obj2) => {
+    return JSON.stringify(obj1) === JSON.stringify(obj2);
   };
 
-  // Make sure game and formData has been set
-  if (isNullOrUndefined(formData)) {
-    return <Skeleton className="col-span-full max-w-2xl" />;
+  // Reset form to initial state
+  const resetForm = () => {
+    setFormData(prevFormData);
+    setError('');
+  };
+
+  // Discard changes and reset form
+  const discardChanges = () => {
+    resetForm();
+    setReadOnly(true);
+    setIsOpen(false);
+  };
+
+  // On cancel, show confirmation dialog if form is dirty (unsaved changes)
+  const handleCancel = () => {
+    const isDirty = !isEqual(formData, prevFormData);
+    if (isDirty) {
+      setIsOpen(true);
+    } else {
+      resetForm();
+      setReadOnly(true);
+    }
+  };
+
+  // Handle all form changes
+  const handleChange = (name, value) => {
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  // Handle form submission
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError('');
+
+    // Validate form data
+    const validationError = validate(formData);
+    if (validationError) {
+      setError(validationError);
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Call the onSubmit function with the form data
+    const pendingData = mapToGame(formData);
+    return onSubmit(pendingData)
+      .then(() => {
+        setPrevFormData(pendingData);
+        setFormData(pendingData);
+        setReadOnly(true);
+        toastify.success('Updated game');
+      })
+      .catch(err => {
+        toastify.error(err.message || 'Failed to save changes.');
+      })
+      .finally(() => {
+        setIsSubmitting(false);
+      });
+  };
+
+  const props = {
+    onSubmit: handleSubmit,
+    onCancel: handleCancel,
+    error: error,
+    setError: setError,
+    readOnly: readOnly,
+    setReadOnly: setReadOnly,
+    disabled: isSubmitting,
+    isOpen: isOpen,
+    setIsOpen: setIsOpen,
+    discardChanges: discardChanges,
   }
 
   return (
     <>
-      <EditForm {...rest}>
+      <EditForm {...props}>
         {/* Game name */}
         <Field className="col-span-full">
           <Label htmlFor="gameName">Game name</Label>
@@ -36,8 +108,8 @@ function EditGameForm({ game, onSubmit, isReadOnly = false }) {
             name="name"
             value={formData.name}
             onChange={(value) => handleChange('name', value)}
-            readOnly={props.readOnly}
-            disabled={props.disabled}
+            readOnly={readOnly}
+            disabled={isSubmitting}
           />
         </Field>
 
@@ -48,8 +120,8 @@ function EditGameForm({ game, onSubmit, isReadOnly = false }) {
             name="thumbnail"
             value={formData.thumbnail}
             onChange={(dataUrl) => handleChange('thumbnail', dataUrl)}
-            readOnly={props.readOnly}
-            disabled={props.disabled}
+            readOnly={readOnly}
+            disabled={isSubmitting}
           />
         </Field>
       </EditForm>
