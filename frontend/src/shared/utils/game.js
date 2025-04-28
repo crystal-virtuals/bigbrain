@@ -1,11 +1,77 @@
-import { questionTypes, duration, points } from '@constants/question';
+import { questionTypes, duration, points } from '@constants/questions';
 import { uid, pluralSuffix, isEmptyString } from '@utils/helpers';
 
 /***************************************************************
-                        Equality
+                        Validation
 ***************************************************************/
 export const isEqual = (game, id) => {
   return Number(game.id) == Number(id);
+}
+
+const validateSingleChoice = (errors, answers) => {
+  // Validate correct answer
+  const correctAnswer = answers.find(a => a.correct);
+  if (isEmptyString(correctAnswer?.name)) {
+    errors.set('correctAnswer', 'Correct answer cannot be empty');
+  }
+
+  // Validate at least one false answer exists
+  const falseAnswers = answers.filter(a => !a.correct);
+  if (falseAnswers.length === 0) {
+    errors.set('falseAnswers', 'At least one false answer is required');
+  }
+
+  // Validate each false answer (only first one is required)
+  falseAnswers.forEach((answer, index) => {
+    if (index === 0 && isEmptyString(answer.name)) {
+      errors.set(`falseAnswers`, 'First false answer cannot be empty');
+    }
+  });
+};
+
+const validateMultipleChoice = (errors, answers) => {
+  const nonEmptyAnswers = answers.filter(a => !isEmptyString(a.name));
+  const correctAnswers = answers.filter(a => a.correct);
+
+  // At least one correct answer is required
+  if (correctAnswers.length === 0) {
+    errors.set('answers', 'At least one answer must be correct');
+  }
+
+  // If there is only one correct answer, it cannot be empty
+  if (correctAnswers.length === 1 && isEmptyString(correctAnswers[0].name)) {
+    errors.set('answers', 'Correct answer cannot be empty');
+  }
+
+  // First two answers are required
+  answers.forEach((answer, index) => {
+    if (index < 2 && isEmptyString(answer.name)) {
+      errors.set(`answers`, 'First two answers cannot be empty');
+    }
+  });
+
+  // At least two answers are required
+  if (nonEmptyAnswers.length < 2) {
+    errors.set('answers', 'At least two answers are required');
+  }
+}
+
+export function validateQuestion(question) {
+  const errors = new Map();
+
+  // Validate question name
+  if (isEmptyString(question.name)) {
+    errors.set('name', 'Question cannot be empty');
+  }
+
+  // Validate answers
+  if (question.type === questionTypes.SINGLE_CHOICE) {
+    validateSingleChoice(errors, question.answers);
+  } else if (question.type === questionTypes.MULTIPLE_CHOICE) {
+    validateMultipleChoice(errors, question.answers);
+  }
+
+  return errors;
 }
 
 /***************************************************************
@@ -22,19 +88,26 @@ const mapToQuestionType = (type) => {
 }
 
 export const newAnswers = (type) => {
-  let answers = [newAnswer(true)];
-  if (type !== questionTypes.JUDGEMENT) {
+  let answers = [];
+  if (type === questionTypes.JUDGEMENT) {
+    answers.push({
+      id: 1,
+      name: 'True',
+      correct: true,
+    });
+    answers.push({
+      id: 2,
+      name: 'False',
+      correct: false,
+    });
+  } else {
+    answers.push(newAnswer(true));
     answers.push(newAnswer(false));
   }
   return answers;
 }
 
 export const newQuestion = (type) => {
-  let answers = [newAnswer(true)];
-  let correctAnswers = [answers[0].id];
-  if (type !== questionTypes.JUDGEMENT) {
-    answers.push(newAnswer(false));
-  }
   return {
     id: uid(),
     name: '',
@@ -42,8 +115,7 @@ export const newQuestion = (type) => {
     type: mapToQuestionType(type),
     duration: duration.NORMAL,
     points: points.STANDARD,
-    answers: answers,
-    correctAnswers: correctAnswers,
+    answers: newAnswers(type),
   };
 }
 
@@ -51,49 +123,6 @@ export const isEmptyQuestion = (question) => {
   return (
     isEmptyString(question.name) &&
     question.answers.filter((a) => !isEmptyString(a.name)).length === 0);
-}
-
-export const validateQuestion = (question) => {
-  const errors = new Map();
-
-  if (isEmptyString(question.name)) {
-    errors.set('name', 'Question cannot be empty');
-  }
-
-  const nonEmptyAnswers = question.answers.filter((a) => !isEmptyString(a.name));
-  const correctAnswers = nonEmptyAnswers.filter((a) => a.correct);
-  const falseAnswers = nonEmptyAnswers.filter((a) => !a.correct);
-
-  if (question.type === questionTypes.JUDGEMENT) {
-    // Judgement question must have one correct answer
-    if (nonEmptyAnswers.length < 1) {
-      errors.set('answers', 'One answer is required');
-    }
-  }
-
-  if (question.type === questionTypes.SINGLE_CHOICE) {
-    // Single choice question must have one correct answer
-    if (correctAnswers.length !== 1) {
-      errors.set('correctAnswer', 'One correct answer is required');
-    }
-    // At least 2 answers are required
-    if (falseAnswers.length < 1) {
-      errors.set('falseAnswers', 'At least one false answer is required');
-    }
-  }
-
-  if (question.type === questionTypes.MULTIPLE_CHOICE) {
-    // Multiple choice question must have at least one correct answer
-    if (correctAnswers.length === 0) {
-      errors.set('answers', 'At least one correct answer is required');
-    }
-    // At least 2 answers are required
-    if (falseAnswers.length < 1) {
-      errors.set('answers', 'At least one false answer is required');
-    }
-  }
-
-  return errors;
 }
 
 export const newAnswer = (isCorrect) => {
@@ -136,8 +165,17 @@ export const convertToQuestion = (question) => {
     answers: question.answers.length > 0
       ? question.answers.filter(a => !isEmptyString(a.name)).map(a => mapToAnswer(a))
       : newAnswers(question.type),
-    correctAnswers: question.answers.filter(a => a.correct && !isEmptyString(a.name)).map(a => Number(a.id)),
   };
+}
+
+export const changeQuestionType = (question, type) => {
+  const newType = mapToQuestionType(type);
+  const newQuestion = {
+    ...question,
+    type: newType,
+    answers: newAnswers(newType),
+  };
+  return newQuestion;
 }
 
 /***************************************************************
