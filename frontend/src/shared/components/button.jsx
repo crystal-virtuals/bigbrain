@@ -187,11 +187,11 @@ export function Spinner({ loading }) {
 export const Button = forwardRef(function Button({ color, outline, plain, loading = false, disabled = false, className, children, ...props }, ref) {
   const isDisabled = disabled || loading;
   let classes = clsx(
+    className,
     styles.base,
     outline ? styles.outline : plain ? styles.plain : clsx(styles.solid, styles.colors[color ?? 'dark/zinc']),
     isDisabled && 'cursor-not-allowed',
     loading && 'cursor-progress',
-    className,
   )
 
 
