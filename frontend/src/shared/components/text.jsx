@@ -6,7 +6,7 @@ export function Text({ className, ...props }) {
     <p
       data-slot="text"
       {...props}
-      className={clsx('text-base/6 text-zinc-500 sm:text-sm/6 dark:text-zinc-400', className)}
+      className={clsx(className, 'text-base/6 text-zinc-500 sm:text-sm/6 dark:text-zinc-400')}
     />
   )
 }
@@ -16,8 +16,8 @@ export function TextLink({ className, ...props }) {
     <Link
       {...props}
       className={clsx(
-        'text-zinc-950 decoration-zinc-950/50 data-hover:decoration-zinc-950 dark:text-white dark:decoration-white/50 dark:data-hover:decoration-white',
-        className)}
+        className,
+        'text-zinc-950 decoration-zinc-950/50 data-hover:decoration-zinc-950 dark:text-white dark:decoration-white/50 dark:data-hover:decoration-white')}
     />
   )
 }
