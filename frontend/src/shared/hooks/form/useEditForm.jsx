@@ -1,35 +1,20 @@
 import { useState, useEffect, useRef } from 'react';
 
-function useEditForm(initialData, onSubmit, validate, isReadOnly) {
+function useEditForm(initialData, onSubmit, validate, isReadOnly = false) {
+  const [prevFormData, setPrevFormData] = useState(initialData);
   const [formData, setFormData] = useState(initialData);
-  const [isDirty, setIsDirty] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [readOnly, setReadOnly] = useState(isReadOnly);
-  const initialRef = useRef(initialData);
 
   const isEqual = (obj1, obj2) => {
     return JSON.stringify(obj1) === JSON.stringify(obj2);
   };
 
-  // Check if form is dirty whenever formData changes
-  useEffect(() => {
-    const dirty = !isEqual(formData, initialRef.current);
-    setIsDirty(dirty);
-  }, [formData]);
-
-  // Update initialData ref if it changes
-  useEffect(() => {
-    if (isEqual(initialData, initialRef.current)) return;
-    initialRef.current = initialData;
-    setFormData(initialData);
-  }, [initialData]);
-
   // Reset form to initial state
   const resetForm = () => {
-    setFormData(initialRef.current);
-    setIsDirty(false);
+    setFormData(prevFormData);
     setError('');
   };
 
@@ -42,6 +27,7 @@ function useEditForm(initialData, onSubmit, validate, isReadOnly) {
 
   // On cancel, show confirmation dialog if form is dirty (unsaved changes)
   const handleCancel = () => {
+    const isDirty = !isEqual(formData, prevFormData);
     if (isDirty) {
       setIsOpen(true);
     } else {
@@ -73,9 +59,8 @@ function useEditForm(initialData, onSubmit, validate, isReadOnly) {
 
     return onSubmit(formData)
       .then((updated) => {
-        initialRef.current = updated;
+        setPrevFormData(updated);
         setFormData(updated);
-        setIsDirty(false);
         setReadOnly(true);
       })
       .catch(err => {
