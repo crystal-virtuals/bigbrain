@@ -6,6 +6,7 @@ import { FormAlert } from '@components/form';
 
 export function AlertPlaceholder({ error, readOnly }) {
   if (isNullOrUndefined(error) || readOnly) return null;
+
   return (
     <FormAlert errors={[error]}>
       {error}

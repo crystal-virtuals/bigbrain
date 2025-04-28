@@ -41,7 +41,7 @@ function Container({ className, children }) {
   return <div className={clsx(className, styles)}>{children}</div>;
 }
 
-function QuestionAnswers({ type, answers }) {
+function QuestionAnswers({ question }) {
   const styles = [
     // Basic layout
     'w-full rounded-lg flex flex-row items-center space-x-3 py-2',
@@ -49,16 +49,20 @@ function QuestionAnswers({ type, answers }) {
     'bg-zinc-400/10 dark:bg-white/10',
   ]
 
-  if (type === questionTypes.JUDGEMENT) {
+  if (isEmptyString(question.name) || question.answers.length === 0) {
+    return null;
+  }
+
+  if (question.type === questionTypes.JUDGEMENT) {
     return (
       <div className="flex flex-col space-y-4">
         <div className={clsx(styles)}>
           <CheckboxButton
-            checked={answers.find((a) => a.correct)?.name === 'True'}
+            checked={question.answers.find((a) => a.correct)?.name === 'True'}
             className="size-6 cursor-default pointer-events-none"
           />
           <span className="text-zinc-950 dark:text-white text-base/6 sm:text-sm/6">
-            {answers.find((a) => a.correct)?.name === 'True' ? 'True' : 'False'}
+            {question.answers.find((a) => a.correct)?.name === 'True' ? 'True' : 'False'}
           </span>
         </div>
       </div>
@@ -67,7 +71,7 @@ function QuestionAnswers({ type, answers }) {
 
   return (
     <div className="flex flex-col space-y-4">
-      {answers.map((a) => (
+      {question.answers.map((a) => (
         <div className={clsx(styles)} key={a.id}>
           <CheckboxButton
             checked={a.correct}
@@ -132,7 +136,7 @@ function QuestionCard({ index, question, deleteQuestion }) {
 
   return (
     <>
-      <Card className="mb-6">
+      <Card className="mb-6" >
         <div className="relative px-4 py-6 sm:p-8">
 
           <div className="absolute top-4 right-4">
@@ -149,7 +153,7 @@ function QuestionCard({ index, question, deleteQuestion }) {
             </Field>
 
             <Field className="col-span-full">
-              <QuestionAnswers type={question.type} answers={question.answers} />
+              <QuestionAnswers question={question} />
             </Field>
 
             <Field className="col-span-full flex flex-row items-center gap-2">
