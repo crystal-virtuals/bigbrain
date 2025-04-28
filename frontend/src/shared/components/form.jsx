@@ -12,7 +12,7 @@ import { Strong } from '@components/text';
 import { Field } from '@components/fieldset';
 
 /***************************************************************
-                       Edit Form
+                       Form Alert
 ***************************************************************/
 export function FormAlert( { errors, children } ) {
   return (
@@ -210,7 +210,9 @@ export function TextInput({ value, onChange, readOnly, ...props }) {
         inputclassname="w-full truncate"
         {...props}
       />
-      {error && <ErrorMessage>{error}</ErrorMessage>}
+      {error && !readOnly && touched && (
+        <ErrorMessage>{error}</ErrorMessage>)
+      }
     </>
   );
 }

@@ -1,5 +1,3 @@
-export { InputQuestionName, SelectQuestionType, SelectDuration, SelectPoints } from './QuestionControls'
-export { default as InputQuestionAnswers } from './InputQuestionAnswers'
 export { default as QuestionCard } from './QuestionCard'
 export { default as NewQuestionModal } from './NewQuestionModal'
 export { default as AddQuestionButton } from './AddQuestionButton'
