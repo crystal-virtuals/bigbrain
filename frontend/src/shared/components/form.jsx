@@ -3,56 +3,54 @@ import { ErrorMessage } from '@components/fieldset';
 import { Input } from '@components/input';
 import { Text } from '@components/text';
 import { Textarea } from '@components/textarea';
-import { CheckIcon, XMarkIcon } from '@heroicons/react/20/solid';
+import { CheckIcon, XCircleIcon, XMarkIcon } from '@heroicons/react/20/solid';
 import { PhotoIcon } from '@heroicons/react/24/solid';
-import { fileToDataUrl } from '@utils/helpers';
+import { fileToDataUrl, pluralSuffix } from '@utils/helpers';
 import clsx from 'clsx';
 import { useRef, useState } from 'react';
+import { Strong } from '@components/text';
+import { Field } from '@components/fieldset';
 
+/***************************************************************
+                       Edit Form
+***************************************************************/
+export function FormAlert( { errors, children } ) {
+  return (
+    <div className="rounded-md bg-red-50 p-4 col-span-full border-2 border-red-100">
+      <div className="flex">
+        <div className="shrink-0">
+          <XCircleIcon aria-hidden="true" className="size-5 text-red-400" />
+        </div>
+        <div className="ml-3">
+          <h3 className="text-sm font-medium text-red-800">There {errors.size === 1 ? 'is' : 'were'} {errors.size || 'some'} error{pluralSuffix(errors.size || 2)} with your submission</h3>
+          <div className="mt-2 text-sm text-red-700">
+            {children}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/***************************************************************
+                       Edit Form Inputs
+***************************************************************/
 export function ControlledTextarea({
   name,
   value,
-  setValue,
-  errors,
-  setErrors,
-  required,
+  onChange,
+  required = false,
   readOnly = false,
-  errorMessage = '',
   ...props
 }) {
-  const validate = (value) => {
-    if (!value || value.trim() === '') {
-      return errorMessage || 'This field is required';
-    }
-    return null;
-  };
-
-  const setError = (error) => {
-    const newErrors = new Map(errors);
-    if (error) {
-      newErrors.set(name, error);
-    } else {
-      newErrors.delete(name);
-    }
-    setErrors(newErrors);
-  };
-
-  const handleChange = (e) => {
-    if (setValue) setValue(e.target.value);
-    if (required) setError(validate(e.target.value));
-  };
-
-  const handleBlur = (e) => {
-    if (required) setError(validate(e.target.value));
-  };
 
   return (
     <>
       <Textarea
         dark={false}
+        name={name}
         value={value}
-        onChange={handleChange}
-        onBlur={handleBlur}
+        onChange={onChange}
         readOnly={readOnly}
         aria-readonly={readOnly}
         placeholder={required ? 'Required' : 'Optional'}
@@ -65,47 +63,18 @@ export function ControlledTextarea({
 export function ControlledInput({
   name,
   value,
-  setValue,
-  errors,
-  setErrors,
+  onChange,
   required = false,
   readOnly = false,
-  errorMessage = '',
   correct,
   ...props
 }) {
-  const validate = (value) => {
-    if (!value || value.trim() === '') {
-      return errorMessage || 'This field is required';
-    }
-    return null;
-  };
 
-  const setError = (error) => {
-    const newErrors = new Map(errors);
-    if (error) {
-      newErrors.set(name, error);
-    } else {
-      newErrors.delete(name);
-    }
-    setErrors(newErrors);
-  };
-
-  const handleChange = (e) => {
-    if (setValue) setValue(e.target.value); // onChange receives the new value
-    if (required) setError(validate(e.target.value));
-  };
-
-  const handleBlur = (e) => {
-    if (required) setError(validate(e.target.value));
-  };
-
-  let key = correct === true ? 'true' : correct === false ? 'false' : 'neutral';
   const styles = {
     true: 'sm:focus-within:after:ring-emerald-600',
     false: 'sm:focus-within:after:ring-pink-600',
     neutral: 'sm:focus-within:after:ring-blue-500',
-  }[key];
+  }[correct === true ? 'true' : correct === false ? 'false' : 'neutral'];
 
   return (
     <>
@@ -113,9 +82,9 @@ export function ControlledInput({
         dark={false}
         className={styles}
         placeholder={required ? 'Required' : 'Optional'}
+        name={name}
         value={value}
-        onChange={handleChange}
-        onBlur={handleBlur}
+        onChange={onChange}
         readOnly={readOnly}
         aria-readonly={readOnly}
         inputclassname="sm:px-[calc(--spacing(3)-1px)] px-[calc(--spacing(3.5)-1px)]"
@@ -125,28 +94,36 @@ export function ControlledInput({
   );
 }
 
-export function CheckboxButton({ checked, setChecked }) {
+export function CheckboxButton({ className, checked, toggleChecked }) {
+  const styles = {
+    base: 'shadow-md text-white flex rounded-lg items-center justify-center p-1.5 ml-2 touch-manipulation cursor-pointer pointer-events-auto',
+    true: 'bg-emerald-400 shadow-emerald-800',
+    false: 'bg-rose-500 shadow-rose-900',
+  };
+
   return (
     <button
       type="button"
       className={clsx(
-        'shadow-md text-white flex rounded-lg items-center justify-center p-1.5 ml-2 touch-manipulation cursor-pointer pointer-events-auto',
+        className,
+        styles.base,
         checked
-          ? 'bg-emerald-400 shadow-emerald-800'
-          : 'bg-rose-500 shadow-rose-900'
+          ? styles.true
+          : styles.false,
       )}
-      onClick={() => setChecked((prev) => !prev)}
+      onClick={toggleChecked}
     >
-      <CheckIcon
-        aria-hidden="true"
-        className="size-6 stroke-1 stroke-white"
-        style={{ display: checked ? 'block' : 'none' }}
-      />
-      <XMarkIcon
-        aria-hidden="true"
-        className="size-6 stroke-1 stroke-white"
-        style={{ display: checked ? 'none' : 'block' }}
-      />
+      {checked ? (
+        <CheckIcon
+          aria-hidden="true"
+          className="size-6 stroke-1 stroke-white"
+        />
+      ) : (
+        <XMarkIcon
+          aria-hidden="true"
+          className="size-6 stroke-1 stroke-white"
+        />
+      )}
     </button>
   );
 }
@@ -237,6 +214,134 @@ export function TextInput({ value, onChange, readOnly, ...props }) {
     </>
   );
 }
+
+/***************************************************************
+                       File Input
+***************************************************************/
+export function ThumbnailInput({ value, onChange, ...props }) {
+  const [error, setError] = useState(null);
+  const fileInputRef = useRef(null);
+
+  const styles = {
+    close: [
+      // cursor
+      'cursor-pointer touch-manipulation pointer-events-auto',
+      // layout
+      'absolute -top-2 -right-2 rounded-full p-1 shadow-sm',
+      // text
+      'text-zinc-950 dark:text-white',
+      // background
+      'bg-white dark:bg-zinc-900 hover:bg-white/10 dark:hover:bg-zinc-950',
+    ],
+    dashed: [
+      'border border-dashed border-zinc-900/25 dark:border-white/25',
+    ],
+    base: [
+      // Base
+      'relative isolate inline-flex items-baseline justify-center gap-x-2 rounded-lg border',
+      // Sizing
+      'px-[calc(--spacing(3.5)-1px)] py-[calc(--spacing(2.5)-1px)] sm:px-[calc(--spacing(3)-1px)] sm:py-[calc(--spacing(1.5)-1px)] sm:text-sm/6',
+    ],
+    readOnly: [
+      // cursor
+      'cursor-none pointer-events-none',
+    ]
+  }
+
+  const handleFileUpload = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // reset the input value to allow re-uploading the same file
+    e.target.value = '';
+
+    fileToDataUrl(file)
+      .then((dataUrl) => {
+        setError(null);
+        onChange(dataUrl); // onChange receives the data URL
+      })
+      .catch((error) => {
+        setError(error.message || 'Failed to load image. Please try again.');
+      })
+  };
+
+  const handleUploadError = () => {
+    setError('Failed to load image. Please try again.');
+  };
+
+  const handleRemoveImage = (e) => {
+    e.preventDefault();
+    e.stopPropagation(); // Prevent triggering the file input
+    onChange(null); // Clear the image
+    setError(null);
+  };
+
+  if (value) {
+    return (
+      <Field className="w-full flex flex-col">
+        <div className={clsx('relative', styles.dashed, styles.base)}>
+          <img
+            alt=""
+            src={value}
+            className="size-full flex-none rounded-lg object-cover"
+            onError={handleUploadError}
+          />
+          <button
+            type="button"
+            className={clsx(styles.close)}
+            onClick={handleRemoveImage}
+          >
+            <XMarkIcon aria-hidden='true' className="size-5 text-zinc-950 dark:text-white" />
+          </button>
+        </div>
+        {error && <ErrorMessage>{error}</ErrorMessage>}
+      </Field>
+    );
+  }
+
+  return (
+    <Field className="w-full flex flex-col">
+      <Button
+        outline
+        type="button"
+        className={clsx(styles.dashed, value && styles.readOnly)}
+        onClick={handleFileUpload}
+      >
+        <div className="text-center px-6 py-10">
+          <PhotoIcon
+            aria-hidden="true"
+            className="mx-auto size-14 text-zinc-300 dark:text-zinc-500"
+          />
+          <div className="mt-4 flex text-sm/6 text-zinc-600 dark:text-gray-400 justify-center">
+            <Strong htmlFor="file-upload">Upload a thumbnail</Strong>
+            <input
+              id="file-upload"
+              name="file-upload"
+              accept="image/jpeg, image/png, image/jpg"
+              type="file"
+              className="sr-only"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              {...props}
+            />
+          </div>
+          <p className="text-xs/5 text-zinc-600">
+            PNG, JPG, JPEG up to 10MB
+          </p>
+        </div>
+      </Button>
+      {error && <ErrorMessage>{error}</ErrorMessage>}
+    </Field>
+  );
+}
+
+
 
 export function FileInput({ value, onChange, readOnly }) {
   const [error, setError] = useState(null);
