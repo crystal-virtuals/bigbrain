@@ -1,45 +1,26 @@
 import { Button } from '@components/button';
 import { Card } from '@components/card';
-import { AlertModal, ConfirmModal } from '@components/modal';
-import { InputQuestionAnswers, InputQuestionName, SelectDuration, SelectQuestionType, SelectPoints } from '@components/questions';
-import { PencilIcon, TrashIcon } from '@heroicons/react/24/solid';
-import { convertToQuestion, isEmptyQuestion, mapToQuestion, validateQuestion } from '@utils/game';
-import clsx from 'clsx';
-import { useState } from 'react';
-import { ThumbnailInput } from '@components/form';
-import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@components/loading';
+import { ConfirmModal } from '@components/modal';
+import {
+  InputQuestionName, SelectQuestionType, SelectDuration, SelectPoints, InputQuestionThumbnail, InputQuestionAnswers
+} from '@components/questions/controls';
+import { useToast } from '@hooks/toast';
+import {
+  convertToQuestion,
+  mapToQuestion,
+  validateQuestion,
+} from '@utils/game';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-function QuestionThumbnail({ question, setQuestion }) {
-  const styles = [
-    'flex flex-col lg:justify-start gap-4 p-4 sm:rounded-xl',
-    'bg-zinc-100 dark:bg-zinc-800',
-    'shadow-xs ring-1 ring-zinc-900/5',
-  ];
-
-  const setThumbnail = (dataUrl) => {
-    setQuestion((prev) => ({ ...prev, thumbnail: dataUrl }));
-  }
-
-  return (
-    <div className={clsx(styles)}>
-      <ThumbnailInput
-        name="thumbnail"
-        value={question.thumbnail}
-        onChange={(dataUrl) => setThumbnail(dataUrl)}
-      />
-    </div>
-  );
-}
-
-function EditQuestionForm({ question, deleteQuestion, setErrors, onSubmit, isReadOnly = false }) {
+function EditQuestionForm({ question, setErrors, onSubmit }) {
   const [prevFormData, setPrevFormData] = useState(convertToQuestion(question));
   const [formData, setFormData] = useState(convertToQuestion(question));
-  const [readOnly, setReadOnly] = useState(isReadOnly);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const toastify = useToast();
 
   const isEqual = (obj1, obj2) => {
     return JSON.stringify(obj1) === JSON.stringify(obj2);
@@ -47,19 +28,8 @@ function EditQuestionForm({ question, deleteQuestion, setErrors, onSubmit, isRea
 
   const validate = () => {
     const validationErrors = validateQuestion(formData);
-    console.log('Validation errors:', validationErrors);
     setErrors(validationErrors);
     return validationErrors.size === 0;
-  };
-
-  const handleDelete = (e) => {
-    e.preventDefault();
-    setIsDeleteOpen(true);
-  };
-
-  const handleEdit = (e) => {
-    e.preventDefault();
-    setReadOnly(false);
   };
 
   const handleCancel = (e) => {
@@ -74,17 +44,10 @@ function EditQuestionForm({ question, deleteQuestion, setErrors, onSubmit, isRea
 
   const discardChanges = () => {
     setFormData(prevFormData);
+    setErrors(new Map());
     setIsConfirmOpen(false);
+    // navigate back
     navigate(-1);
-  };
-
-  const deleteThisQuestion = () => {
-    deleteQuestion(question.id)
-      .finally(() => {
-        setIsDeleteOpen(false)
-        // navigate back
-        navigate(-1);
-      });
   };
 
   const handleSubmit = (e) => {
@@ -94,17 +57,16 @@ function EditQuestionForm({ question, deleteQuestion, setErrors, onSubmit, isRea
     if (!validate()) return;
 
     setIsSubmitting(true);
-    const question = mapToQuestion(formData);
-
-    onSubmit(question)
+    const pendingQuestion = mapToQuestion(formData);
+    onSubmit(pendingQuestion)
       .then(() => {
-        console.log('Question updated successfully:', question);
-        setPrevFormData(question);
-        setFormData(question);
+        console.log('Question updated successfully:', pendingQuestion);
+        setPrevFormData(pendingQuestion);
+        setFormData(pendingQuestion);
         setErrors(new Map());
+        toastify.success('Updated question');
         // navigate back
         navigate(-1);
-
       })
       .catch((error) => {
         console.error('Error updating question:', error);
@@ -125,7 +87,7 @@ function EditQuestionForm({ question, deleteQuestion, setErrors, onSubmit, isRea
   return (
     <>
       {/* Question Thumbnail */}
-      <QuestionThumbnail question={formData} setQuestion={setFormData}/>
+      <InputQuestionThumbnail question={formData} setQuestion={setFormData} />
 
       {/* Question Form */}
       <Card>
@@ -163,40 +125,24 @@ function EditQuestionForm({ question, deleteQuestion, setErrors, onSubmit, isRea
           </div>
 
           <div className="flex items-center justify-end gap-x-6 border-t border-zinc-900/10 dark:border-white/10 px-4 py-4 sm:px-8">
-            {readOnly ? (
-              <>
-                <Button type="button" color="red" onClick={handleDelete}>
-                  <TrashIcon aria-hidden="true" />
-                  Delete
-                </Button>
+            <Button
+              type="button"
+              onClick={handleCancel}
+              disabled={isSubmitting}
+              outline
+            >
+              Cancel
+            </Button>
 
-                <Button type="button" color="white" onClick={handleEdit}>
-                  <PencilIcon aria-hidden="true" />
-                  Edit
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button
-                  type="button"
-                  onClick={handleCancel}
-                  disabled={isSubmitting}
-                  outline
-                >
-                  Cancel
-                </Button>
-
-                <Button
-                  type="submit"
-                  onClick={handleSubmit}
-                  loading={isSubmitting}
-                  disabled={isSubmitting}
-                  color="teal"
-                >
-                  Save
-                </Button>
-              </>
-            )}
+            <Button
+              type="submit"
+              onClick={handleSubmit}
+              loading={isSubmitting}
+              disabled={isSubmitting}
+              color="teal"
+            >
+              Save
+            </Button>
           </div>
         </form>
       </Card>
@@ -210,16 +156,6 @@ function EditQuestionForm({ question, deleteQuestion, setErrors, onSubmit, isRea
         isOpen={isConfirmOpen}
         setIsOpen={setIsConfirmOpen}
         onConfirm={discardChanges}
-      />
-
-      {/* Delete Dialog */}
-      <AlertModal
-        title="Delete this question?"
-        description="You are about to delete this question and all of its data. No one will be able to access this question ever again."
-        confirmText="Delete"
-        isOpen={isDeleteOpen}
-        setIsOpen={setIsDeleteOpen}
-        onConfirm={deleteThisQuestion}
       />
     </>
   );
