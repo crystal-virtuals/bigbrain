@@ -1,6 +1,5 @@
 import { Field, Label } from '@components/fieldset';
-import { FileInput, TextInput } from '@components/form';
-import { EditForm } from '@hooks/form';
+import { FileInput, TextInput, EditForm } from '@components/form';
 import { useToast } from '@hooks/toast';
 import { mapToGame } from '@utils/game';
 import { useState } from 'react';
