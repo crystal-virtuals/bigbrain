@@ -26,9 +26,7 @@ function GameQuestions({ game, updateGame }) {
 
   // If game is null or undefined
   if (isNullOrUndefined(game) || isNullOrUndefined(game.questions)) {
-    return (
-      <Skeleton className="col-span-2 max-w-2xl" />
-    );
+    return <Skeleton className="col-span-2 max-w-2xl" />;
   }
 
   // If game has no questions
@@ -42,7 +40,12 @@ function GameQuestions({ game, updateGame }) {
   return (
     <div className="col-span-2 flex flex-col">
       {game.questions.map((question, index) => (
-        <QuestionCard key={question.id} index={index} question={question} deleteQuestion={deleteQuestion} />
+        <QuestionCard
+          key={question.id}
+          index={index}
+          question={question}
+          deleteQuestion={deleteQuestion}
+        />
       ))}
       <AddQuestionButton className="self-end" createQuestion={createQuestion} />
     </div>
@@ -50,16 +53,14 @@ function GameQuestions({ game, updateGame }) {
 }
 
 function Game({ game, updateGame }) {
+  if (isNullOrUndefined(game)) {
+    return <Skeleton className="col-span-2 max-w-2xl" />;
+  }
+
   return (
-    <>
-      <Card>
-        {isNullOrUndefined(game) ? (
-          <Skeleton className="col-span-2 max-w-2xl" />
-        ) : (
-          <EditGameForm game={game} onSubmit={updateGame} />
-        )}
-      </Card>
-    </>
+    <Card>
+      <EditGameForm game={game} onSubmit={updateGame} />
+    </Card>
   );
 }
 
@@ -83,7 +84,7 @@ export default function EditGame() {
 
         {/* Questions */}
         <Section title="Questions" description="Edit your game questions.">
-          <GameQuestions game={game} updateGame={updateGame}/>
+          <GameQuestions game={game} updateGame={updateGame} />
         </Section>
       </div>
     </>
