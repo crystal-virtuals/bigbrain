@@ -5,8 +5,17 @@ import {
   DropdownMenu,
 } from '@components/dropdown';
 import { AlertModal } from '@components/modal';
-import { EllipsisVerticalIcon } from '@heroicons/react/20/solid';
+import { EllipsisVerticalIcon, EllipsisHorizontalIcon } from '@heroicons/react/16/solid';
 import { useState } from 'react';
+
+const styles = {
+  button: [
+    'group w-full relative rounded-full',
+    'shrink-0 flex flex-col items-center justify-center',
+    'w-6 h-6',
+    "overflow-hidden bg-black/10"
+  ]
+}
 
 export default function GameMenu({ game, onDelete }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,7 +34,7 @@ export default function GameMenu({ game, onDelete }) {
       {/* Menu Button */}
       <Dropdown>
         <DropdownButton plain aria-label="More options">
-          <EllipsisVerticalIcon aria-hidden="true" className="size-6 text-zinc-600"/>
+          <EllipsisHorizontalIcon aria-hidden="true"/>
         </DropdownButton>
         <DropdownMenu className="hover:cursor-pointer">
           <DropdownItem href={`/game/${game.id}`}>View</DropdownItem>

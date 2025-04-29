@@ -232,7 +232,7 @@ export function ThumbnailInput({ value, onChange, ...props }) {
       // text
       'text-zinc-950 dark:text-white',
       // background
-      'bg-white dark:bg-zinc-900 hover:bg-white/10 dark:hover:bg-zinc-950',
+      'bg-white dark:bg-zinc-900 hover:bg-zinc-300 dark:hover:bg-zinc-950',
     ],
     dashed: [
       'border border-dashed border-zinc-900/25 dark:border-white/25',

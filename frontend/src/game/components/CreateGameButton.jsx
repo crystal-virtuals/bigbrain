@@ -1,7 +1,7 @@
-import { NewGameModal } from '@components/game';
 import { Button } from '@components/button';
 import { PlusIcon } from '@heroicons/react/16/solid';
 import { useState } from 'react';
+import NewGameModal from './NewGameModal';
 
 export default function CreateGameButton( { onCreate }) {
   const [isOpen, setIsOpen] = useState(false);

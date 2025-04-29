@@ -95,7 +95,7 @@ function QuestionHeader({ index, question }) {
         <Label>Question {index + 1}</Label>
         <Container>
           <Strong>Empty question. </Strong>
-          <Link className="hover:text-accent" to={url}>
+          <Link className="hover:text-accent hover:underline " to={url}>
             Get started here
             <span aria-hidden="true"> &rarr;</span>
           </Link>

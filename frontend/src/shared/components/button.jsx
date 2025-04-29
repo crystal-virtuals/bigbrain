@@ -166,24 +166,6 @@ export function Spinner({ loading }) {
   ) : null;
 }
 
-// export const Button = forwardRef(function Button({ color, outline, plain, className, children, ...props }, ref) {
-//   let classes = clsx(
-//     styles.base,
-//     outline ? styles.outline : plain ? styles.plain : clsx(styles.solid, styles.colors[color ?? 'dark/zinc']),
-//     className,
-//   )
-
-//   return 'href' in props ? (
-//     <Link {...props} className={classes} ref={ref}>
-//       <TouchTarget>{children}</TouchTarget>
-//     </Link>
-//   ) : (
-//     <Headless.Button {...props} className={clsx(classes, 'cursor-pointer')} ref={ref}>
-//       <TouchTarget>{children}</TouchTarget>
-//     </Headless.Button>
-//   )
-// })
-
 export const Button = forwardRef(function Button({ color, outline, plain, loading = false, disabled = false, className, children, ...props }, ref) {
   const isDisabled = disabled || loading;
   let classes = clsx(
@@ -243,5 +225,38 @@ export function TouchTarget({ children }) {
       />
       {children}
     </>
+  );
+}
+
+
+export function Button3D ({ children, ...props }) {
+  const classes = clsx(
+    'relative flex group text-black touch-manipulation cursor-pointer pointer-events-auto md:h-14 md:w-32 lg:w-40 md:text-base w-24 h-10 p-0 text-sm font-bold',
+  );
+
+  return (
+    <a className={classes} {...props}>
+
+      <div className="-inset-1 absolute z-0 rounded-[2.9375rem]"/>
+      <div className="absolute inset-x-0 top-0 bottom-0 transform group-active:translate-y-0.5 group-active:bottom-0.5 z-1 bg-black p-[0.1875rem] rounded-[3.125rem]">
+        <div className="relative w-full h-full">
+          <div className="top-1 absolute inset-x-0 bottom-0 overflow-hidden rounded-[2.8125rem] bg-pink-300">
+            <div className="bg-opacity-30 absolute inset-0 bg-black" />
+          </div>
+          <div className="bottom-1 absolute inset-x-0 top-0 overflow-hidden group-active:bottom-0.5 rounded-[2.8125rem] bg-pink-300">
+            <div className="group-hover:bg-opacity-20 absolute inset-0" />
+          </div>
+        </div>
+      </div>
+
+      <div className="relative flex flex-row gap-x-4 items-center w-full min-h-full pointer-events-none z-2 transform -translate-y-0.5 group-active:translate-y-0 p-[0.1875rem]">
+        <div className="flex flex-col flex-1 items-center">
+          <div className="relative">
+            { children }
+          </div>
+        </div>
+      </div>
+
+    </a>
   );
 }

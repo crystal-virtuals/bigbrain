@@ -1,6 +1,6 @@
 import { Navbar, Sidebar } from '@components/dashboard';
 import { Divider } from '@components/divider';
-import { CreateGameButton, GameCardList } from '@components/game';
+import { CreateGameButton, GameCardList } from '@/game/components';
 import { Heading } from '@components/heading';
 import { SidebarLayout } from '@components/sidebar-layout';
 import { useAuth } from '@hooks/auth';

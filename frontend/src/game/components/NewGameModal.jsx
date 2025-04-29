@@ -24,20 +24,29 @@ export default function NewGameModal({ isOpen, setIsOpen, onSubmit }) {
   }
 
   const reset = () => {
-    setName('');
-    setError('');
     setShowError(false);
     setIsLoading(false);
     setIsOpen(false);
+    setName('');
+    setError('');
   }
 
   const handleSubmit = (event) => {
     event.preventDefault();
+
     if (validate() === false) {
       return;
     }
+
     setIsLoading(true);
     onSubmit(name).finally(() => reset());
+  }
+
+  const handleClose = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsOpen(false);
+    reset();
   }
 
   return (
@@ -63,7 +72,7 @@ export default function NewGameModal({ isOpen, setIsOpen, onSubmit }) {
             </Field>
           </DialogBody>
           <DialogActions>
-            <Button plain type="button" onClick={reset}>
+            <Button plain type="button" onClick={handleClose}>
               Cancel
             </Button>
             <Button type="submit" onClick={handleSubmit} loading={isLoading}>

@@ -1,26 +1,12 @@
-import { GameCard, NewGameModal } from '@components/game';
 import { Subheading } from '@components/heading';
-import { Strong, Text } from '@components/text';
-import { SearchBar } from '@components/search-bar';
-import { useEffect, useState } from 'react';
 import { Skeleton } from '@components/loading';
+import { SearchBar } from '@components/search-bar';
+import { Strong, Text } from '@components/text';
 import { isNullOrUndefined } from '@utils/helpers';
+import { useEffect, useState } from 'react';
 import clsx from 'clsx';
-
-function GamesList({ games, onDelete }) {
-  return (
-    <ul
-      role="list"
-      className="mt-3 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3 xl:gap-x-8"
-    >
-      {[...games]
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .map((game) => (
-          <GameCard key={game.id} game={game} onDelete={onDelete} />
-        ))}
-    </ul>
-  );
-}
+import Card from './Card';
+import NewGameModal from './NewGameModal';
 
 const styles = {
   dashed: [
@@ -79,6 +65,20 @@ function EmptyState({ onCreate }) {
   );
 }
 
+function GamesList({ games, onDelete }) {
+  return (
+    <ul role="list" className="mt-3 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3 xl:gap-x-8">
+      {[...games]
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .map((game) => (
+          <li key={game.id} className="col-span-1">
+            <Card game={game} onDelete={onDelete} />
+          </li>
+        ))}
+    </ul>
+  );
+}
+
 export default function GameCardList({ games, onDelete, onCreate }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredGames, setFilteredGames] = useState([]);
@@ -93,7 +93,6 @@ export default function GameCardList({ games, onDelete, onCreate }) {
     );
     setFilteredGames(filtered);
   }, [searchQuery, games]);
-
 
   // If the games array is not fetched yet, it will be null
   if (isNullOrUndefined(games)) {
@@ -119,6 +118,7 @@ export default function GameCardList({ games, onDelete, onCreate }) {
         <Subheading>All Games</Subheading>
         <SearchBar onChange={setSearchQuery} />
       </div>
+
       <GamesList games={filteredGames} onDelete={onDelete} />
     </>
   );
