@@ -176,7 +176,6 @@ export const Button = forwardRef(function Button({ color, outline, plain, loadin
     loading && 'cursor-progress',
   )
 
-
   const content = (
     <TouchTarget>
       {(loading !== undefined && loading) ? (
@@ -229,13 +228,16 @@ export function TouchTarget({ children }) {
 }
 
 
-export function Button3D ({ children, ...props }) {
+export function ButtonLink({ children, ...props }) {
+  const { className, href, to, ...rest } = props;
+
   const classes = clsx(
+    className,
     'relative flex group text-black touch-manipulation cursor-pointer pointer-events-auto md:h-14 md:w-32 lg:w-40 md:text-base w-24 h-10 p-0 text-sm font-bold',
   );
 
   return (
-    <a className={classes} {...props}>
+    <Link className={classes} to={to || href} {...rest}>
 
       <div className="-inset-1 absolute z-0 rounded-[2.9375rem]"/>
       <div className="absolute inset-x-0 top-0 bottom-0 transform group-active:translate-y-0.5 group-active:bottom-0.5 z-1 bg-black p-[0.1875rem] rounded-[3.125rem]">
@@ -257,6 +259,6 @@ export function Button3D ({ children, ...props }) {
         </div>
       </div>
 
-    </a>
+    </Link>
   );
 }
