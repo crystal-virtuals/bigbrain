@@ -10,10 +10,10 @@ const useToast = () => {
   const { addToast } = context;
 
   return {
-    success: (message, description = '') => addToast('success', message, description),
-    error: (message, description = '') => addToast('error', message, description),
-    info: (message, description = '') => addToast('info', message, description),
-    warn: (message, description = '') => addToast('warning', message, description),
+    success: ({ message, description = '', replace = false }) => addToast('success', message, description, replace),
+    error: ({message, description = '', replace=false}) => addToast('error', message, description, replace),
+    info: ({message, description = '', replace=false}) => addToast('info', message, description, replace),
+    warn: ({message, description = '', replace=false}) => addToast('warning', message, description, replace),
   }
 }
 

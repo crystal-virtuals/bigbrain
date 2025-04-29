@@ -11,7 +11,10 @@ export default function Logout() {
     if (!hasLoggedOut.current) {
       hasLoggedOut.current = true;
       logout();
-      toastify.success('Successfully logged out', 'See you next time!');
+      toastify.success({
+        message: 'Successfully logged out',
+        description: 'See you next time!',
+      });
     }
   }, []);
 

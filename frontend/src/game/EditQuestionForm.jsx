@@ -64,7 +64,7 @@ function EditQuestionForm({ question, setErrors, onSubmit }) {
         setPrevFormData(pendingQuestion);
         setFormData(pendingQuestion);
         setErrors(new Map());
-        toastify.success('Updated question');
+        toastify.success({ message: 'Updated question' });
         // navigate back
         navigate(-1);
       })

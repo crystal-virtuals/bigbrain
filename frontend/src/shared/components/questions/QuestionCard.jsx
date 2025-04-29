@@ -129,8 +129,8 @@ function QuestionCard({ index, question, deleteQuestion }) {
 
   const deleteThisQuestion = () => {
     deleteQuestion(question.id)
-      .then(() => toastify.success('Question deleted'))
-      .catch(() => toastify.error('Failed to delete question. Please try again later.'))
+      .then(() => toastify.success({ message: 'Question deleted'}))
+      .catch(() => toastify.error({ message: 'Failed to delete question. Please try again later.'}))
       .finally(() => setIsDeleteOpen(false));
   }
 

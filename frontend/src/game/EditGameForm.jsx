@@ -74,10 +74,10 @@ function EditGameForm({ game, onSubmit, isReadOnly = false }) {
         setPrevFormData(pendingData);
         setFormData(pendingData);
         setReadOnly(true);
-        toastify.success('Updated game');
+        toastify.success({ message: 'Updated game' });
       })
-      .catch(err => {
-        toastify.error(err.message || 'Failed to save changes.');
+      .catch((err) => {
+        toastify.error({ message: err.message || 'Failed to save changes.' });
       })
       .finally(() => {
         setIsSubmitting(false);
