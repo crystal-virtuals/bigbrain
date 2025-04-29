@@ -1,72 +1,132 @@
 import { Badge } from '@components/badge';
-import { Link } from '@components/link';
+import { TextLink } from '@components/text';
 import { ClockIcon, QuestionMarkCircleIcon } from '@heroicons/react/20/solid';
 import { getNumberOfQuestions, getTotalDuration } from '@utils/game';
-import { getInitials, getRandomBgColor, isEmptyString } from '@utils/helpers';
-import { useState, useMemo } from 'react';
+import { isEmptyString } from '@utils/helpers';
+import { useState } from 'react';
 import GameMenu from './GameMenu';
-import clsx from 'clsx';
+import StartGameButton from './StartGameButton';
+
+function DefaultThumbnail() {
+  return (
+    <div className="bg-zinc-200 flex flex-col items-center justify-center w-full h-full">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 40 40"
+        className="text-opacity-20 bg-black-10 w-24 h-24 mx-auto text-zinc-400"
+      >
+        <path
+          fill="currentColor"
+          d="M17.78 22.41a2.19 2.19 0 0 0 1.15.32 2.23 2.23 0 0 0 1.17-.32 2.31 2.31 0 0 0 .85-.85 2.33 2.33 0 0 0 0-2.32 2.39 2.39 0 0 0-.85-.85 2.23 2.23 0 0 0-1.17-.32 2.19 2.19 0 0 0-1.15.32 2.44 2.44 0 0 0-.84.85 2.33 2.33 0 0 0 0 2.32 2.36 2.36 0 0 0 .84.85Z"
+        ></path>
+        <path
+          fill="currentColor"
+          d="M32.42 15.1a3.47 3.47 0 0 0-2.54-.86H27.7l-.59-3.33a3.41 3.41 0 0 0-1.29-2.32 3.4 3.4 0 0 0-2.65-.41L8.56 10.76A3.43 3.43 0 0 0 6.22 12a3.45 3.45 0 0 0-.41 2.63l1.78 10.23a3.35 3.35 0 0 0 1.29 2.32 3.44 3.44 0 0 0 2.65.4h.12V28a3.43 3.43 0 0 0 .86 2.51 3.49 3.49 0 0 0 2.54.86h14.83a3.47 3.47 0 0 0 2.54-.86 3.43 3.43 0 0 0 .86-2.51V17.61a3.43 3.43 0 0 0-.86-2.51Zm-1.68 1.68a1.39 1.39 0 0 1 .36 1v7.94l-3.6-3.32a2 2 0 0 0-1.44-.58 2.12 2.12 0 0 0-.75.14 2.37 2.37 0 0 0-.68.42l-4.33 3.84-1.73-1.57a2.51 2.51 0 0 0-.62-.4 1.64 1.64 0 0 0-.68-.15 1.52 1.52 0 0 0-.63.14 2.21 2.21 0 0 0-.61.4l-2.19 1.94v-8.75a1.39 1.39 0 0 1 .36-1 1.43 1.43 0 0 1 1-.35h14.51a1.43 1.43 0 0 1 1.03.3ZM11.33 25.4a1.41 1.41 0 0 1-1.08-.17 1.35 1.35 0 0 1-.53-1L8 14.5a1.36 1.36 0 0 1 .16-1.1 1.41 1.41 0 0 1 1-.51l14.27-2.52a1.36 1.36 0 0 1 1.06.16 1.41 1.41 0 0 1 .54 1l.48 2.73H15.05a3.49 3.49 0 0 0-2.54.86 3.41 3.41 0 0 0-.86 2.51v7.73Z"
+        ></path>
+      </svg>
+    </div>
+  );
+}
+
+function Thumbnail({ src, alt, onError }) {
+  return (
+    <div className="relative inset-0 flex items-center justify-center w-full h-full overflow-hidden bg-zinc-200 z-1">
+      <div className="absolute w-full h-full">
+        <img
+          src={src}
+          alt={alt}
+          onError={onError}
+          className="object-cover h-full w-full"
+        />
+      </div>
+    </div>
+  );
+}
 
 function GameThumbnail({ game }) {
   const [error, setError] = useState(false);
   const imgError = error || isEmptyString(game.thumbnail);
-  const bgcolor = useMemo(() => getRandomBgColor(game.id), []);
 
   if (imgError) {
-    return (
-      <div
-        className={clsx(
-          bgcolor,
-          'flex height-100 w-16 shrink-0 items-center justify-center rounded-l-md text-sm font-medium text-white truncate',
-        )}
-      >
-        {getInitials(game.name)}
-      </div>
-    );
+    return <DefaultThumbnail />;
   }
 
   return (
-    <img
+    <Thumbnail
       src={game.thumbnail}
       alt={game.name}
-      className="w-16 rounded-l-md shrink-0 object-cover"
       onError={() => setError(true)}
     />
   );
 }
 
-export default function GameCard({ game, onDelete }) {
+function CardHeader({ game }) {
   return (
-    <>
-      <li className="col-span-1 rounded-md shadow-xs bg-white ring-1 ring-zinc-950/10 dark:ring-white/10">
-        <div className="flex size-full justify-between">
+    <div className="pb-[75%] relative w-full">
+      <div className="md:rounded-xl z-1 absolute top-0 left-0 block w-full h-full overflow-hidden rounded-lg">
+
+        {/* Thumbnail */}
+        <div className="absolute top-0 left-0 z-0 w-full h-full">
           <GameThumbnail game={game} />
-          <div className="flex flex-1 items-center justify-between py-2 truncate">
-            <div className="flex flex-col flex-1 px-4 py-3 text-sm truncate">
-              {/* Name */}
-              <Link to={`/game/${game.id}`} className="font-medium max-w-full truncate" title={game.name}>
-                {game.name}
-              </Link>
-              {/* Number of Questions & Total Duration (as a badge) */}
-              <div className="flex items-center gap-x-2 pt-3">
-                <Badge color="indigo">
-                  <ClockIcon aria-hidden="true" className="size-4"/>
-                  {getTotalDuration(game.questions)}
-                </Badge>
-                <Badge color="fuchsia">
-                  <QuestionMarkCircleIcon
-                    aria-hidden="true"
-                    className="size-4"
-                  />
-                  {getNumberOfQuestions(game.questions)}
-                </Badge>
-              </div>
-            </div>
-            {/* Menu */}
-            <GameMenu game={game} onDelete={onDelete} className="shrink-0 ml-2" />
+        </div>
+
+        {/* Play Button */}
+        <div className="z-2 absolute top-0 left-0 w-full h-full visible">
+          <div className="z-3 absolute inset-0 flex flex-row items-center justify-center transition-opacity duration-300 ease-in-out bg-black/50 opacity-0 hover:opacity-100 ">
+            <StartGameButton sessionId={123456}/>
           </div>
         </div>
-      </li>
-    </>
+      </div>
+    </div>
   );
 }
+
+function GameMetadata({ game }) {
+  return (
+    <div className="flex flex-row items-center flex-shrink-0 space-x-3">
+
+      {/* Total Duration */}
+      <Badge color="indigo" className="flex flex-shrink-0">
+        <ClockIcon aria-hidden="true" className="size-4" />
+        {getTotalDuration(game.questions)}
+      </Badge>
+
+      {/* Number of Questions */}
+      <Badge color="fuchsia" className="flex flex-shrink-0">
+        <QuestionMarkCircleIcon aria-hidden="true" className="size-4" />
+        {getNumberOfQuestions(game.questions)}
+      </Badge>
+
+    </div>
+  );
+}
+
+function CardDescription({ game, onDelete }) {
+  const url = `/game/${game.id}`;
+
+  return (
+    <div className="rounded-b-xl flex flex-col w-full space-y-0.5 bg-transparent">
+
+      <TextLink className="line-clamp-2 hover:underline font-bold pb-1" title={game.name} to={url}>
+        {game.name}
+      </TextLink>
+
+      <div className='flex flex-row items-center justify-between'>
+        <GameMetadata game={game} />
+        <GameMenu game={game} onDelete={onDelete}/>
+      </div>
+
+    </div>
+  );
+}
+
+function GameCard({ game, onDelete }) {
+  return (
+    <div className="relative flex flex-col gap-4">
+      <CardHeader game={game} />
+      <CardDescription game={game} onDelete={onDelete} />
+    </div>
+  );
+}
+
+export default GameCard;

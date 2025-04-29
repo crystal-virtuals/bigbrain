@@ -5,28 +5,27 @@ import { Strong, Text } from '@components/text';
 import { isNullOrUndefined } from '@utils/helpers';
 import { useEffect, useState } from 'react';
 import clsx from 'clsx';
-import Card from './Card';
+import GameCard from './GameCard';
 import NewGameModal from './NewGameModal';
-
-const styles = {
-  dashed: [
-    // Base
-    'group w-full relative block rounded-lg p-12 text-center',
-    // Background
-    'bg-transparent hover:bg-pink-400/10',
-    // Border
-    'border-2 border-dashed border-zinc-950/10 text-zinc-950',
-    // Dark mode
-    'dark:border-white/15 dark:text-white',
-    // Hover
-    'hover:border-pink-400',
-    // Cursor
-    'cursor-pointer touch-manipulation pointer-events-auto',
-  ],
-};
 
 function EmptyState({ onCreate }) {
   const [isOpen, setIsOpen] = useState(false);
+  const styles = {
+    dashed: [
+      // Base
+      'group w-full relative block rounded-lg p-12 text-center',
+      // Background
+      'bg-transparent hover:bg-pink-400/10',
+      // Border
+      'border-2 border-dashed border-zinc-950/10 text-zinc-950',
+      // Dark mode
+      'dark:border-white/15 dark:text-white',
+      // Hover
+      'hover:border-pink-400',
+      // Cursor
+      'cursor-pointer touch-manipulation pointer-events-auto',
+    ],
+  };
 
   return (
     <>
@@ -72,7 +71,7 @@ function GamesList({ games, onDelete }) {
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
         .map((game) => (
           <li key={game.id} className="col-span-1">
-            <Card game={game} onDelete={onDelete} />
+            <GameCard game={game} onDelete={onDelete} />
           </li>
         ))}
     </ul>
