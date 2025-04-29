@@ -13,7 +13,7 @@ function DefaultThumbnail() {
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 40 40"
-        className="text-opacity-20 bg-black-10 w-24 h-24 mx-auto text-zinc-400"
+        className="text-opacity-20 w-24 h-24 mx-auto text-zinc-400"
       >
         <path
           fill="currentColor"
@@ -72,7 +72,7 @@ function CardHeader({ game }) {
 
         {/* Play Button */}
         <div className="z-2 absolute top-0 left-0 w-full h-full visible">
-          <div className="z-3 absolute inset-0 flex flex-row items-center justify-center transition-opacity duration-300 ease-in-out bg-black/50 opacity-0 hover:opacity-100 ">
+          <div className="z-3 absolute inset-0 flex flex-row items-center justify-center transition-opacity duration-300 ease-in-out bg-black/60 opacity-0 hover:opacity-100 ">
             <StartGameButton sessionId={123456}/>
           </div>
         </div>

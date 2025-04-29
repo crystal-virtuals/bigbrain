@@ -14,7 +14,7 @@ export default function StartGameButton({ sessionId }) {
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const sessionUrl = `/play/${sessionId}`;
+  const sessionUrl = `${window.location.origin}/play/${sessionId}`;
   const copyToClipboard = () => {
     navigator.clipboard
       .writeText(sessionUrl)

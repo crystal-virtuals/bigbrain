@@ -18,7 +18,7 @@ function Strong({ children }) {
         // Basic layout
         'relative block w-full appearance-none rounded-lg py-[calc(--spacing(2.5)-1px)] sm:py-[calc(--spacing(1.5)-1px)]',
         // Typography
-        'font-nunito text-3xl font-black leading-none tracking-wider text-cyan dark:text-cyan',
+        'font-nunito text-3xl font-black leading-none tracking-wider text-teal dark:text-teal',
       ])}
     >
       {children}

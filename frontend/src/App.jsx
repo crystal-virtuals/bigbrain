@@ -11,6 +11,26 @@ import { ToastProvider } from '@hooks/toast';
 import { NotFound, Unauthorized } from '@pages/errors';
 import { Home, Landing } from '@pages/public';
 import { Outlet, Route, Routes } from 'react-router-dom';
+import { SessionLayout } from '@/session';
+
+
+function PlayJoin() {
+  return (
+    <h1>Enter session id</h1>
+  )
+}
+
+function PlaySession() {
+  return (
+    <h1>Play session</h1>
+  )
+}
+
+function AdminSession() {
+  return (
+    <h1>Admin session</h1>
+  )
+}
 
 function AppLayout() {
   const classes =
@@ -46,11 +66,22 @@ function App() {
         {/* Admin routes (user must be authorised) */}
         <Route element={<AdminLayout />}>
           <Route path="dashboard" element={<Dashboard />} />
+
           <Route path="game/:gameId" element={<GameLayout />}>
             <Route index element={<EditGame />} />
             <Route path="question/:questionId" element={<EditQuestion />}/>
           </Route>
+
+          <Route path="session" element={<SessionLayout />}>
+            <Route path="session/:sessionId" element={<AdminSession />} />
+          </Route>
+
         </Route>
+
+        {/* Player routes (no auth) */}
+        <Route path="play" element={<PlayJoin />} /> {/* Join a session */}
+        <Route path="play/:sessionId" element={<PlaySession />} /> {/* Play a session */}
+
 
         {/* Fallback */}
         <Route path="*" element={<NotFound />} />
