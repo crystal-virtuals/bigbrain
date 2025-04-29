@@ -14,7 +14,8 @@
   --color-neutral: oklch(14% .005 285.823);
   --color-green: rgb(198, 234, 132);
   --color-orange: rgb(255, 198, 121);
-  --color-cyan: #ABFDD7;
+  --color-cyan: rgb(0, 175, 198);
+  --color-teal: #ABFDD7;
   --radius-field: 0.25rem;
 
   --color-false: rgb(213, 69, 108);
@@ -24,3 +25,4 @@
   --color-navy: rgb(35, 97, 106);
   --color-navy-dark: rgb(25, 68, 74);
 }
+å

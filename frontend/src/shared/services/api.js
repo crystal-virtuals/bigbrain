@@ -66,3 +66,32 @@ export const api = {
 ***************************************************************/
 export const fetchGames = () => api.get('/admin/games').then(res => res.games);
 export const updateGames = (games) => api.put('/admin/games', { games });
+
+class GameStatus {
+  constructor(data) {
+    this.status = data.status;
+
+    if (data.status === 'started') {
+      this.sessionId = data.sessionId;
+    }
+    else if (data.status === 'advanced') {
+      this.position = data.position;
+    }
+    else if (data.status === 'ended') {
+      // No additional properties to set for "ended"
+    }
+    else {
+      throw new Error(`Unknown status: ${data.status}`);
+    }
+  }
+}
+
+export const gameAPI = {
+  start: (gameId) => api.post(`/admin/game/${gameId}/mutate`, { mutationType: 'START' }).then(res => new GameStatus(res.data)),
+  advance: (gameId) => api.post(`/admin/game/${gameId}/mutate`, { mutationType: 'ADVANCE' }).then(res => new GameStatus(res.data)),
+  end: (gameId) => api.post(`/admin/game/${gameId}/mutate`, { mutationType: 'END' }).then(res => new GameStatus(res.data)),
+}
+
+// export const startGame = (gameId) => api.post(`/admin/game/${gameId}/mutate`, { mutationType: 'START' }).then(res => new GameStatus(res.data));
+// export const advanceGame = (gameId) => api.post(`/admin/game/${gameId}/mutate`, { mutationType: 'ADVANCE' }).then(res => new GameStatus(res.data));
+// export const endGame = (gameId) => api.post(`/admin/game/${gameId}/mutate`, { mutationType: 'END' }).then(res => new GameStatus(res.data));
