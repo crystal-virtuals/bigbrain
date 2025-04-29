@@ -9,16 +9,18 @@
 
 @theme {
   --font-sans: Inter, sans-serif;
+  --font-nunito: Nunito, sans-serif;
   --color-accent: var(--color-pink-500);
-  --color-cyan: rgb(0, 175, 198);
+  --color-neutral: oklch(14% .005 285.823);
+  --color-green: rgb(198, 234, 132);
+  --color-orange: rgb(255, 198, 121);
+  --color-cyan: #ABFDD7;
+  --radius-field: 0.25rem;
+
   --color-false: rgb(213, 69, 108);
   --color-dark: #113034;
   --color-purple: rgb(144, 103, 145);
   --color-purple-dark: rgb(87, 74, 98);
   --color-navy: rgb(35, 97, 106);
   --color-navy-dark: rgb(25, 68, 74);
-
-  --text-neutral: rgb(129, 97, 63);
-  --bg-neutral-dark: rgb(91, 68, 43);
-  --bg-neutral: rgb(251, 244, 239);
 }
