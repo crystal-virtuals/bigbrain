@@ -5,6 +5,7 @@ import axios from 'axios'
 import { BACKEND_PORT } from '@frontend/backend.config.json'
 import { getAuthToken } from './token.js'
 import { createError } from './error.jsx'
+import { mapSessionData } from '@utils/session.js'
 
 const instance = axios.create({
   baseURL: `http://localhost:${BACKEND_PORT}`,
@@ -84,25 +85,9 @@ export const gamesAPI = {
 export const fetchGames = () => api.get('/admin/games').then(res => res.games);
 export const updateGames = (games) => api.put('/admin/games', { games });
 
-// map the game status to the corresponding mutation type
-const MutationTypeMap = {
-  'START': 'started',
-  'ADVANCE': 'advanced',
-  'END': 'ended',
-}
-
-const convertSessionData = (data) => {
-  const { status, sessionId, position } = data;
-  return {
-    sessionId: sessionId ?? null, // null for 'ended'
-    position: position ?? -1, // only for advanced
-    status: status, // ['started', 'advanced', 'ended']
-  };
-}
-
 const mutateSession = async (gameId, mutationType) => {
   const response  = await api.post(`/admin/game/${gameId}/mutate`, { mutationType });
-  return convertSessionData(response.data);
+  return mapSessionData(response.data);
 };
 
 export const mutateGameAPI = {

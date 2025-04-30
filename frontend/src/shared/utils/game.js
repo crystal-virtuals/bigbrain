@@ -19,7 +19,17 @@ const mapToSession = (status, sessionId, position, gameId) => {
   };
 }
 
-
+export const endActiveSession = (game) => {
+  const sessionId = game.active;
+  if (!sessionId) {
+    throw new Error('Game does not have an active session');
+  }
+  return {
+    ...game,
+    active: null,
+    oldSessions: [...(game.oldSessions || []), sessionId],
+  }
+}
 
 /***************************************************************
                         Validation
@@ -233,7 +243,7 @@ export const mapToGames = (games) => {
 
 export const getTotalDuration = (questions) => {
   if (!questions || questions.length === 0) {
-    return '0 min';
+    return '0 seconds';
   }
 
   // if questions exist, sum the duration of each question
@@ -246,14 +256,13 @@ export const getTotalDuration = (questions) => {
     return acc + question.duration;
   }, 0);
 
-  // if total is less than 60, return in minutes
+  // if total is less than 60, return in seconds
   if (total < 60) {
-    return `${total} min`;
+    return `${total} seconds`;
   }
-  // if total is greater than 60, return in hours and minutes
-  const hours = Math.floor(total / 60);
-  const minutes = total % 60;
-  return `${hours > 0 ? `${hours}h ` : ''}${minutes}min`;
+  // if total is greater than 60, return in minutes
+  const minutes = Math.floor(total / 60);
+  return `${minutes} min`;
 };
 
 
