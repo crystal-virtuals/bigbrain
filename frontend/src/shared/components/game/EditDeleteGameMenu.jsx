@@ -7,12 +7,15 @@ import {
 import { AlertModal } from '@components/modal';
 import { EllipsisVerticalIcon, EllipsisHorizontalIcon } from '@heroicons/react/16/solid';
 import { useState } from 'react';
+import { useToast } from '@hooks/toast';
 
 // Edit Delete Game Menu
 export default function EditDeleteGameMenu({ game, onDelete }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const toastify = useToast();
+
 
   const deleteGame = () => {
     setIsLoading(true);
@@ -21,10 +24,12 @@ export default function EditDeleteGameMenu({ game, onDelete }) {
         setIsLoading(false);
         setIsOpen(false);
         setError('');
+        toastify.success({ message: 'Game deleted!' });
       })
       .catch((error) => {
         setIsLoading(false);
         setError(error.message);
+        toastify.error({ message: error.message, replace: true });
       });
   };
 
