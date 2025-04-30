@@ -1,2 +1,2 @@
 export {default as SessionLayout} from './SessionLayout';
-export { AdminSession } from './AdminSession';
+export {default as AdminSession } from './AdminSession';

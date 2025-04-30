@@ -3,6 +3,7 @@ import { Link } from '@components/link';
 import { Navbar, NavbarDivider, NavbarSection } from '@components/navbar';
 import { UserIcon } from '@heroicons/react/16/solid';
 import { clsx } from 'clsx';
+import { Outlet, useOutletContext, useParams} from 'react-router-dom';
 
 function NavbarItem({ children }) {
   return (
@@ -39,20 +40,23 @@ function NavbarComponent({ sessionId = 123456, numberOfPlayers = 0 }) {
   );
 }
 
-function SessionLayout({ children }) {
+function SessionLayout() {
+  const { user, games, setGames, createGame, deleteGame, updateGame } = useOutletContext();
+  const { sessionId } = useParams();
+
   return (
     <div className="flex min-h-svh w-full flex-col bg-white lg:bg-zinc-100 dark:bg-zinc-900 dark:lg:bg-zinc-950">
       {/* Navbar */}
       <header className="flex items-center px-4">
         <div className="min-w-0 flex-1">
-          <NavbarComponent />
+          <NavbarComponent sessionId={sessionId}/>
         </div>
       </header>
 
       {/* Content */}
       <main className="flex min-h-dvh flex-col p-2">
         <div className="flex grow items-center justify-center p-6 lg:rounded-lg lg:bg-white lg:p-10 lg:shadow-xs lg:ring-1 lg:ring-zinc-950/5 dark:lg:bg-zinc-900 dark:lg:ring-white/10">
-          {children}
+          <Outlet />
         </div>
       </main>
     </div>
