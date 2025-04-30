@@ -2,16 +2,16 @@ import { AuthLayout, Login, Logout, Register } from '@/auth';
 import {
   AdminLayout,
   GameLayout,
-  Dashboard,
   EditGame,
   EditQuestion,
 } from '@/admin';
+import { Dashboard } from '@/dashboard';
 import { AuthProvider } from '@hooks/auth';
 import { ToastProvider } from '@hooks/toast';
 import { NotFound, Unauthorized } from '@pages/errors';
 import { Home, Landing } from '@pages/public';
 import { Outlet, Route, Routes } from 'react-router-dom';
-import { SessionLayout } from '@/session';
+import { SessionLayout, AdminSession } from '@/session';
 
 
 function PlayJoin() {
@@ -23,12 +23,6 @@ function PlayJoin() {
 function PlaySession() {
   return (
     <h1>Play session</h1>
-  )
-}
-
-function AdminSession() {
-  return (
-    <h1>Admin session</h1>
   )
 }
 
@@ -72,10 +66,9 @@ function App() {
             <Route path="question/:questionId" element={<EditQuestion />}/>
           </Route>
 
-          <Route path="session" element={<SessionLayout />}>
-            <Route path="session/:sessionId" element={<AdminSession />} />
+          <Route path="session/:sessionId" element={<SessionLayout />}>
+            <Route index element={<AdminSession />} />
           </Route>
-
         </Route>
 
         {/* Player routes (no auth) */}
