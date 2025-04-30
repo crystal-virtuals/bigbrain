@@ -2,6 +2,26 @@ import { questionTypes, duration, points } from '@constants/questions';
 import { uid, pluralSuffix, isEmptyString } from '@utils/helpers';
 
 /***************************************************************
+                        Session
+***************************************************************/
+const GameStatusMap = {
+  'started': 'started',
+  'advanced': 'advanced',
+  'ended': 'ended',
+}
+
+const mapToSession = (status, sessionId, position, gameId) => {
+  return {
+    status: GameStatusMap[status],
+    sessionId: Number(sessionId) || null,
+    gameId: Number(gameId),
+    position: position || -1,
+  };
+}
+
+
+
+/***************************************************************
                         Validation
 ***************************************************************/
 export const isEqual = (game, id) => {
@@ -203,6 +223,7 @@ export const mapToGame = (game) => {
     thumbnail: game.thumbnail,
     active: Number(game.active) || null,
     questions: game.questions ? game.questions.map((q) => mapToQuestion(q)) : [],
+    oldSessions: game.oldSessions ?? [], // array of old session IDs
   };
 }
 
