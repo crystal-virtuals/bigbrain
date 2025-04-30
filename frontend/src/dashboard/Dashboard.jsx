@@ -29,13 +29,13 @@ function DashboardHeading({ games, createGame }) {
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const { games, createGame, deleteGame, startGame } = useOutletContext();
+  const { games, createGame, deleteGame } = useOutletContext();
 
   return (
     <DashboardLayout user={user}>
       <DashboardHeading games={games} createGame={createGame} />
       <Divider className="my-6" />
-      <Games games={games} onDelete={deleteGame} startGame={startGame}/>
+      <Games games={games} onDelete={deleteGame}/>
     </DashboardLayout>
   );
 }

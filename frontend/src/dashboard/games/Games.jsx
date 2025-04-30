@@ -6,22 +6,25 @@ import { useEffect, useState } from 'react';
 import EmptyState from './EmptyState';
 import GameCard from './GameCard';
 
-function GamesList({ games, onDelete, startGame }) {
+function GamesList({ games, onDelete }) {
+  const sortCriteria = (a, b) => {
+    return new Date(b.createdAt) - new Date(a.createdAt); // sort by most recent
+  }
 
   return (
-    <ul role="list" className='grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3 xl:gap-x-8 mt-3'>
+    <ul role="list" className='grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3 xl:gap-x-8 mt-3 auto-rows-fr'>
       {[...games]
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // sort by most recent
+        .sort(sortCriteria)
         .map((game) => (
-          <li key={game.id} className="col-span-1">
-            <GameCard game={game} onDelete={onDelete} startGame={startGame}/>
+          <li key={game.id} className="col-span-1 h-full">
+            <GameCard game={game} onDelete={onDelete}/>
           </li>
         ))}
     </ul>
   );
 }
 
-export default function Games({ games, onDelete, onCreate, startGame }) {
+export default function Games({ games, onDelete, onCreate }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredGames, setFilteredGames] = useState([]);
 
@@ -61,7 +64,7 @@ export default function Games({ games, onDelete, onCreate, startGame }) {
         <SearchBar onChange={setSearchQuery} />
       </div>
 
-      <GamesList games={filteredGames} onDelete={onDelete} startGame={startGame} />
+      <GamesList games={filteredGames} onDelete={onDelete} />
     </>
   );
 }
