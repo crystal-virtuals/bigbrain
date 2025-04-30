@@ -59,6 +59,16 @@ export const isNullOrUndefined = (value) => {
   return  (value === null || value === undefined || value === '');
 }
 
+
+export const splitNumber = (number) => {
+  const str = number.toString();
+  // split in half
+  const mid = Math.floor(str.length / 2);
+  const firstPart = str.slice(0, mid);
+  const secondPart = str.slice(mid);
+  return [firstPart, secondPart];
+}
+
 /***************************************************************
                        Date Processing
 ***************************************************************/

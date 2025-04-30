@@ -28,9 +28,7 @@ instance.interceptors.request.use((config) => {
 instance.interceptors.response.use(
   (response) => response.data,
   (error) => {
-    if (import.meta.env.MODE !== 'production') {
-      console.error('API error:', error);
-    }
+    console.error('API error:', error);
     return Promise.reject(createError(error));
   }
 );
