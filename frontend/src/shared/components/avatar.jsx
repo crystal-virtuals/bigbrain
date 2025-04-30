@@ -60,3 +60,30 @@ export const AvatarButton = forwardRef(function AvatarButton(
     </Headless.Button>
   )
 })
+
+export function PresenceIndicator({ color = 'active', size = 'md' }) {
+  const colors = {
+    active: { level1: 'bg-emerald-400', level2: 'bg-emerald-500' },
+    red: { level1: 'bg-red-400', level2: 'bg-red-500' },
+    blue: { level1: 'bg-blue-400', level2: 'bg-blue-500' },
+  };
+
+  const fallback = { level1: 'bg-emerald-400', level2: 'bg-emerald-500' };
+  const { level1, level2 } = colors[color] || fallback;
+
+  const sizeClass = {
+    xs: 'size-3',
+    sm: 'size-4',
+    md: 'size-5',
+    lg: 'size-6',
+    xl: 'size-7',
+    '2xl': 'size-8',
+  }[size] || 'size-5';
+
+  return (
+    <span className={clsx('relative flex', sizeClass)}>
+      <span className={clsx('absolute inline-flex h-full w-full animate-ping rounded-full opacity-75', level1)} />
+      <span className={clsx('relative inline-flex rounded-full', level2, sizeClass)} />
+    </span>
+  );
+}
