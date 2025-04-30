@@ -8,14 +8,17 @@ export default function Logout() {
   const hasLoggedOut = useRef(false);
 
   useEffect(() => {
-    if (!hasLoggedOut.current) {
-      hasLoggedOut.current = true;
-      logout();
-      toastify.success({
-        message: 'Successfully logged out',
-        description: 'See you next time!',
-      });
-    }
+    const handleLogout = async () => {
+      if (!hasLoggedOut.current) {
+        hasLoggedOut.current = true;
+        await logout();
+        toastify.success({
+          message: 'Successfully logged out',
+          description: 'See you next time!',
+        });
+      }
+    };
+    handleLogout();
   }, []);
 
   return null;

@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { authAPI } from '@services/api';
 import AuthContext from './AuthContext';
 
 export default function AuthProvider({ children }) {
@@ -26,7 +27,19 @@ export default function AuthProvider({ children }) {
     navigate('/dashboard');
   }
 
-  const logout = () => {
+  const logout = useCallback(async () => {
+    try {
+      await authAPI.logout();
+      logoutUser();
+      return true
+    } catch (error) {
+      console.error('Logout failed:', error);
+      logoutUser();
+      return false;
+    }
+  }, []);
+
+  const logoutUser = () => {
     localStorage.clear();
     setUser(null);
     navigate('/home');
