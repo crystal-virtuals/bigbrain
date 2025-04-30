@@ -4,12 +4,7 @@
 import axios from 'axios'
 import { BACKEND_PORT } from '@frontend/backend.config.json'
 import { getAuthToken } from './token.js'
-
-const statusText = {
-  200: 'OK',
-  400: 'Bad Input',
-  403: 'Unauthorized',
-}
+import { createError } from './error.jsx'
 
 const instance = axios.create({
   baseURL: `http://localhost:${BACKEND_PORT}`,
@@ -29,18 +24,14 @@ instance.interceptors.request.use((config) => {
   return config;
 });
 
-
-// Intercept the response and handle errors
+// Intercept the response and return an Error object
 instance.interceptors.response.use(
   (response) => response.data,
   (error) => {
-    console.error('API error:', error);
-    return Promise.reject({
-      status: error.response?.status || 500,
-      statusText: statusText[error.response?.status] || 'Unknown Error',
-      data: error.response?.data?.error || error.message,
-      request: error.config.data
-    });
+    if (import.meta.env.MODE !== 'production') {
+      console.error('API error:', error);
+    }
+    return Promise.reject(createError(error));
   }
 );
 
@@ -62,36 +53,62 @@ export const api = {
 };
 
 /***************************************************************
+                      Authentication
+***************************************************************/
+async function register({ email, password, name }) {
+  return api.post('/admin/auth/register', { email, password, name })
+    .then(res => res.token);
+}
+
+async function login ({ email, password }) {
+  return api.post('/admin/auth/login', { email, password })
+    .then(res => res.token);
+}
+
+async function logout () {
+  return api.post('/admin/auth/logout')
+}
+
+export const authAPI = {
+  register,
+  login,
+  logout,
+}
+
+/***************************************************************
                          Game API
 ***************************************************************/
+export const gamesAPI = {
+  getGames: () => api.get('/admin/games').then(res => res.games),
+  updateGames: (games) => api.put('/admin/games', { games }),
+}
+
 export const fetchGames = () => api.get('/admin/games').then(res => res.games);
 export const updateGames = (games) => api.put('/admin/games', { games });
 
-class GameStatus {
-  constructor(data) {
-    this.status = data.status;
-
-    if (data.status === 'started') {
-      this.sessionId = data.sessionId;
-    }
-    else if (data.status === 'advanced') {
-      this.position = data.position;
-    }
-    else if (data.status === 'ended') {
-      // No additional properties to set for "ended"
-    }
-    else {
-      throw new Error(`Unknown status: ${data.status}`);
-    }
-  }
+// map the game status to the corresponding mutation type
+const MutationTypeMap = {
+  'START': 'started',
+  'ADVANCE': 'advanced',
+  'END': 'ended',
 }
 
-export const gameAPI = {
-  start: (gameId) => api.post(`/admin/game/${gameId}/mutate`, { mutationType: 'START' }).then(res => new GameStatus(res.data)),
-  advance: (gameId) => api.post(`/admin/game/${gameId}/mutate`, { mutationType: 'ADVANCE' }).then(res => new GameStatus(res.data)),
-  end: (gameId) => api.post(`/admin/game/${gameId}/mutate`, { mutationType: 'END' }).then(res => new GameStatus(res.data)),
+const convertSessionData = (data) => {
+  const { status, sessionId, position } = data;
+  return {
+    sessionId: sessionId ?? null, // null for 'ended'
+    position: position ?? -1, // only for advanced
+    status: status, // ['started', 'advanced', 'ended']
+  };
 }
 
-// export const startGame = (gameId) => api.post(`/admin/game/${gameId}/mutate`, { mutationType: 'START' }).then(res => new GameStatus(res.data));
-// export const advanceGame = (gameId) => api.post(`/admin/game/${gameId}/mutate`, { mutationType: 'ADVANCE' }).then(res => new GameStatus(res.data));
-// export const endGame = (gameId) => api.post(`/admin/game/${gameId}/mutate`, { mutationType: 'END' }).then(res => new GameStatus(res.data));
+const mutateSession = async (gameId, mutationType) => {
+  const response  = await api.post(`/admin/game/${gameId}/mutate`, { mutationType });
+  return convertSessionData(response.data);
+};
+
+export const mutateGameAPI = {
+  start: (gameId) => mutateSession(gameId, 'START'),
+  advance: (gameId) => mutateSession(gameId, 'ADVANCE'),
+  end: (gameId) => mutateSession(gameId, 'END'),
+};
