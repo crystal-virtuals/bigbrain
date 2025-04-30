@@ -35,3 +35,13 @@ export function Section({ title, description, children }) {
     </div>
   );
 }
+
+export function CardHeader({ children }) {
+  return (
+    <div className="pb-[75%] relative w-full h-full">
+      <div className="md:rounded-xl z-1 absolute top-0 left-0 block w-full h-full overflow-hidden rounded-lg">
+        {children}
+      </div>
+    </div>
+  );
+}

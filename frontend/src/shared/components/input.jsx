@@ -91,7 +91,7 @@ export const Input = forwardRef(function Input(
 // input with validation error
 export function InputError({ ...props }) {
   return (
-    <div className="mt-2 grid grid-cols-1">
+    <div className="my-2 grid grid-cols-1">
       <Input
         className='col-start-1 row-start-1 before:hidden'
         {...props}

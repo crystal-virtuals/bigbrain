@@ -269,6 +269,7 @@ export function ButtonLink({ children, ...props }) {
     purple: 'bg-purple-500',
     fuchsia: 'bg-fuchsia-500',
     pink: 'bg-pink-300',
+    error: 'bg-error',
   }
 
   let colorClass = colors[color] || 'bg-pink-300';
