@@ -107,11 +107,13 @@ function QuestionHeader({ index, question }) {
   return (
     <>
       <div className="flex flex-row gap-2">
-        <img
-          src={question.thumbnail}
-          alt="Question Thumbnail"
-          className="size-24 rounded-lg object-cover"
-        />
+        {!isEmptyString(question.thumbnail) && (
+          <img
+            src={question.thumbnail}
+            alt="Question Thumbnail"
+            className="size-24 rounded-lg object-cover"
+          />
+        )}
         <div className="ml-2 flex flex-col justify-center">
           <Label>Question {index + 1}</Label>
           <Container>{question.name}</Container>
