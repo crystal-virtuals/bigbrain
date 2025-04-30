@@ -200,9 +200,9 @@ export function LabelTab({ type, label, children, invalid = false, ...props }) {
   // type is either 'correct' or 'false'
   const styles = {
     correct: 'bg-emerald-500',
-    false: 'bg-[var(--color-false)]',
-    neutral: 'bg-[var(--color-cyan)]',
-    dark: 'bg-[var(--color-dark)]',
+    false: 'bg-error',
+    neutral: 'bg-cyan',
+    dark: 'bg-[#113034]',
   };
 
   const bgColor = styles[type] || styles.neutral;

@@ -1,6 +1,7 @@
 import * as Headless from '@headlessui/react'
 import clsx from 'clsx'
 import React, { forwardRef } from 'react'
+import { ExclamationCircleIcon } from '@heroicons/react/16/solid';
 
 export function InputGroup({ children }) {
   return (
@@ -86,3 +87,21 @@ export const Input = forwardRef(function Input(
     </span>
   )
 })
+
+// input with validation error
+export function InputError({ ...props }) {
+  return (
+    <div className="mt-2 grid grid-cols-1">
+      <Input
+        className='col-start-1 row-start-1 before:hidden'
+        {...props}
+      />
+      {props.invalid && (
+        <ExclamationCircleIcon
+          aria-hidden="true"
+          className="pointer-events-none col-start-1 row-start-1 mr-3 size-5 self-center justify-self-end text-red-500 sm:size-4"
+        />
+      )}
+    </div>
+  )
+}
