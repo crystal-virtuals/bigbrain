@@ -1,36 +1,49 @@
-import { Button, ButtonLink } from '@components/button';
-import {
-  Dialog,
-  DialogActions,
-  DialogBody,
-  DialogDescription,
-  DialogTitle,
-} from '@components/dialog';
 import { Field, Label } from '@components/fieldset';
 import { InputGroup } from '@components/input';
-import clsx from 'clsx';
+import { Link } from '@components/link';
+import { LinkIcon } from '@heroicons/react/16/solid';
 import { useState } from 'react';
+import { useToast } from '@hooks/toast';
+import clsx from 'clsx';
 
-function Strong({ children }) {
+export function CopyToClipboardLink({ value }) {
+  const [copied, setCopied] = useState(false);
+  const toastify = useToast();
+
+  const copyToClipboard = () => {
+    navigator.clipboard
+      .writeText(value)
+      .then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+        toastify.success({ message: 'Copied to clipboard.', replace: true });
+      })
+      .catch((error) => {
+        console.error('Failed to copy:', error);
+      });
+  };
+
+  const styles = [
+    // color
+    'text-zinc-950 dark:text-white',
+    // hover
+    'group-hover:opacity-100 opacity-50',
+  ]
+
   return (
-    <span
-      className={clsx([
-        // Basic layout
-        'relative block w-full appearance-none rounded-lg py-[calc(--spacing(2.5)-1px)] sm:py-[calc(--spacing(1.5)-1px)]',
-        // Typography
-        'font-nunito text-3xl font-black leading-none tracking-wider text-teal dark:text-teal',
-      ])}
-    >
-      {children}
-    </span>
-  );
+    <Link className='group flex flex-row items-center gap-1' onClick={copyToClipboard}>
+      <LinkIcon className={clsx(styles, 'size-5')}/>
+      <span className={clsx(styles, 'group-hover:underline text-sm font-normal leading-none text-center')}>
+        {copied ? 'Link copied' : 'Copy link'}
+      </span>
+    </Link>
+  )
 }
 
 export function CopyToClipboardInput({ value, copied, onCopy }) {
   return (
     <InputGroup className="relative">
       <span
-        id="session-url"
         data-slot="control"
         className={clsx([
           // Basic layout
@@ -96,17 +109,19 @@ export function CopyToClipboardInput({ value, copied, onCopy }) {
   );
 }
 
-export function StartGameButton({ sessionId }) {
-  const [isOpen, setIsOpen] = useState(false);
+export function CopySessionId({ sessionId }) {
   const [copied, setCopied] = useState(false);
+  const toastify = useToast();
 
-  const sessionUrl = `/play/${sessionId}`;
+  const sessionUrl = `${window.location.origin}/play/${sessionId}`;
+
   const copyToClipboard = () => {
     navigator.clipboard
       .writeText(sessionUrl)
       .then(() => {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
+        toastify.success({ message: 'Copied to clipboard.', replace: true });
       })
       .catch((error) => {
         console.error('Failed to copy:', error);
@@ -115,36 +130,15 @@ export function StartGameButton({ sessionId }) {
 
   return (
     <>
-      <ButtonLink onClick={() => setIsOpen(true)}>
-        <span className="md:inline hidden">Start Game</span>
-        <span className="md:hidden inline">Start</span>
-      </ButtonLink>
-
-      {/* Modal */}
-      <Dialog open={isOpen} onClose={setIsOpen}>
-        <DialogTitle>Game Started!</DialogTitle>
-        <DialogDescription>
-          Share the link below with your friends.
-        </DialogDescription>
-        <DialogBody>
-          <Field>
-            <Label htmlFor="session-url">Game PIN:</Label>
-            <CopyToClipboardInput
-              value={sessionId}
-              copied={copied}
-              onCopy={copyToClipboard}
-            />
-          </Field>
-        </DialogBody>
-        <DialogActions>
-          <Button plain onClick={() => setIsOpen(false)}>
-            Close
-          </Button>
-          <Button onClick={() => setIsOpen(false)}>
-            Lobby <span aria-hidden="true">&rarr;</span>
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <Field>
+        <Label htmlFor="session-url">Game PIN:</Label>
+        <CopyToClipboardInput
+          id="session-url"
+          value={sessionId}
+          copied={copied}
+          onCopy={copyToClipboard}
+        />
+      </Field>
     </>
   );
 }
