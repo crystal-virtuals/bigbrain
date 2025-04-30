@@ -10,12 +10,14 @@ import { ErrorMessage, Field, Label } from '@components/fieldset';
 import { InputError } from '@components/input';
 import { isEmptyString } from '@utils/helpers';
 import { useEffect, useState } from 'react';
+import { useToast } from '@hooks/toast';
 
 export default function NewGameModal({ isOpen, setIsOpen, onSubmit }) {
   const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isTouched, setIsTouched] = useState(false);
+  const toastify = useToast();
 
   useEffect(() => {
     if (isTouched) {
@@ -53,10 +55,14 @@ export default function NewGameModal({ isOpen, setIsOpen, onSubmit }) {
     if (!validate()) return;
 
     setIsLoading(true);
-    onSubmit(name).finally(() => {
-      reset();
-      setIsOpen(false);
-    });
+    onSubmit(name)
+      .then(() => {
+        toastify.success({ message: 'Game created!' });
+      })
+      .finally(() => {
+        reset();
+        setIsOpen(false);
+      });
   };
 
   const handleClose = (e) => {
@@ -64,6 +70,13 @@ export default function NewGameModal({ isOpen, setIsOpen, onSubmit }) {
     reset();
     setIsOpen(false);
   };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSubmit(e);
+    }
+  }
 
   return (
     <Dialog open={isOpen} onClose={setIsOpen}>
@@ -77,9 +90,10 @@ export default function NewGameModal({ isOpen, setIsOpen, onSubmit }) {
             type="text"
             value={name}
             onChange={handleChange}
+            onKeyDown={handleKeyDown}
             invalid={isTouched && isEmptyString(name)}
             placeholder="My awesome game"
-            className='col-start-1 row-start-1 before:hidden'
+            className="col-start-1 row-start-1 before:hidden"
             autoFocus
           />
           {isTouched && error && <ErrorMessage>{error}</ErrorMessage>}
