@@ -1,8 +1,9 @@
 import { useAuth } from '@hooks/auth';
 import { gamesAPI, mutateGameAPI } from '@services/api';
-import { isEqual, mapToGame, newGame } from '@utils/game';
 import { useEffect, useState } from 'react';
 import { Navigate, Outlet, useNavigate } from 'react-router-dom';
+import { isEqual, mapToGame, newGame, endActiveSession } from '@utils/game';
+import { createSession, endSession} from '@utils/session';
 
 const Authenticate = ({ user, redirectPath = '/login', children }) => {
   // wait for user to be set
@@ -18,7 +19,7 @@ const Authenticate = ({ user, redirectPath = '/login', children }) => {
 
 function AdminLayout() {
   const [games, setGames] = useState(null);
-  const [sessions, setSessions] = useState(null);
+  const [sessions, setSessions] = useState({});
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -60,7 +61,14 @@ function AdminLayout() {
     return gamesAPI.updateGames(updatedGames).then(() => setGames(updatedGames));
   };
 
-  const startGame = async (gameId) => {
+  const findGameSession = (gameId) => {
+    // find the session by game ID
+    const session = sessions[gameId];
+    if (!session) throw new Error('Session not found');
+    return session;
+  }
+
+  const startGameSession = async (gameId) => {
     // find the game by ID
     const game = games.find((game) => isEqual(game, gameId));
     console.log('Starting game:', game);
@@ -73,12 +81,13 @@ function AdminLayout() {
     try {
       // start a new session
       const sessionData = await mutateGameAPI.start(gameId);
+      const sessionId = sessionData.sessionId;
 
       // update the game with the new session ID
       setGames((prev) =>
         prev.map((game) =>
           isEqual(game, gameId)
-            ? { ...game, active: sessionData.sessionId }
+            ? { ...game, active: sessionId}
             : game
         )
       );
@@ -86,27 +95,70 @@ function AdminLayout() {
       // update the sessions state with the new session
       setSessions((prev) => ({
         ...prev,
-        [gameId]: sessionData, // use gameId as the key
+        [sessionId]: createSession(gameId, sessionData.status, sessionData.position)
       }));
 
       // return the sessionId
-      return sessionData.sessionId;
+      return sessionId;
 
     } catch (error) {
-      throw new Error(error.data || 'Failed to start game. Please try again.');
+      throw new Error(error.message || 'Failed to start game. Please try again.');
     }
   };
 
+  const stopGameSession = async (gameId) => {
+    // find the game by ID
+    const game = games.find((game) => isEqual(game, gameId));
+
+    // validate the game
+    if (!game) throw new Error('Game not found');
+    if (!game.active) throw new Error('Game does not have an active session');
+
+    console.log('Ending the active session in this game:', game);
+    console.log('Stopping session:', sessions[game.active]);
+
+    const sessionId = game.active;
+
+    try {
+      await mutateGameAPI.end(gameId);
+
+      setGames((prev) =>
+        prev.map((game) =>
+          isEqual(game, gameId)
+            ? endActiveSession(game)
+            : game
+        )
+      );
+
+      // mark session as inactive
+      setSessions((prev) => {
+        const session = prev[sessionId];
+        return {
+          ...prev,
+          [sessionId]: endSession(session)
+        };
+      })
+
+      return sessionId;
+
+    } catch (error) {
+      throw new Error(error.message || 'Failed to end game. Please try again.');
+    }
+  }
 
   const data = {
     games,
     setGames,
     sessions,
     setSessions,
+    // game functions
     createGame,
     deleteGame,
     updateGame,
-    startGame,
+    // session functions
+    findGameSession,
+    startGameSession,
+    stopGameSession,
   };
 
   return (
