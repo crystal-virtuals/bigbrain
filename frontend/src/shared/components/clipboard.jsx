@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { useToast } from '@hooks/toast';
 import clsx from 'clsx';
 
-export function CopyToClipboardLink({ value }) {
+export function CopyToClipboardLink({ color, value }) {
   const [copied, setCopied] = useState(false);
   const toastify = useToast();
 
@@ -25,7 +25,7 @@ export function CopyToClipboardLink({ value }) {
 
   const styles = [
     // color
-    'text-zinc-950 dark:text-white',
+    color ? {color} : 'text-zinc-950 dark:text-white',
     // hover
     'group-hover:opacity-100 opacity-50',
   ]

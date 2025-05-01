@@ -39,9 +39,6 @@
   --color-secondary-300: oklch(84.89% .017 123.72);
   --color-secondary-content: oklch(19.742% .004 123.72);
 
-  /* --color-secondary: oklch(93% .034 272.788);
-  --color-secondary-content: oklch(45% .24 277.023); */
-
   --color-success: rgb(198, 234, 132);
   --color-success-content: oklch(37% .077 168.94);
 

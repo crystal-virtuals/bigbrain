@@ -361,7 +361,7 @@ export function ButtonToggle({ iconOn, iconOff, textOn = 'On', textOff = 'Off', 
   );
 }
 
-export function LinkToggle({ iconOn, iconOff, textOn = 'On', textOff = 'Off', isOn, setIsOn, ...props }) {
+export function LinkToggle({ color, iconOn, iconOff, textOn = 'On', textOff = 'Off', isOn, setIsOn, ...props }) {
   const { className, ...rest } = props;
 
   const IconOn = iconOn || EyeIcon;
@@ -369,7 +369,7 @@ export function LinkToggle({ iconOn, iconOff, textOn = 'On', textOff = 'Off', is
 
   const styles = {
     base: [
-      'text-zinc-950 dark:text-white',
+      color ? color : 'text-zinc-950 dark:text-white',
       'group-hover:opacity-100 opacity-50',
     ],
     link: ['group flex flex-row items-center gap-1'],
