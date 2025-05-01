@@ -44,13 +44,13 @@ export default function AuthForm({ isLogin, onSubmit }) {
       .then((response) => {
         setFormData(initialFormData[isLogin ? 'login' : 'register']);
         setErrors(new Map());
-        toastify.success(response.message, response.description);
+        toastify.success(response);
       })
       .catch((error) => {
         const newErrors = new Map();
-        newErrors.set('email', error.data);
+        newErrors.set('email', error.message);
         setErrors(newErrors);
-        toastify.error(error.message, error.description);
+        toastify.error(error.toast);
       })
       .finally(() => {
         setLoading(false);

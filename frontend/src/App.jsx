@@ -2,15 +2,29 @@ import { AuthLayout, Login, Logout, Register } from '@/auth';
 import {
   AdminLayout,
   GameLayout,
-  Dashboard,
   EditGame,
   EditQuestion,
 } from '@/admin';
+import { Dashboard } from '@/dashboard';
 import { AuthProvider } from '@hooks/auth';
 import { ToastProvider } from '@hooks/toast';
 import { NotFound, Unauthorized } from '@pages/errors';
 import { Home, Landing } from '@pages/public';
 import { Outlet, Route, Routes } from 'react-router-dom';
+import { SessionLayout, AdminSession } from '@/session';
+
+
+function PlayJoin() {
+  return (
+    <h1>Enter session id</h1>
+  )
+}
+
+function PlaySession() {
+  return (
+    <h1>Play session</h1>
+  )
+}
 
 function AppLayout() {
   const classes =
@@ -46,11 +60,21 @@ function App() {
         {/* Admin routes (user must be authorised) */}
         <Route element={<AdminLayout />}>
           <Route path="dashboard" element={<Dashboard />} />
+
           <Route path="game/:gameId" element={<GameLayout />}>
             <Route index element={<EditGame />} />
             <Route path="question/:questionId" element={<EditQuestion />}/>
           </Route>
+
+          <Route path="session/:sessionId" element={<SessionLayout />}>
+            <Route index element={<AdminSession />} />
+          </Route>
         </Route>
+
+        {/* Player routes (no auth) */}
+        <Route path="play" element={<PlayJoin />} /> {/* Join a session */}
+        <Route path="play/:sessionId" element={<PlaySession />} /> {/* Play a session */}
+
 
         {/* Fallback */}
         <Route path="*" element={<NotFound />} />

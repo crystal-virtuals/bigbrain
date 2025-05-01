@@ -1,14 +1,14 @@
 import { Button } from '@components/button';
 import { ErrorMessage, Field } from '@components/fieldset';
-import { Input } from '@components/input';
 import { ConfirmModal } from '@components/modal';
 import { Strong, Text } from '@components/text';
 import { Textarea } from '@components/textarea';
+import * as Headless from '@headlessui/react';
 import { CheckIcon, XCircleIcon, XMarkIcon } from '@heroicons/react/20/solid';
 import { PencilIcon, PhotoIcon } from '@heroicons/react/24/solid';
 import { fileToDataUrl, isNullOrUndefined, pluralSuffix } from '@utils/helpers';
-import { useRef, useState } from 'react';
 import clsx from 'clsx';
+import React, { forwardRef, useRef, useState } from 'react';
 
 /***************************************************************
                        Form Alert
@@ -34,6 +34,65 @@ export function FormAlert( { errors, children } ) {
 /***************************************************************
                        Edit Form Inputs
 ***************************************************************/
+const Input = forwardRef(function Input({ className, readOnly, dark=true, inputclassname='', ...props }, ref) {
+  return (
+    <span
+      data-slot="control"
+      className={clsx([
+        className,
+        // Basic layout
+        'relative block w-full',
+        // Background color + shadow applied to inset pseudo element, so shadow blends with border in light mode
+        !readOnly && 'before:absolute before:inset-px before:rounded-[calc(var(--radius-lg)-1px)] before:shadow-sm before:bg-white',
+        // Background color is moved to control and shadow is removed in dark mode so hide `before` pseudo
+        dark && 'dark:before:hidden',
+        // Focus ring
+        'after:pointer-events-none after:absolute after:inset-0 after:rounded-lg after:ring-transparent after:ring-inset sm:focus-within:after:ring-2 sm:focus-within:after:ring-blue-500',
+        // Disabled state
+        'has-data-disabled:opacity-50 has-data-disabled:before:bg-zinc-950/5 has-data-disabled:before:shadow-none',
+        // Invalid state
+        'has-data-invalid:before:shadow-red-500/10'
+      ])}
+    >
+      <Headless.Input
+        ref={ref}
+        readOnly={readOnly}
+        aria-readonly={readOnly}
+        {...props}
+        className={clsx([
+          // Basic layout
+          'relative block w-full appearance-none rounded-lg py-[calc(--spacing(2.5)-1px)] sm:py-[calc(--spacing(1.5)-1px)]',
+          // Padding
+          !readOnly && 'sm:px-[calc(--spacing(3)-1px)] px-[calc(--spacing(3.5)-1px)]',
+          // Typography
+          'text-base/6 text-zinc-950 placeholder:text-zinc-500 sm:text-sm/6',
+          // Border
+          !readOnly && 'border border-zinc-950/10 data-hover:border-zinc-950/20',
+          // Background color
+          'bg-transparent',
+          // Hide default focus styles
+          'focus:outline-hidden',
+          // Invalid state
+          'data-invalid:border-red-500 data-invalid:data-hover:border-red-500 dark:data-invalid:border-red-500 dark:data-invalid:data-hover:border-red-500',
+          // Disabled state
+          'data-disabled:border-zinc-950/20 dark:data-disabled:border-white/15 dark:data-disabled:bg-white/[2.5%] dark:data-hover:data-disabled:border-white/15',
+          // System icons
+          'dark:[color-scheme:dark]',
+          // Readonly state
+          readOnly && 'cursor-default pointer-events-none',
+          // Dark mode
+          dark && 'dark:text-white dark:border-white/10 dark:data-hover:border-white/20',
+          // Readonly state
+          !readOnly && 'dark:bg-white/5',
+          // Input classes
+          inputclassname,
+        ])}
+      />
+    </span>
+  );
+});
+
+
 export function ControlledTextarea({
   name,
   value,
@@ -141,10 +200,11 @@ export function LabelTab({ type, label, children, invalid = false, ...props }) {
   // type is either 'correct' or 'false'
   const styles = {
     correct: 'bg-emerald-500',
-    false: 'bg-[var(--color-false)]',
-    neutral: 'bg-[var(--color-cyan)]',
-    dark: 'bg-[var(--color-dark)]',
+    false: 'bg-error',
+    neutral: 'bg-cyan',
+    dark: 'bg-[#113034]',
   };
+
   const bgColor = styles[type] || styles.neutral;
   const style = clsx(
     'relative rounded-t-md inline-block px-3 py-2 leading-none select-none',
@@ -232,7 +292,7 @@ export function ThumbnailInput({ value, onChange, ...props }) {
       // text
       'text-zinc-950 dark:text-white',
       // background
-      'bg-white dark:bg-zinc-900 hover:bg-white/10 dark:hover:bg-zinc-950',
+      'bg-white dark:bg-zinc-900 hover:bg-zinc-300 dark:hover:bg-zinc-950',
     ],
     dashed: [
       'border border-dashed border-zinc-900/25 dark:border-white/25',

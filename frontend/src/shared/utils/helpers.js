@@ -59,6 +59,16 @@ export const isNullOrUndefined = (value) => {
   return  (value === null || value === undefined || value === '');
 }
 
+
+export const splitNumber = (number) => {
+  const str = number.toString();
+  // split in half
+  const mid = Math.floor(str.length / 2);
+  const firstPart = str.slice(0, mid);
+  const secondPart = str.slice(mid);
+  return [firstPart, secondPart];
+}
+
 /***************************************************************
                        Date Processing
 ***************************************************************/
@@ -128,76 +138,6 @@ export const uid = () => {
   const num = Math.floor(Math.random() * 1000000);
   return parseInt(num, 10); // return as a 10 digit number
 }
-
-/***************************************************************
-                        Game
-***************************************************************/
-export const newGame = (name, user) => {
-  // generate a random key for the new game
-  const key = uid();
-  // create a new game object
-  const newGame = {
-    id: key,
-    name: name,
-    owner: user.email,
-    thumbnail: '',
-    createdAt: new Date().toISOString(),
-    active: 0, // 0 = inactive, 1 = active
-  };
-  return newGame;
-}
-
-export const getTotalDuration = (questions) => {
-  // if no questions, return 0
-  if (!questions || questions.length === 0) {
-    return '0 min';
-  }
-
-  // if questions exist, sum the duration of each question
-  const total = questions.reduce((acc, question) => {
-    // if question has no duration, return 0
-    if (!question.duration) {
-      return acc;
-    }
-    // if question has duration, add to total
-    return acc + question.duration;
-  }, 0);
-
-  // if total is less than 60, return in minutes
-  if (total < 60) {
-    return `${total} min`;
-  }
-  // if total is greater than 60, return in hours and minutes
-  const hours = Math.floor(total / 60);
-  const minutes = total % 60;
-  return `${hours > 0 ? `${hours}h ` : ''}${minutes}min`;
-};
-
-
-export const getNumberOfQuestions = (questions) => {
-  // if no questions, return 0
-  if (!questions || questions.length === 0) {
-    return '0 questions';
-  }
-  const count = questions.length;
-  return `${count} question${pluralSuffix(count)}`;
-};
-
-export const isActive = (active) => {
-  return active === 1 ? 'Active' : 'Inactive';
-};
-
-export const isEqual = (obj1, obj2) => {
-  if (obj1 === obj2) return true;
-  if (typeof obj1 !== 'object' || typeof obj2 !== 'object' || !obj1 || !obj2) return false;
-  const keys1 = Object.keys(obj1);
-  const keys2 = Object.keys(obj2);
-  if (keys1.length !== keys2.length) return false;
-  return keys1.every(key =>
-    Object.prototype.hasOwnProperty.call(obj2, key) &&
-    isEqual(obj1[key], obj2[key])
-  );
-};
 
 /***************************************************************
                         Colors

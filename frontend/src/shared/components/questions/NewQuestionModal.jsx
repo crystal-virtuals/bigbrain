@@ -77,10 +77,10 @@ export default function NewQuestionModal({ isOpen, setIsOpen, createQuestion }) 
   const handleClick = (questionType) => {
     createQuestion(questionType)
       .then(() => {
-        toastify.success('Question created');
+        toastify.success({ message: 'Question created'});
       })
       .catch(() => {
-        toastify.error('Failed to create question. Please try again later.');
+        toastify.error({ message: 'Failed to create question. Please try again later.'});
       })
       .finally(() => {
         setIsOpen(false);

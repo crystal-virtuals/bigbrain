@@ -4,12 +4,8 @@
 import axios from 'axios'
 import { BACKEND_PORT } from '@frontend/backend.config.json'
 import { getAuthToken } from './token.js'
-
-const statusText = {
-  200: 'OK',
-  400: 'Bad Input',
-  403: 'Unauthorized',
-}
+import { createError } from './error.jsx'
+import { mapSessionData } from '@utils/session.js'
 
 const instance = axios.create({
   baseURL: `http://localhost:${BACKEND_PORT}`,
@@ -29,18 +25,12 @@ instance.interceptors.request.use((config) => {
   return config;
 });
 
-
-// Intercept the response and handle errors
+// Intercept the response and return an Error object
 instance.interceptors.response.use(
   (response) => response.data,
   (error) => {
     console.error('API error:', error);
-    return Promise.reject({
-      status: error.response?.status || 500,
-      statusText: statusText[error.response?.status] || 'Unknown Error',
-      data: error.response?.data?.error || error.message,
-      request: error.config.data
-    });
+    return Promise.reject(createError(error));
   }
 );
 
@@ -62,7 +52,46 @@ export const api = {
 };
 
 /***************************************************************
+                      Authentication
+***************************************************************/
+async function register({ email, password, name }) {
+  return api.post('/admin/auth/register', { email, password, name })
+    .then(res => res.token);
+}
+
+async function login ({ email, password }) {
+  return api.post('/admin/auth/login', { email, password })
+    .then(res => res.token);
+}
+
+async function logout () {
+  return api.post('/admin/auth/logout')
+}
+
+export const authAPI = {
+  register,
+  login,
+  logout,
+}
+
+/***************************************************************
                          Game API
 ***************************************************************/
+export const gamesAPI = {
+  getGames: () => api.get('/admin/games').then(res => res.games),
+  updateGames: (games) => api.put('/admin/games', { games }),
+}
+
 export const fetchGames = () => api.get('/admin/games').then(res => res.games);
 export const updateGames = (games) => api.put('/admin/games', { games });
+
+const mutateSession = async (gameId, mutationType) => {
+  const response  = await api.post(`/admin/game/${gameId}/mutate`, { mutationType });
+  return mapSessionData(response.data);
+};
+
+export const mutateGameAPI = {
+  start: (gameId) => mutateSession(gameId, 'START'),
+  advance: (gameId) => mutateSession(gameId, 'ADVANCE'),
+  end: (gameId) => mutateSession(gameId, 'END'),
+};

@@ -76,7 +76,7 @@ export default function EditGame() {
   return (
     <>
       <Header title="Edit Game" />
-      <div className="divide-y divide-zinc-900/10">
+      <div className="divide-y divide-zinc-900/10 dark:divide-white/5">
         {/* Game */}
         <Section title="Game" description="Edit your game details.">
           <Game game={game} updateGame={updateGame} />

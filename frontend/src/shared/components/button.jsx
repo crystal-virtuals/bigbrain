@@ -2,6 +2,7 @@ import * as Headless from '@headlessui/react';
 import clsx from 'clsx';
 import React, { forwardRef } from 'react';
 import { Link } from './link';
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/16/solid';
 
 const styles = {
   base: [
@@ -14,7 +15,7 @@ const styles = {
     // Disabled
     'data-disabled:opacity-50',
     // Icon
-    '*:data-[slot=icon]:-mx-0.5 *:data-[slot=icon]:my-0.5 *:data-[slot=icon]:size-5 *:data-[slot=icon]:shrink-0 *:data-[slot=icon]:self-center *:data-[slot=icon]:text-(--btn-icon) sm:*:data-[slot=icon]:my-1 sm:*:data-[slot=icon]:size-4 forced-colors:[--btn-icon:ButtonText] forced-colors:data-hover:[--btn-icon:ButtonText]',
+    '*:data-[slot=icon]:-mx-0.5 *:data-[slot=icon]:my-0.5 *:data-[slot=icon]:size-5 *:data-[slot=icon]:shrink-0 *:data-[slot=icon]:self-center *:data-[slot=icon]:text-(--btn-icon) sm:*:data-[slot=icon]:my-1 sm:*:data-[slot=icon]:size-4 forced-colors:[--btn-icon:ButttextOn] forced-colors:data-hover:[--btn-icon:ButttextOn]',
     // Cursor
     'cursor-pointer touch-manipulation pointer-events-auto',
   ],
@@ -156,7 +157,7 @@ const styles = {
     rose: [
       'text-white [--btn-hover-overlay:var(--color-white)]/10 [--btn-bg:var(--color-rose-500)] [--btn-border:var(--color-rose-600)]/90',
       '[--btn-icon:var(--color-rose-300)] data-active:[--btn-icon:var(--color-rose-200)] data-hover:[--btn-icon:var(--color-rose-200)]',
-    ]
+    ],
   },
 };
 
@@ -166,38 +167,35 @@ export function Spinner({ loading }) {
   ) : null;
 }
 
-// export const Button = forwardRef(function Button({ color, outline, plain, className, children, ...props }, ref) {
-//   let classes = clsx(
-//     styles.base,
-//     outline ? styles.outline : plain ? styles.plain : clsx(styles.solid, styles.colors[color ?? 'dark/zinc']),
-//     className,
-//   )
-
-//   return 'href' in props ? (
-//     <Link {...props} className={classes} ref={ref}>
-//       <TouchTarget>{children}</TouchTarget>
-//     </Link>
-//   ) : (
-//     <Headless.Button {...props} className={clsx(classes, 'cursor-pointer')} ref={ref}>
-//       <TouchTarget>{children}</TouchTarget>
-//     </Headless.Button>
-//   )
-// })
-
-export const Button = forwardRef(function Button({ color, outline, plain, loading = false, disabled = false, className, children, ...props }, ref) {
+export const Button = forwardRef(function Button(
+  {
+    color,
+    outline,
+    plain,
+    loading = false,
+    disabled = false,
+    className,
+    children,
+    ...props
+  },
+  ref
+) {
   const isDisabled = disabled || loading;
   let classes = clsx(
     className,
     styles.base,
-    outline ? styles.outline : plain ? styles.plain : clsx(styles.solid, styles.colors[color ?? 'dark/zinc']),
+    outline
+      ? styles.outline
+      : plain
+      ? styles.plain
+      : clsx(styles.solid, styles.colors[color ?? 'dark/zinc']),
     isDisabled && 'cursor-not-allowed',
-    loading && 'cursor-progress',
-  )
-
+    loading && 'cursor-progress'
+  );
 
   const content = (
     <TouchTarget>
-      {(loading !== undefined && loading) ? (
+      {loading !== undefined && loading ? (
         <span className="flex items-center gap-2">
           <span className="loading loading-spinner loading-sm" />
           {children}
@@ -206,7 +204,7 @@ export const Button = forwardRef(function Button({ color, outline, plain, loadin
         children
       )}
     </TouchTarget>
-  )
+  );
 
   return 'href' in props ? (
     <Link
@@ -243,5 +241,151 @@ export function TouchTarget({ children }) {
       />
       {children}
     </>
+  );
+}
+
+export function ButtonLink({ children, ...props }) {
+  const { color,  className, href, to, ...rest } = props;
+
+  const classes = clsx(
+    className,
+    'relative flex group text-black touch-manipulation cursor-pointer pointer-events-auto md:h-14 md:w-32 lg:w-40 md:text-base w-24 h-10 p-0 text-sm font-bold'
+  );
+
+  const colors = {
+    indigo: 'bg-indigo-500',
+    cyan: 'bg-cyan-500',
+    red: 'bg-red-500',
+    orange: 'bg-orange',
+    amber: 'bg-amber-500',
+    yellow: 'bg-yellow-500',
+    lime: 'bg-lime-500',
+    green: 'bg-green',
+    emerald: 'bg-emerald-500',
+    teal: 'bg-teal-500',
+    sky: 'bg-sky-500',
+    blue: 'bg-blue-500',
+    violet: 'bg-violet-500',
+    purple: 'bg-purple-500',
+    fuchsia: 'bg-fuchsia-500',
+    pink: 'bg-pink-300',
+    error: 'bg-error',
+  }
+
+  let colorClass = colors[color] || 'bg-pink-300';
+
+  return (
+    <Link className={classes} to={to || href} {...rest}>
+      <div className="-inset-1 absolute z-0 rounded-[2.9375rem]" />
+      <div className="absolute inset-x-0 top-0 bottom-0 transform group-active:translate-y-0.5 group-active:bottom-0.5 z-1 bg-black p-[0.1875rem] rounded-[3.125rem]">
+        <div className="relative w-full h-full">
+          <div className={clsx("top-1 absolute inset-x-0 bottom-0 overflow-hidden rounded-[2.8125rem]", colorClass)}>
+            <div className="bg-opacity-30 absolute inset-0 bg-black" />
+          </div>
+          <div className={clsx('bottom-1 absolute inset-x-0 top-0 overflow-hidden group-active:bottom-0.5 rounded-[2.8125rem]', colorClass)}>
+            <div className="group-hover:bg-opacity-20 absolute inset-0" />
+          </div>
+        </div>
+      </div>
+
+      <div className="relative flex flex-row gap-x-4 items-center w-full min-h-full pointer-events-none z-2 transform -translate-y-0.5 group-active:translate-y-0 p-[0.1875rem]">
+        <div className="flex flex-col flex-1 items-center">
+          <div className="relative">{children}</div>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+export function ButtonPrimary({ children, ...props }) {
+  const { className, disabled, ...rest } = props;
+
+  let classes = clsx(
+    className,
+    'relative flex group text-black touch-manipulation cursor-pointer pointer-events-auto whitespace-nowrap md:px-8 w-full md:w-80 h-12 px-6 py-0 text-base font-bold',
+    disabled && 'cursor-not-allowed opacity-50 pointer-events-none',
+  );
+
+  return (
+    <button
+      className={classes}
+      type="button"
+      {...props}
+    >
+      <div className="-inset-1 absolute z-0 rounded-[2.9375rem]"/>
+      <div
+        className="absolute inset-x-0 top-0 bottom-0 transform group-active:translate-y-0.5 group-active:bottom-0.5 z-1 bg-black rounded-[3.125rem] p-[0.1875rem]"
+      >
+        <div className="relative w-full h-full">
+          <div className="top-1 absolute inset-x-0 bottom-0 overflow-hidden rounded-[2.8125rem] bg-success">
+            <div className="opacity-30 absolute inset-0 bg-black" />
+          </div>
+          <div className="bottom-1 absolute inset-x-0 top-0 overflow-hidden group-active:bottom-0.5 bg-success rounded-[2.8125rem]">
+            <div
+              className="group-hover:opacity-20 absolute inset-0 opacity-0"
+            />
+          </div>
+        </div>
+      </div>
+      <div
+        className="z-1 absolute inset-0 overflow-hidden hidden rounded-[2.8125rem] "
+      >
+        <div
+          className="opacity-20 absolute top-0 left-0 w-full h-full bg-black"
+          style={{ left: "-100%" }}
+        />
+      </div>
+      <div className="relative flex flex-row gap-x-4 items-center w-full min-h-full pointer-events-none z-2 transform -translate-y-0.5 group-active:translate-y-0 p-[0.1875rem]">
+        <div className="flex flex-col flex-1 items-center">
+          <div className="relative">
+            <div className="relative">{children}</div>
+          </div>
+        </div>
+      </div>
+    </button>
+  );
+}
+
+export function ButtonToggle({ iconOn, iconOff, textOn = 'On', textOff = 'Off', isOn, setIsOn, ...props }) {
+  const IconOn = iconOn || EyeIcon;
+  const IconOff = iconOff || EyeSlashIcon;
+
+  return (
+    <Button
+      onClick={() => setIsOn((pre) => !pre)}
+      {...props}
+    >
+      {isOn ? <IconOn className="size-6" /> : <IconOff className="size-6" />}
+      <p>{isOn ? textOn : textOff}</p>
+    </Button>
+  );
+}
+
+export function LinkToggle({ iconOn, iconOff, textOn = 'On', textOff = 'Off', isOn, setIsOn, ...props }) {
+  const { className, ...rest } = props;
+
+  const IconOn = iconOn || EyeIcon;
+  const IconOff = iconOff || EyeSlashIcon;
+
+  const styles = {
+    base: [
+      'text-zinc-950 dark:text-white',
+      'group-hover:opacity-100 opacity-50',
+    ],
+    link: ['group flex flex-row items-center gap-1'],
+    text: ['text-sm font-normal leading-none text-center group-hover:underline'],
+  };
+
+  return (
+    <Link
+      className={clsx(styles.link, className)}
+      onClick={() => setIsOn((prev) => !prev)}
+      {...rest}
+    >
+      {isOn ? <IconOn className={clsx('size-4', styles.base)}/> : <IconOff className={clsx('size-4', styles.base)}/>}
+      <div className={clsx(styles.text, styles.base)}>
+        {isOn ? textOn : textOff}
+      </div>
+    </Link>
   );
 }

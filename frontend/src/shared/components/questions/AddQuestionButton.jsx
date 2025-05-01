@@ -10,7 +10,8 @@ export default function AddQuestionButton({ className, createQuestion }) {
     <>
       <Button color="dark/white" className={className} onClick={() => setIsOpen(true)}>
         <PlusIcon />
-        Add question
+        <span className="md:inline hidden">Add another question</span>
+        <span className="md:hidden inline">Add question</span>
       </Button>
 
       <NewQuestionModal

@@ -5,19 +5,32 @@ import {
   DropdownMenu,
 } from '@components/dropdown';
 import { AlertModal } from '@components/modal';
-import { EllipsisVerticalIcon } from '@heroicons/react/20/solid';
+import { EllipsisVerticalIcon, EllipsisHorizontalIcon } from '@heroicons/react/16/solid';
 import { useState } from 'react';
+import { useToast } from '@hooks/toast';
 
-export default function GameMenu({ game, onDelete }) {
+// Edit Delete Game Menu
+export default function EditDeleteGameMenu({ game, onDelete }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const toastify = useToast();
+
 
   const deleteGame = () => {
     setIsLoading(true);
     onDelete(game.id)
-      .then(() => setIsOpen(false) && setIsLoading(false))
-      .catch((error) => setError(error.data) && setIsLoading(false));
+      .then(() => {
+        setIsLoading(false);
+        setIsOpen(false);
+        setError('');
+        toastify.success({ message: 'Game deleted!' });
+      })
+      .catch((error) => {
+        setIsLoading(false);
+        setError(error.message);
+        toastify.error({ message: error.message, replace: true });
+      });
   };
 
   return (
@@ -25,7 +38,7 @@ export default function GameMenu({ game, onDelete }) {
       {/* Menu Button */}
       <Dropdown>
         <DropdownButton plain aria-label="More options">
-          <EllipsisVerticalIcon aria-hidden="true" className="size-6 text-zinc-600"/>
+          <EllipsisHorizontalIcon aria-hidden="true"/>
         </DropdownButton>
         <DropdownMenu className="hover:cursor-pointer">
           <DropdownItem href={`/game/${game.id}`}>View</DropdownItem>

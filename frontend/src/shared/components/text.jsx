@@ -23,7 +23,7 @@ export function TextLink({ className, ...props }) {
 }
 
 export function Strong({ className, ...props }) {
-  return <strong {...props} className={clsx(className, 'font-medium text-zinc-950 dark:text-white')} />
+  return <strong {...props} className={clsx(className, 'font-bold text-zinc-950 dark:text-white')} />
 }
 
 export function Code({ className, ...props }) {

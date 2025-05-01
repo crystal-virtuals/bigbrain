@@ -1,6 +1,7 @@
+import { Games } from '@/dashboard/games';
 import { Navbar, Sidebar } from '@components/dashboard';
 import { Divider } from '@components/divider';
-import { CreateGameButton, GameCardList } from '@components/game';
+import { CreateGameButton } from '@components/game';
 import { Heading } from '@components/heading';
 import { SidebarLayout } from '@components/sidebar-layout';
 import { useAuth } from '@hooks/auth';
@@ -34,7 +35,7 @@ export default function Dashboard() {
     <DashboardLayout user={user}>
       <DashboardHeading games={games} createGame={createGame} />
       <Divider className="my-6" />
-      <GameCardList games={games} onDelete={deleteGame} />
+      <Games games={games} onDelete={deleteGame}/>
     </DashboardLayout>
   );
 }

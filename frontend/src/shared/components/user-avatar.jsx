@@ -1,5 +1,5 @@
 import { Avatar } from '@components/avatar';
-import { isEmpty } from '@utils/validation';
+import { isEmptyString } from '@utils/validation';
 import clsx from 'clsx'
 
 const getInitials = (name) => {
@@ -24,10 +24,17 @@ function AvatarDefault( { className } ) {
 }
 
 export function UserAvatar({ user, className, ...props }) {
+  if (!user) {
+    console.log('User is null or undefined', user);
+    return (
+      <AvatarDefault className={className} {...props} />
+    );
+  }
+
   const initials = getInitials(user.name);
 
   // if user has no name, show default avatar
-  if (isEmpty(user.name) || isEmpty(initials)) {
+  if (isEmptyString(user.name) || isEmptyString(initials)) {
     return (
       <AvatarDefault className={className} {...props} />
     );

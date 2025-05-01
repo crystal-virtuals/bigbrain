@@ -2,6 +2,36 @@ import { questionTypes, duration, points } from '@constants/questions';
 import { uid, pluralSuffix, isEmptyString } from '@utils/helpers';
 
 /***************************************************************
+                        Session
+***************************************************************/
+const GameStatusMap = {
+  'started': 'started',
+  'advanced': 'advanced',
+  'ended': 'ended',
+}
+
+const mapToSession = (status, sessionId, position, gameId) => {
+  return {
+    status: GameStatusMap[status],
+    sessionId: Number(sessionId) || null,
+    gameId: Number(gameId),
+    position: position || -1,
+  };
+}
+
+export const endActiveSession = (game) => {
+  const sessionId = game.active;
+  if (!sessionId) {
+    throw new Error('Game does not have an active session');
+  }
+  return {
+    ...game,
+    active: null,
+    oldSessions: [...(game.oldSessions || []), sessionId],
+  }
+}
+
+/***************************************************************
                         Validation
 ***************************************************************/
 export const isEqual = (game, id) => {
@@ -203,6 +233,7 @@ export const mapToGame = (game) => {
     thumbnail: game.thumbnail,
     active: Number(game.active) || null,
     questions: game.questions ? game.questions.map((q) => mapToQuestion(q)) : [],
+    oldSessions: game.oldSessions ?? [], // array of old session IDs
   };
 }
 
@@ -212,7 +243,7 @@ export const mapToGames = (games) => {
 
 export const getTotalDuration = (questions) => {
   if (!questions || questions.length === 0) {
-    return '0 min';
+    return '0 seconds';
   }
 
   // if questions exist, sum the duration of each question
@@ -225,14 +256,13 @@ export const getTotalDuration = (questions) => {
     return acc + question.duration;
   }, 0);
 
-  // if total is less than 60, return in minutes
+  // if total is less than 60, return in seconds
   if (total < 60) {
-    return `${total} min`;
+    return `${total} seconds`;
   }
-  // if total is greater than 60, return in hours and minutes
-  const hours = Math.floor(total / 60);
-  const minutes = total % 60;
-  return `${hours > 0 ? `${hours}h ` : ''}${minutes}min`;
+  // if total is greater than 60, return in minutes
+  const minutes = Math.floor(total / 60);
+  return `${minutes} min`;
 };
 
 

@@ -95,7 +95,7 @@ function QuestionHeader({ index, question }) {
         <Label>Question {index + 1}</Label>
         <Container>
           <Strong>Empty question. </Strong>
-          <Link className="hover:text-accent" to={url}>
+          <Link className="hover:text-accent hover:underline " to={url}>
             Get started here
             <span aria-hidden="true"> &rarr;</span>
           </Link>
@@ -107,11 +107,13 @@ function QuestionHeader({ index, question }) {
   return (
     <>
       <div className="flex flex-row gap-2">
-        <img
-          src={question.thumbnail}
-          alt="Question Thumbnail"
-          className="size-24 rounded-lg object-cover"
-        />
+        {!isEmptyString(question.thumbnail) && (
+          <img
+            src={question.thumbnail}
+            alt="Question Thumbnail"
+            className="size-24 rounded-lg object-cover"
+          />
+        )}
         <div className="ml-2 flex flex-col justify-center">
           <Label>Question {index + 1}</Label>
           <Container>{question.name}</Container>
@@ -129,8 +131,8 @@ function QuestionCard({ index, question, deleteQuestion }) {
 
   const deleteThisQuestion = () => {
     deleteQuestion(question.id)
-      .then(() => toastify.success('Question deleted'))
-      .catch(() => toastify.error('Failed to delete question. Please try again later.'))
+      .then(() => toastify.success({ message: 'Question deleted'}))
+      .catch(() => toastify.error({ message: 'Failed to delete question. Please try again later.'}))
       .finally(() => setIsDeleteOpen(false));
   }
 
