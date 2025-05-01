@@ -2,6 +2,7 @@ import { AuthLayout, Login, Logout, Register } from '@/auth';
 import {
   AdminLayout,
   GameLayout,
+  QuestionLayout,
   EditGame,
   EditQuestion,
 } from '@/admin';
@@ -63,7 +64,9 @@ function App() {
 
           <Route path="game/:gameId" element={<GameLayout />}>
             <Route index element={<EditGame />} />
-            <Route path="question/:questionId" element={<EditQuestion />}/>
+            <Route path="question/:questionId" element={<QuestionLayout />}>
+              <Route index element={<EditQuestion />} />
+            </Route>
           </Route>
 
           <Route path="session/:sessionId" element={<SessionLayout />}>
@@ -74,7 +77,6 @@ function App() {
         {/* Player routes (no auth) */}
         <Route path="play" element={<PlayJoin />} /> {/* Join a session */}
         <Route path="play/:sessionId" element={<PlaySession />} /> {/* Play a session */}
-
 
         {/* Fallback */}
         <Route path="*" element={<NotFound />} />

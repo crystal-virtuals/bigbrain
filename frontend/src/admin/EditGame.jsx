@@ -5,8 +5,29 @@ import { Skeleton } from '@components/loading';
 import { AddQuestionButton, QuestionCard } from '@components/questions';
 import { isEqual, newQuestion } from '@utils/game';
 import { isNullOrUndefined } from '@utils/helpers';
-import { useMemo } from 'react';
-import { useOutletContext, useParams } from 'react-router-dom';
+import { useOutletContext } from 'react-router-dom';
+
+export default function EditGame() {
+  const { game, updateGame } = useOutletContext();
+
+  return (
+    <>
+      <Header title="Edit Game" />
+      <div className="divide-y divide-zinc-900/10 dark:divide-white/5">
+
+        {/* Game */}
+        <Section title="Game" description="Edit your game details.">
+          <Game game={game} updateGame={updateGame} />
+        </Section>
+
+        {/* Questions */}
+        <Section title="Questions" description="Edit your game questions.">
+          <GameQuestions game={game} updateGame={updateGame} />
+        </Section>
+      </div>
+    </>
+  );
+}
 
 function GameQuestions({ game, updateGame }) {
   const createQuestion = (questionType) => {
@@ -61,32 +82,5 @@ function Game({ game, updateGame }) {
     <Card>
       <EditGameForm game={game} onSubmit={updateGame} />
     </Card>
-  );
-}
-
-export default function EditGame() {
-  const { gameId } = useParams();
-  const { games, updateGame } = useOutletContext();
-
-  const game = useMemo(() => {
-    if (!games) return null;
-    return games.find((game) => isEqual(game, gameId));
-  }, [games, gameId]);
-
-  return (
-    <>
-      <Header title="Edit Game" />
-      <div className="divide-y divide-zinc-900/10 dark:divide-white/5">
-        {/* Game */}
-        <Section title="Game" description="Edit your game details.">
-          <Game game={game} updateGame={updateGame} />
-        </Section>
-
-        {/* Questions */}
-        <Section title="Questions" description="Edit your game questions.">
-          <GameQuestions game={game} updateGame={updateGame} />
-        </Section>
-      </div>
-    </>
   );
 }
