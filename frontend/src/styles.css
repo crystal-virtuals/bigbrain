@@ -17,16 +17,30 @@
   --color-cyan: rgb(0, 175, 198);
   --color-teal: #ABFDD7;
 
-  --radius-field: 0.25rem;
+  --radius-field: 0.5rem;
+  --radius-selector: 1rem;
+  --radius-box: 1rem;
+  --size-selector: .25rem;
+  --size-field: .25rem;
+
+  --color-base-100: oklch(97% .014 343.198);
+  --color-base-200: oklch(94% .028 342.258);
+  --color-base-300: oklch(89% .061 343.231);
+  --color-base-content: oklch(52% .223 3.958);
+
+  --color-primary: oklch(89% .061 343.231);
+  --color-primary-content: oklch(45% .187 3.815);
 
   --color-neutral: oklch(14% .005 285.823);
   --color-neutral-content: oklch(92% .004 286.32);
 
-  --color-primary: oklch(94% .028 342.258);
-  --color-primary-content: oklch(65% .241 354.308);
+  --color-secondary-100: oklch(98.71% .02 123.72);
+  --color-secondary-200: oklch(91.8% .018 123.72);
+  --color-secondary-300: oklch(84.89% .017 123.72);
+  --color-secondary-content: oklch(19.742% .004 123.72);
 
-  --color-secondary: oklch(93% .034 272.788);
-  --color-secondary-content: oklch(45% .24 277.023);
+  /* --color-secondary: oklch(93% .034 272.788);
+  --color-secondary-content: oklch(45% .24 277.023); */
 
   --color-success: rgb(198, 234, 132);
   --color-success-content: oklch(37% .077 168.94);

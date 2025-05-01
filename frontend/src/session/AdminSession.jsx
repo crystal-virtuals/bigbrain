@@ -1,12 +1,11 @@
+import { ButtonPrimary, LinkToggle } from '@components/button';
 import { CopyToClipboardLink } from '@components/clipboard';
-import { HeadingBorder, Heading, Subheading } from '@components/heading';
+import { Heading, HeadingBorder, Subheading } from '@components/heading';
 import { Strong } from '@components/text';
+import { LockClosedIcon, LockOpenIcon } from '@heroicons/react/16/solid';
 import { splitNumber } from '@utils/helpers';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { LinkToggle, ButtonPrimary } from '@components/button';
-import { LockOpenIcon, LockClosedIcon } from '@heroicons/react/16/solid';
-import { clsx } from 'clsx';
 
 function LockToggle({ lock, setLock }) {
   return (
@@ -46,7 +45,7 @@ function Header({ sessionId, lock, setLock }) {
   const sessionUrl = `${window.location.origin}/play/${sessionId}`;
 
   return (
-    <div className="flex flex-col items-center justify-center flex-1 gap-2">
+    <div className="flex flex-col items-center justify-center flex-1 gap-2 text-secondary-content">
       <Strong>Session ID:</Strong>
 
       {!lock ? (
@@ -68,26 +67,15 @@ function Header({ sessionId, lock, setLock }) {
   );
 }
 
-function Section({ header, content, children }) {
-  const styles = {
-    // color
-    base: [
-      // Background
-      'dark:bg-black/25 ring-2 ring-green/50 bg-zinc-100/25',
-      // Basic layout
-      'rounded-2xl overflow-hidden w-full flex-1 h-full lg:max-h-[700px]',
-    ],
-  };
-
+function Section({ header, children }) {
   return (
-    <section className={clsx(styles.base)}>
-      <div className="flex flex-col items-center w-full h-full">
-        <div className="px-4 py-5 sm:px-6 w-full dark:bg-zinc-950 bg-zinc-300">
+    <section className="dark:bg-black/25 ring-2 ring-green/50 bg-zinc-100/25 rounded-2xl overflow-hidden w-full flex-1 h-full lg:max-h-[700px]">
+      <div className="flex flex-col items-center justify-center mb-8 w-full h-full">
+        <div className="px-4 py-5 sm:px-6 w-full dark:bg-zinc-950 bg-secondary-200">
           {header}
         </div>
-
-        <div className="px-4 py-5 sm:p-6 flex-1 w-full">
-          <div className="md:gap-8 flex flex-col items-center justify-between flex-1 w-full gap-4">
+        <div className="px-4 py-5 sm:p-6 flex-1 w-full bg-secondary-100/20">
+          <div className="flex flex-col items-center justify-between flex-1 w-full gap-4 h-full">
             {children}
           </div>
         </div>
@@ -116,12 +104,11 @@ function AdminSession() {
     <div className="flex flex-col lg:flex-row gap-8 w-full h-screen px-2 lg:px-10 py-4 lg:py-10">
       <Section
         header={<Header sessionId={sessionId} lock={lock} setLock={setLock} />}
-        content={<Content lock={lock} />}
-      ></Section>
+      >
+        <Content lock={lock} />
+      </Section>
 
-      <section className="bg-zinc-800 rounded-2xl overflow-hidden w-full flex-1 h-full lg:max-h-[700px]">
-        hi
-      </section>
+      <Section></Section>
     </div>
   );
 }
