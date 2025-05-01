@@ -1,16 +1,49 @@
-import { Button, ButtonLink } from '@components/button';
+import { ButtonLink } from '@components/button';
 import { CopySessionId } from '@components/clipboard';
-import {
-  Dialog,
-  DialogActions,
-  DialogBody,
-  DialogDescription,
-  DialogTitle,
-} from '@components/dialog';
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Modal } from '@components/modal';
 import { useToast } from '@hooks/toast';
-import { useOutletContext } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useOutletContext } from 'react-router-dom';
+
+function StartButton({ game, onStart }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    // if game has no questions, update dialog message
+    if (!game.questions || game.questions.length === 0) {
+      setIsOpen(true);
+      return;
+    } else {
+      setIsOpen(false);
+      if (onStart) onStart();
+    }
+  };
+
+  return (
+    <>
+      <ButtonLink onClick={handleClick} color={game.active ? 'green' : 'pink'}>
+        <span className="md:inline hidden">
+          {game.active ? 'Enter Game' : 'Start Game'}
+        </span>
+        <span className="md:hidden inline">
+          {game.active ? 'Enter' : 'Start'}
+        </span>
+      </ButtonLink>
+
+      <Modal
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        color="error"
+        title="This game has no questions!"
+        description="Please add questions to the game before starting it."
+        action="Edit Game"
+        onClick={() => navigate(`/game/${game.id}`)}
+      />
+    </>
+  );
+}
+
 
 export default function StartGameButton({ game }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -43,40 +76,21 @@ export default function StartGameButton({ game }) {
     }
   };
 
-  const toLobby = () => {
-    setIsOpen(false);
-    navigate(`/session/${sessionId}`);
-  };
-
   return (
     <>
-      <ButtonLink onClick={handleClick} color={game.active ? 'green' : 'pink'}>
-        <span className="md:inline hidden">
-          {game.active ? 'Enter Game' : 'Start Game'}
-        </span>
-        <span className="md:hidden inline">
-          {game.active ? 'Enter' : 'Start'}
-        </span>
-      </ButtonLink>
+      <StartButton game={game} onStart={handleClick} />
 
       {/* Modal */}
-      <Dialog open={isOpen} onClose={setIsOpen}>
-        <DialogTitle>Game Started!</DialogTitle>
-        <DialogDescription>
-          Share the link below with your friends.
-        </DialogDescription>
-        <DialogBody>
-          <CopySessionId sessionId={sessionId} />
-        </DialogBody>
-        <DialogActions>
-          <Button plain onClick={() => setIsOpen(false)}>
-            Close
-          </Button>
-          <Button onClick={toLobby}>
-            Lobby <span aria-hidden="true">&rarr;</span>
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <Modal
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        color="info"
+        title="Game Started!"
+        description="Share the link below with your friends."
+        body={<CopySessionId sessionId={sessionId} />}
+        action={<>Lobby <span aria-hidden="true">&rarr;</span></>}
+        onClick={() => navigate(`/session/${sessionId}`)}
+      />
     </>
   );
 }
