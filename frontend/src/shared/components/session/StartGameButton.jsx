@@ -16,7 +16,7 @@ export default function StartGameButton({ game }) {
   const [isOpen, setIsOpen] = useState(false);
   const [sessionId, setSessionId] = useState(null);
   const [redirectUrl, setRedirectUrl] = useState(null);
-  const { startGameSession } = useOutletContext(); // get from AdminLayout
+  const { startGame } = useOutletContext(); // get from AdminLayout
   const navigate = useNavigate();
   const toastify = useToast();
 
@@ -35,7 +35,7 @@ export default function StartGameButton({ game }) {
     }
     // game is not active, start a new session
     try {
-      const newSessionId = await startGameSession(game.id);
+      const newSessionId = await startGame(game.id);
       setSessionId(newSessionId);
       setIsOpen(true);
     } catch (error) {

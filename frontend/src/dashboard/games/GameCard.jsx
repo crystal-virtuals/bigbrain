@@ -53,13 +53,13 @@ function GameMetadata({ game }) {
 function GameCard({ game, onDelete }) {
   const [isViewResultsOpen, setIsViewResultsOpen] = useState(false);
   const [sessionId, setSessionId] = useState(null);
-  const { stopGameSession } = useOutletContext();
+  const { stopGame } = useOutletContext();
   const navigate = useNavigate();
   const toastify = useToast();
 
   const handleStopGame = async () => {
     try {
-      const sessionId = await stopGameSession(game.id);
+      const sessionId = await stopGame(game.id);
       setSessionId(sessionId);
       setIsViewResultsOpen(true); // open "View Results" modal
     } catch (error) {
