@@ -12,7 +12,7 @@ import { isEmptyString } from '@utils/helpers';
 import { useEffect, useState } from 'react';
 import { useToast } from '@hooks/toast';
 
-export default function NewGameModal({ isOpen, setIsOpen, onSubmit }) {
+export default function CreateGameModal({ isOpen, setIsOpen, onSubmit }) {
   const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -58,6 +58,10 @@ export default function NewGameModal({ isOpen, setIsOpen, onSubmit }) {
     onSubmit(name)
       .then(() => {
         toastify.success({ message: 'Game created!' });
+      })
+      .catch((err) => {
+        toastify.error({ message: err.message });
+        setError(err.message);
       })
       .finally(() => {
         reset();
