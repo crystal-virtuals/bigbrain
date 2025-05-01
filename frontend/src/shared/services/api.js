@@ -5,7 +5,6 @@ import axios from 'axios'
 import { BACKEND_PORT } from '@frontend/backend.config.json'
 import { getAuthToken } from './token.js'
 import { createError } from './error.jsx'
-import { mapSessionData } from '@utils/session.js'
 
 const instance = axios.create({
   baseURL: `http://localhost:${BACKEND_PORT}`,
@@ -77,21 +76,73 @@ export const authAPI = {
 /***************************************************************
                          Game API
 ***************************************************************/
+const mutateSession = async (gameId, mutationType) => {
+  const response  = await api.post(`/admin/game/${gameId}/mutate`, { mutationType });
+  const { status, sessionId, position } = response.data;
+  return {
+    sessionId: sessionId ?? null, // null for 'ended'
+    position: position ?? -1,     // only for 'advanced'
+    status: status,               // ['started', 'advanced', 'ended']
+  }
+};
+
+
+// get/update all games
 export const gamesAPI = {
   getGames: () => api.get('/admin/games').then(res => res.games),
   updateGames: (games) => api.put('/admin/games', { games }),
 }
 
-export const fetchGames = () => api.get('/admin/games').then(res => res.games);
-export const updateGames = (games) => api.put('/admin/games', { games });
-
-const mutateSession = async (gameId, mutationType) => {
-  const response  = await api.post(`/admin/game/${gameId}/mutate`, { mutationType });
-  return mapSessionData(response.data);
-};
-
-export const mutateGameAPI = {
+// mutate (start/advance/end) a game
+export const gameAPI = {
+  // returns an object with sessionId, position, status
   start: (gameId) => mutateSession(gameId, 'START'),
   advance: (gameId) => mutateSession(gameId, 'ADVANCE'),
   end: (gameId) => mutateSession(gameId, 'END'),
 };
+
+// get status/results of a game session
+export const sessionAPI = {
+  getStatus: (sessionId) => api.get(`/admin/session/${sessionId}/status`).then(res => res.results),
+  getResults: (sessionId) => api.get(`/admin/session/${sessionId}/results`).then(res => res.results),
+}
+
+
+/**
+ * Fetch all games and their sessions
+ * @returns { games: Array, sessions: Object }
+ */
+export const fetchGamesAndSessions = async () => {
+  try {
+    // fetch the list of games
+    const games = await gamesAPI.getGames();
+
+    // collect all session IDs from each game
+    const sessionIds = games.flatMap(game => {
+      const ids = [];
+      if (game.active) ids.push(game.active);
+      if (game.oldSessions) ids.push(...game.oldSessions);
+      return ids;
+    })
+
+    // fetch the status of each session
+    const sessionEntries = await Promise.all(
+      sessionIds.map(async (sessionId) => {
+        try {
+          const sessionStatus = await sessionAPI.getStatus(sessionId);
+          return [sessionId, sessionStatus];
+        } catch (error) {
+          console.warn(`Failed to fetch session ${sessionId}:`, error);
+          return [sessionId, null];
+        }
+      })
+    );
+
+    // convert session entries to an object
+    const sessions = Object.fromEntries(sessionEntries);
+    return { games, sessions };
+  } catch (error) {
+    console.error('Error loading games and sessions:', error);
+    return { games: [], sessions: {} };
+  }
+}

@@ -10,27 +10,6 @@ const GameStatusMap = {
   'ended': 'ended',
 }
 
-const mapToSession = (status, sessionId, position, gameId) => {
-  return {
-    status: GameStatusMap[status],
-    sessionId: Number(sessionId) || null,
-    gameId: Number(gameId),
-    position: position || -1,
-  };
-}
-
-export const endActiveSession = (game) => {
-  const sessionId = game.active;
-  if (!sessionId) {
-    throw new Error('Game does not have an active session');
-  }
-  return {
-    ...game,
-    active: null,
-    oldSessions: [...(game.oldSessions || []), sessionId],
-  }
-}
-
 /***************************************************************
                         Validation
 ***************************************************************/
