@@ -1,12 +1,13 @@
 import { Branding } from '@components/branding';
 import { Link } from '@components/link';
+import { Skeleton } from '@components/loading';
 import { Navbar, NavbarDivider, NavbarSection } from '@components/navbar';
 import { UserIcon } from '@heroicons/react/16/solid';
-import { clsx } from 'clsx';
-import { Outlet, useOutletContext, useParams} from 'react-router-dom';
-import { useState, useEffect, useMemo } from 'react';
-import { Skeleton } from '@components/loading';
 import { NotFound } from '@pages/errors';
+import { isNullOrUndefined } from '@utils/helpers';
+import { clsx } from 'clsx';
+import { useMemo } from 'react';
+import { Outlet, useOutletContext, useParams } from 'react-router-dom';
 
 function NavbarItem({ children }) {
   return (
@@ -64,19 +65,30 @@ function Layout( { sessionId, children }) {
 
 function SessionLayout() {
   const { sessionId } = useParams();
-  const { sessions } = useOutletContext();
-  const session = useMemo(() => sessions[sessionId] || null, [sessions, sessionId]);
+  const { games, sessions } = useOutletContext();
 
-  if (!sessions) {
+  const session = useMemo(() => {
+    if (!sessions) return null;
+    return sessions[sessionId] || null;
+  }, [sessions, sessionId]);
+
+  const game = useMemo(() => {
+    if (!games) return null;
+    return games.find(g => g.active == sessionId || g.oldSessions?.includes(sessionId));
+  }, [games, sessionId]);
+
+
+  // If session or game is not found, redirect to NotFound page
+  if (!sessions || !games || !session || !game) {
     return <NotFound />;
   }
 
   return (
     <Layout sessionId={sessionId}>
-      {session ? (
-        <Outlet context={{ session }} />
+      {isNullOrUndefined(session) || isNullOrUndefined(game) ? (
+        <Skeleton className="col-span-2 max-w-2xl" />
       ) : (
-        <Skeleton />
+        <Outlet context={{ session, game }} />
       )}
     </Layout>
   );

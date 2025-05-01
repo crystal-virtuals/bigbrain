@@ -146,9 +146,7 @@ function AdminLayout() {
 
   const data = {
     games,
-    setGames,
     sessions,
-    setSessions,
     // game functions
     createGame,
     deleteGame,
