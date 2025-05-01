@@ -1,5 +1,5 @@
 /***************************************************************
-                      Helper functions
+                      Game session management
 ***************************************************************/
 const isEqual = (game, gameId) => {
   return Number(game.id) === Number(gameId);
@@ -20,10 +20,6 @@ const endActiveSession = (game) => {
     oldSessions: [...(game.oldSessions || []), sessionId],
   }
 }
-
-/***************************************************************
-                     Game Session Management
-***************************************************************/
 
 /*
  * Fetch latest session status and update state.
