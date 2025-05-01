@@ -4,6 +4,9 @@ import { Navbar, NavbarDivider, NavbarSection } from '@components/navbar';
 import { UserIcon } from '@heroicons/react/16/solid';
 import { clsx } from 'clsx';
 import { Outlet, useOutletContext, useParams} from 'react-router-dom';
+import { useState, useEffect, useMemo } from 'react';
+import { Skeleton } from '@components/loading';
+import { NotFound } from '@pages/errors';
 
 function NavbarItem({ children }) {
   return (
@@ -20,7 +23,7 @@ function NavbarItem({ children }) {
   );
 }
 
-function NavbarComponent({ sessionId = 123456, numberOfPlayers = 0 }) {
+function NavbarComponent({ sessionId, numberOfPlayers = 0 }) {
   return (
     <Navbar>
       <Link to="/" aria-label="Home">
@@ -28,7 +31,7 @@ function NavbarComponent({ sessionId = 123456, numberOfPlayers = 0 }) {
       </Link>
       <NavbarDivider />
       <NavbarSection>
-        <NavbarItem>SESSION {sessionId}</NavbarItem>
+        {sessionId && <NavbarItem>SESSION {sessionId}</NavbarItem>}
         <NavbarItem>
           <div className="flex flex-row items-center gap-2">
             <UserIcon className="size-6" />
@@ -40,10 +43,7 @@ function NavbarComponent({ sessionId = 123456, numberOfPlayers = 0 }) {
   );
 }
 
-function SessionLayout() {
-  const { user, games, setGames, createGame, deleteGame, updateGame } = useOutletContext();
-  const { sessionId } = useParams();
-
+function Layout( { sessionId, children }) {
   return (
     <div className="flex min-h-svh w-full flex-col bg-white lg:bg-zinc-100 dark:bg-zinc-900 dark:lg:bg-zinc-950">
       {/* Navbar */}
@@ -52,14 +52,33 @@ function SessionLayout() {
           <NavbarComponent sessionId={sessionId}/>
         </div>
       </header>
-
       {/* Content */}
       <main className="flex min-h-dvh flex-col p-2">
         <div className="flex grow items-center justify-center p-6 lg:rounded-lg lg:bg-white lg:p-10 lg:shadow-xs lg:ring-1 lg:ring-zinc-950/5 dark:lg:bg-zinc-900 dark:lg:ring-white/10">
-          <Outlet />
+          {children}
         </div>
       </main>
     </div>
+  );
+}
+
+function SessionLayout() {
+  const { sessionId } = useParams();
+  const { sessions } = useOutletContext();
+  const session = useMemo(() => sessions[sessionId] || null, [sessions, sessionId]);
+
+  if (!sessions) {
+    return <NotFound />;
+  }
+
+  return (
+    <Layout sessionId={sessionId}>
+      {session ? (
+        <Outlet context={{ session }} />
+      ) : (
+        <Skeleton />
+      )}
+    </Layout>
   );
 }
 
