@@ -2,7 +2,7 @@
 @plugin "daisyui" {
   root: ":root";
   include: ;
-  exclude: ;
+  exclude: rootscrollgutter, rootcolor;
   logs: true;
   themes: false;
 }
