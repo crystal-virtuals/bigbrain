@@ -2,11 +2,33 @@ import clsx from 'clsx'
 
 export function Heading({ className, level = 1, ...props }) {
   let Element = `h${level}`
+  let { light } = props;
+  let classes = clsx(
+    className,
+    'text-2xl/8 font-semibold text-zinc-950 sm:text-xl/8',
+    !light && 'dark:text-white',
+  )
 
   return (
     <Element
       {...props}
-      className={clsx(className, 'text-2xl/8 font-semibold text-zinc-950 sm:text-xl/8 dark:text-white')}
+      className={classes}
+    />
+  )
+}
+
+
+export function HeadingLight({ className, level = 1, ...props }) {
+  let Element = `h${level}`
+  let classes = clsx(
+    className,
+    'text-2xl/8 font-semibold text-zinc-950 sm:text-xl/8',
+  )
+
+  return (
+    <Element
+      {...props}
+      className={classes}
     />
   )
 }
@@ -36,7 +58,7 @@ export function HeadingBorder({ children, ...props }) {
   const styles = [
     'font-nunito font-black leading-none text-center tracking-widest',
     color ? `text-${color} dark:text-${color}` : 'text-green dark:text-green',
-    size ? size : 'xl:text-6xl lg:text-5xl sm:text-6xl text-4xl',
+    size ? size : 'text-4xl lg:text-5xl xl:text-6xl',
   ]
 
   return (
