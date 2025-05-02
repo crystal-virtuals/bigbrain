@@ -8,14 +8,27 @@ import {
 import { Branding } from '@components/branding';
 import { NavbarProfileDropdown } from './user-dropdown';
 import { actions, navigation } from '@constants/dashboard';
+import { useLocation } from 'react-router-dom';
 
 export default function DashboardNavbar({ user }) {
+  const location = useLocation();
+  const path = location.pathname;
+
+  const isActive = (url) => {
+    return path === url || path.startsWith(url);
+  };
+
+  const navItems = navigation.map((item) => ({
+    ...item,
+    current: isActive(item.url),
+  }));
+
   return (
     <Navbar>
       <Branding />
       <NavbarSection className="max-lg:hidden">
         {/* Navigation items */}
-        {navigation.map(({ label, url, current }) => (
+        {navItems.map(({ label, url, current }) => (
           <NavbarItem key={label} href={url} current={current}>
             {label}
           </NavbarItem>
