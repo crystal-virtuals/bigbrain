@@ -47,7 +47,7 @@ export default function DashboardSidebar({ user }) {
         </SidebarSection>
         <SidebarDivider />
         <SidebarSection>
-          <SidebarHeading>Start Here</SidebarHeading>
+          <SidebarHeading>Quick Actions</SidebarHeading>
           {/* Action buttons */}
           {actions.map(({ label, url, Icon }) => (
             <SidebarItem key={label} href={url} aria-label={label}>

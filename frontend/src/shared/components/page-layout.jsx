@@ -30,7 +30,7 @@ export function PageNavbar() {
 
 export function PageFooter() {
   return (
-    <footer className="mt-90">
+    <footer className="absolute inset-x-0 bottom-0 z-50 bg-white dark:bg-gray-900">
       <div className="px-16 border-t border-gray-900/10 dark:border-white/10 py-10 md:flex md:items-center md:justify-between">
         <p className="mt-8 text-center text-sm/6 text-gray-600 dark:text-gray-400 md:order-1 md:mt-0">
           &copy; {new Date().getFullYear()} BigBrain - All rights reserved.
