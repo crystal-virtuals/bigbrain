@@ -6,12 +6,21 @@ import { AddQuestionButton, QuestionCard } from '@components/questions';
 import { isEqual, newQuestion } from '@utils/game';
 import { isNullOrUndefined } from '@utils/helpers';
 import { useOutletContext } from 'react-router-dom';
+import { Breadcrumbs } from '@components/breadcrumbs';
+
+const breadcrumbs = [
+  { label: 'Dashboard', link: '/dashboard' },
+  { label: 'Edit Game' },
+];
 
 export default function EditGame() {
   const { game, updateGame } = useOutletContext();
 
   return (
     <>
+      <div className="mb-10 flex w-full items-center justify-between">
+        <Breadcrumbs crumbs={breadcrumbs} />
+      </div>
       <Header title="Edit Game" />
       <div className="divide-y divide-zinc-900/10 dark:divide-white/5">
 
