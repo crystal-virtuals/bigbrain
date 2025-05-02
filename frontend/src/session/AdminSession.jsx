@@ -18,7 +18,6 @@ function AdminSession() {
   const { session, game, advanceGame, stopGame } = useOutletContext();
   const [lock, setLock] = useState(false);
 
-
   const handleAdvanceGame = async () => {
     if (lock) return;
     setLock(true);
@@ -41,7 +40,6 @@ function AdminSession() {
     setLock(false);
   };
 
-
   const sharedProps = {
     sessionId,
     session,
@@ -53,19 +51,18 @@ function AdminSession() {
   };
 
   const state = getSessionState(session);
-  switch (state) {
-    case 'finished':
-      return <Results {...sharedProps} />;
-
-    case 'not_started':
-      return <Lobby {...sharedProps} />;
-
-    case 'in_progress':
-      return <QuestionRunner {...sharedProps} />;
-
-    default:
-      return <NotFound />; // or 404 fallback if invalid session
+  if (state === 'finished') {
+    return <Results {...sharedProps} />;
   }
+
+  if (state === 'not_started') {
+    return <Lobby {...sharedProps} />;
+  }
+
+  if (state === 'in_progress') {
+    return <QuestionRunner {...sharedProps} />;
+  }
+  return <NotFound />;
 }
 
 export default AdminSession;

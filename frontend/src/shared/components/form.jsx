@@ -8,7 +8,7 @@ import { CheckIcon, XCircleIcon, XMarkIcon } from '@heroicons/react/20/solid';
 import { PencilIcon, PhotoIcon } from '@heroicons/react/24/solid';
 import { fileToDataUrl, isNullOrUndefined, pluralSuffix } from '@utils/helpers';
 import clsx from 'clsx';
-import React, { forwardRef, useRef, useState } from 'react';
+import { forwardRef, useRef, useState } from 'react';
 
 /***************************************************************
                        Form Alert
@@ -501,7 +501,6 @@ export function EditForm({
   onSubmit,
   onCancel,
   error,
-  setError,
   readOnly=false,
   setReadOnly,
   disabled=false,

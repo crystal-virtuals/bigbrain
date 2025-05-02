@@ -7,7 +7,7 @@ import clsx from 'clsx';
 import { Strong } from '@components/text';
 
 export function AlertModal( { style = 'error', title, description, warning, confirmText = 'Confirm', onConfirm, isOpen, setIsOpen, ...props} ) {
-  const { isLoading, error, ...rest } = props;
+  const { isLoading, error } = props;
 
   style = style || 'error';
   let styles = {

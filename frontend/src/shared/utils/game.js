@@ -2,15 +2,6 @@ import { questionTypes, duration, points } from '@constants/questions';
 import { uid, pluralSuffix, isEmptyString } from '@utils/helpers';
 
 /***************************************************************
-                        Session
-***************************************************************/
-const GameStatusMap = {
-  'started': 'started',
-  'advanced': 'advanced',
-  'ended': 'ended',
-}
-
-/***************************************************************
                         Validation
 ***************************************************************/
 export const isEqual = (game, id) => {

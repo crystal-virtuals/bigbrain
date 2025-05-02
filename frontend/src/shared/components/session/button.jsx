@@ -1,6 +1,6 @@
 import { CheckCircleIcon } from '@heroicons/react/16/solid';
 import clsx from 'clsx';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 const styles = {
   base: [
@@ -27,19 +27,30 @@ const styles = {
 };
 
 export function SingleChoiceButton({ children, ...props }) {
-  const { id, correct, selected, touched, disabled, onClick, className, ...rest } = props;
+  const {
+    id,
+    correct,
+    selected,
+    touched,
+    disabled,
+    onClick,
+    className,
+    ...rest
+  } = props;
 
   let classes = clsx(
     className,
     styles.base,
     disabled && 'opacity-50 pointer-events-none',
     touched && !selected && 'opacity-50', // if not selected, show 50% opacity
-    touched && selected && 'opacity-100', // if selected, show full opacity
+    touched && selected && 'opacity-100' // if selected, show full opacity
   );
 
   let bgClass = clsx(
-    id ? styles.colors.random[id % styles.colors.random.length] : styles.colors.default,
-  )
+    id
+      ? styles.colors.random[id % styles.colors.random.length]
+      : styles.colors.default
+  );
 
   const content = (
     <>
@@ -102,7 +113,7 @@ export function SingleChoiceButton({ children, ...props }) {
   );
 }
 
-export function MultipleChoiceOptions({ children, ...props }) {
+export function MultipleChoiceOptions({ children }) {
   return (
     <div className="flex flex-col items-center w-full space-y-2 text-white mt-4 max-w-lg px-4">
       {children}
@@ -111,7 +122,7 @@ export function MultipleChoiceOptions({ children, ...props }) {
 }
 
 export function MultipleChoiceButton({ children, ...props }) {
-  const { id, correct, className, disabled, onClick, ...rest } = props;
+  const { id, disabled, onClick } = props;
   const [checked, setChecked] = useState(false);
 
   const handleClick = () => {

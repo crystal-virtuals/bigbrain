@@ -1,5 +1,4 @@
 import { Branding } from '@components/branding';
-import { Link } from '@components/link';
 import { Navbar, NavbarDivider, NavbarSection } from '@components/navbar';
 import { UserIcon } from '@heroicons/react/16/solid';
 import { clsx } from 'clsx';

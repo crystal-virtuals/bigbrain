@@ -48,7 +48,7 @@ const breadcrumbs = [
 ];
 
 export default function Results({ ...props }) {
-  const { sessionId, session } = props;
+  const { sessionId } = props;
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

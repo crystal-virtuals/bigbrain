@@ -4,7 +4,6 @@ import { Heading, HeadingBorder } from '@components/heading';
 import { Strong, Text } from '@components/text';
 import { LockClosedIcon, LockOpenIcon } from '@heroicons/react/16/solid';
 import { splitNumber } from '@utils/helpers';
-import clsx from 'clsx';
 
 function ToggleLockLink({ lock, setLock }) {
   return (

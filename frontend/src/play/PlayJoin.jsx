@@ -1,20 +1,14 @@
 import { Button } from '@components/button';
-import { ErrorMessage, Field, Fieldset, Label } from '@components/fieldset';
-import { Input, InputError } from '@components/input';
+import { Fieldset, Label } from '@components/fieldset';
+import { FormAlert } from '@components/form';
+import { InputError } from '@components/input';
 import { PageContent, PageLayout } from '@components/page-layout';
+import * as Headless from '@headlessui/react';
+import { useToast } from '@hooks/toast';
+import { playerAPI } from '@services/api';
 import { isEmptyString } from '@utils/validation';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Dialog,
-  DialogActions,
-  DialogBody,
-  DialogTitle,
-} from '@components/dialog';
-import { playerAPI } from '@services/api';
-import { useToast } from '@hooks/toast';
-import * as Headless from '@headlessui/react';
-import { FormAlert } from '@components/form';
 
 export default function PlayJoin() {
   const [formdata, setFormdata] = useState({ sessionId: '', name: '' });
