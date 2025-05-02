@@ -49,18 +49,10 @@ function SessionId({ sessionId, lock }) {
   );
 }
 
-export function Page({ children }) {
-  return (
-    <div className="flex flex-col lg:flex-row gap-8 w-full h-screen px-2 lg:px-10 py-4 lg:py-10">
-      {children}
-    </div>
-  );
-}
-
 export function Section({ children }) {
   return (
     // align center
-    <div className="w-full flex-1 h-full lg:max-h-[800px] flex flex-col items-center justify-center">
+    <div className="w-full flex-1 h-full lg:max-h-[800px] flex flex-col items-center justify-center min-h-[300px] max-h-[600px]">
       <section className="dark:bg-black/25 ring-2 ring-green dark:ring-green/50 bg-secondary-100 rounded-2xl overflow-hidden h-full w-full flex flex-col">
         {children}
       </section>
@@ -118,13 +110,25 @@ export function LobbyContent({ lock, children }) {
       <div className="flex-1 flex items-center justify-center">
         {!lock && (
           <Heading className="flex items-end gap-2">
-            <p>Waiting for players</p>
+            <p className="text-base md:text-lg">Waiting for players</p>
             <span className="loading loading-dots loading-sm"></span>
           </Heading>
         )}
       </div>
       {/* Children (bottom-aligned) */}
-      <div className="pb-12"><div>{children}</div></div>
+      <div className="pb-12">
+        <div>{children}</div>
+      </div>
     </SectionContent>
+  );
+}
+
+export function LobbyLayout({ children }) {
+  return (
+    <div className="container mx-auto md:max-w-xl lg:max-w-2xl">
+      <section className="h-[32rem] flex-1 dark:bg-black/25 ring-2 ring-green dark:ring-green/50 bg-secondary-100 rounded-2xl overflow-hidden flex flex-col">
+        {children}
+      </section>
+    </div>
   );
 }
