@@ -1,4 +1,4 @@
-import { Link } from '@components/link';
+import { TextLink } from '@components/text';
 import { Branding } from '@components/branding';
 
 export function PageNavbar() {
@@ -9,19 +9,19 @@ export function PageNavbar() {
         className="flex items-center justify-between p-6 lg:px-8"
       >
         <div className="flex lg:flex-1">
-          <Link
+          <TextLink
             to="/home"
             aria-label="Home"
             className="-m-1.5 p-1.5 flex items-center gap-2 py-1.5 w-full justify-start"
           >
             <Branding size="sm" />
-          </Link>
+          </TextLink>
         </div>
 
         <div className="lg:flex lg:flex-1 lg:justify-end">
-          <Link to="/login" className="text-sm/6 font-semibold">
+          <TextLink to="/login" className="text-sm/6 font-semibold">
             Log in <span aria-hidden="true">&rarr;</span>
-          </Link>
+          </TextLink>
         </div>
       </nav>
     </header>

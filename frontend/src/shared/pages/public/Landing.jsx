@@ -1,4 +1,4 @@
-import { Link } from '@components/link';
+import { TextLink } from '@components/text';
 import { PageFooter, PageLayout, PageNavbar, PageContent} from '@components/page-layout';
 import { useAuth } from '@hooks/auth';
 import { useNavigate } from 'react-router-dom';
@@ -21,18 +21,19 @@ export default function Landing() {
     <PageLayout navbar={<PageNavbar />} footer={<PageFooter />}>
       <PageContent title="Welcome to BigBrain" description={description}>
         <>
-          <Link
+          <button
+            type="button"
             onClick={authenticate}
-            className="rounded-md bg-pink text-white px-3.5 py-2.5 text-sm font-semibold shadow-xs hover:bg-pink-600  focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pink"
+            className="rounded-md bg-pink text-white px-3.5 py-2.5 text-sm font-semibold shadow-xs hover:bg-pink-600 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pink"
           >
             Get started
-          </Link>
-          <Link
+          </button>
+          <TextLink
             to="/register"
-            className="text-sm/6 font-semibold text-zinc-800 dark:text-white"
+            className="text-sm/6 font-semibold"
           >
             Sign up today <span aria-hidden="true">&rarr;</span>
-          </Link>
+          </TextLink>
         </>
       </PageContent>
     </PageLayout>
