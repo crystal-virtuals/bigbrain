@@ -33,33 +33,20 @@ export default function QuestionRunner({ session, lock, advanceGame, stopGame })
     return () => clearInterval(interval);
   }, [duration, session.isoTimeLastQuestionStarted]);
 
-  // useEffect(() => {
-  //   setSelected(null);
-  //   setShowAnswers(false);
-  //   setTimeLeft(calculateTimeLeft(duration, session.isoTimeLastQuestionStarted));
-  // }, [session.position, question.id]);
   useEffect(() => {
-    const newTimeLeft = calculateTimeLeft(duration, session.isoTimeLastQuestionStarted);
-    setTimeLeft(newTimeLeft);
-
-    if (newTimeLeft > 0) {
-      setSelected(null);
-    } else {
-      setShowAnswers(true); // Show answers once time has expired
-    }
+    setSelected(null);
+    setShowAnswers(false);
+    setTimeLeft(calculateTimeLeft(duration, session.isoTimeLastQuestionStarted));
   }, [session.position, question.id]);
 
   useEffect(() => {
     if (!showAnswers || lock) return;
-
     const timeout = setTimeout(() => {
       advanceGame();
     }, 3000);
-
     return () => clearTimeout(timeout);
   }, [showAnswers]);
 
-  // Handle answer selection
   const handleSelect = (answerId) => {
     if (timeLeft === 0) return;
     if (type == 'singleChoice' || type == 'judgement') {
@@ -74,17 +61,13 @@ export default function QuestionRunner({ session, lock, advanceGame, stopGame })
   };
 
   const isCorrect = (answerId) => {
-    if (type === 'multipleChoice') {
-      return correctAnswers.includes(answerId);
-    }
+    if (type === 'multipleChoice') return correctAnswers.includes(answerId);
     return correctAnswers[0] === answerId;
   }
 
   const isSelected = (answerId) => {
     if (selected === null) return false;
-    if (type === 'multipleChoice') {
-      return selected.includes(answerId);
-    }
+    if (type === 'multipleChoice') return selected.includes(answerId);
     return selected.length === 1 && selected[0] === answerId;
   }
 
@@ -138,7 +121,6 @@ export default function QuestionRunner({ session, lock, advanceGame, stopGame })
           <Button
             color="dark"
             onClick={advanceGame}
-            disabled={!showAnswers || lock}
           >
             Next
           </Button>
