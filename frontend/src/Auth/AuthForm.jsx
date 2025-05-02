@@ -1,7 +1,7 @@
 import { Button } from '@components/button';
 import { ErrorMessage, Field, Label } from '@components/fieldset';
 import { Heading } from '@components/heading';
-import { Input } from '@components/input';
+import { InputError } from '@components/input';
 import { Link } from '@components/link';
 import { Strong, Text } from '@components/text';
 import { useToast } from '@hooks/toast';
@@ -10,7 +10,7 @@ import { useState } from 'react';
 import { Branding } from '@components/branding';
 
 const initialFormData = {
-  login: { email: '', password: '' },
+  login: { email: '', password: ''},
   register : { email: '', password: '', name: '', confirmPassword: '' }
 }
 
@@ -70,8 +70,9 @@ export default function AuthForm({ isLogin, onSubmit }) {
 
       {/* Email Field (always shown) */}
       <Field>
-        <Label>Email</Label>
-        <Input
+        <Label htmlFor="email">Email</Label>
+        <InputError
+          id="email"
           type="email"
           name="email"
           value={formData.email}
@@ -87,8 +88,9 @@ export default function AuthForm({ isLogin, onSubmit }) {
       {/* Name Field (only for register) */}
       {!isLogin && (
         <Field>
-          <Label>Name</Label>
-          <Input
+          <Label htmlFor='name'>Name</Label>
+          <InputError
+            id="name"
             name="name"
             value={formData.name}
             invalid={errors.has('name')}
@@ -103,8 +105,9 @@ export default function AuthForm({ isLogin, onSubmit }) {
 
       {/* Password Field (always shown) */}
       <Field>
-        <Label>Password</Label>
-        <Input
+        <Label htmlFor='password'>Password</Label>
+        <InputError
+          id="password"
           type="password"
           name="password"
           value={formData.password}
@@ -119,8 +122,9 @@ export default function AuthForm({ isLogin, onSubmit }) {
       {/* Confirm Password (only for register) */}
       {!isLogin && (
         <Field>
-          <Label>Confirm Password</Label>
-          <Input
+          <Label htmlFor='confirmPassword'>Confirm Password</Label>
+          <InputError
+            id="confirmPassword"
             type="password"
             name="confirmPassword"
             value={formData.confirmPassword}

@@ -18,11 +18,11 @@ function DashboardLayout({ user, children }) {
   );
 }
 
-function DashboardHeading({ games, createGame }) {
+function DashboardHeading({ games, onCreate }) {
   return (
     <div className="flex w-full flex-wrap items-end justify-between gap-4">
       <Heading>Dashboard</Heading>
-      {!!games && <CreateGameButton onCreate={createGame} />}
+      {!!games && <CreateGameButton onCreate={onCreate} />}
     </div>
   );
 }
@@ -33,9 +33,9 @@ export default function Dashboard() {
 
   return (
     <DashboardLayout user={user}>
-      <DashboardHeading games={games} createGame={createGame} />
+      <DashboardHeading games={games} onCreate={createGame} />
       <Divider className="my-6" />
-      <Games games={games} onDelete={deleteGame}/>
+      <Games games={games} onDelete={deleteGame} onCreate={createGame}/>
     </DashboardLayout>
   );
 }

@@ -11,7 +11,7 @@ export default function Login() {
 
     try {
       const token = await authAPI.login(credentials);
-      login(token, credentials);
+      login(token, { email, name: '' });
       return {
         message: 'Successfully logged in',
         description: 'Welcome back!',

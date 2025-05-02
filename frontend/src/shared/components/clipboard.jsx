@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { useToast } from '@hooks/toast';
 import clsx from 'clsx';
 
-export function CopyToClipboardLink({ value }) {
+export function CopyToClipboardLink({ color, value, className }) {
   const [copied, setCopied] = useState(false);
   const toastify = useToast();
 
@@ -25,13 +25,13 @@ export function CopyToClipboardLink({ value }) {
 
   const styles = [
     // color
-    'text-zinc-950 dark:text-white',
+    color ? {color} : 'text-zinc-950 dark:text-white',
     // hover
     'group-hover:opacity-100 opacity-50',
   ]
 
   return (
-    <Link className='group flex flex-row items-center gap-1' onClick={copyToClipboard}>
+    <Link className={clsx(className, 'group flex flex-row items-center gap-1')} onClick={copyToClipboard}>
       <LinkIcon className={clsx(styles, 'size-5')}/>
       <span className={clsx(styles, 'group-hover:underline text-sm font-normal leading-none text-center')}>
         {copied ? 'Link copied' : 'Copy link'}

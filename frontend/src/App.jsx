@@ -2,6 +2,7 @@ import { AuthLayout, Login, Logout, Register } from '@/auth';
 import {
   AdminLayout,
   GameLayout,
+  QuestionLayout,
   EditGame,
   EditQuestion,
 } from '@/admin';
@@ -12,19 +13,7 @@ import { NotFound, Unauthorized } from '@pages/errors';
 import { Home, Landing } from '@pages/public';
 import { Outlet, Route, Routes } from 'react-router-dom';
 import { SessionLayout, AdminSession } from '@/session';
-
-
-function PlayJoin() {
-  return (
-    <h1>Enter session id</h1>
-  )
-}
-
-function PlaySession() {
-  return (
-    <h1>Play session</h1>
-  )
-}
+import { PlaySession, PlayJoin } from '@/play';
 
 function AppLayout() {
   const classes =
@@ -63,7 +52,9 @@ function App() {
 
           <Route path="game/:gameId" element={<GameLayout />}>
             <Route index element={<EditGame />} />
-            <Route path="question/:questionId" element={<EditQuestion />}/>
+            <Route path="question/:questionId" element={<QuestionLayout />}>
+              <Route index element={<EditQuestion />} />
+            </Route>
           </Route>
 
           <Route path="session/:sessionId" element={<SessionLayout />}>
@@ -74,7 +65,6 @@ function App() {
         {/* Player routes (no auth) */}
         <Route path="play" element={<PlayJoin />} /> {/* Join a session */}
         <Route path="play/:sessionId" element={<PlaySession />} /> {/* Play a session */}
-
 
         {/* Fallback */}
         <Route path="*" element={<NotFound />} />

@@ -40,19 +40,25 @@ function Thumbnail({ src, alt, onError }) {
   );
 }
 
-export default function GameThumbnail({ game }) {
+export default function GameThumbnail({ className, game }) {
   const [error, setError] = useState(false);
   const imgError = error || isEmptyString(game.thumbnail);
 
   if (imgError) {
-    return <DefaultThumbnail />;
+    return (
+      <div className={className}>
+        <DefaultThumbnail />
+      </div>
+    );
   }
 
   return (
-    <Thumbnail
-      src={game.thumbnail}
-      alt={game.name}
-      onError={() => setError(true)}
-    />
+    <div className={className}>
+      <Thumbnail
+        src={game.thumbnail}
+        alt={game.name}
+        onError={() => setError(true)}
+      />
+    </div>
   );
 }

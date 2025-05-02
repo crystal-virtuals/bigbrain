@@ -25,7 +25,6 @@ function AvatarDefault( { className } ) {
 
 export function UserAvatar({ user, className, ...props }) {
   if (!user) {
-    console.log('User is null or undefined', user);
     return (
       <AvatarDefault className={className} {...props} />
     );

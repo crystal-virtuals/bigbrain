@@ -1,65 +1,64 @@
-import { Branding } from '@components/branding';
-import { Link } from '@components/link';
-import { Navbar, NavbarDivider, NavbarSection } from '@components/navbar';
-import { UserIcon } from '@heroicons/react/16/solid';
-import { clsx } from 'clsx';
-import { Outlet, useOutletContext, useParams} from 'react-router-dom';
-
-function NavbarItem({ children }) {
-  return (
-    <span
-      className={clsx([
-        // Basic layout
-        'relative flex min-w-0 items-center gap-3 rounded-lg p-2 text-left text-base/6 text-zinc-950 dark:text-white',
-        // Typography
-        'font-nunito font-black leading-none tracking-wider',
-      ])}
-    >
-      {children}
-    </span>
-  );
-}
-
-function NavbarComponent({ sessionId = 123456, numberOfPlayers = 0 }) {
-  return (
-    <Navbar>
-      <Link to="/" aria-label="Home">
-        <Branding className="px-2" />
-      </Link>
-      <NavbarDivider />
-      <NavbarSection>
-        <NavbarItem>SESSION {sessionId}</NavbarItem>
-        <NavbarItem>
-          <div className="flex flex-row items-center gap-2">
-            <UserIcon className="size-6" />
-            {numberOfPlayers}
-          </div>
-        </NavbarItem>
-      </NavbarSection>
-    </Navbar>
-  );
-}
+import { Skeleton } from '@components/loading';
+import { Layout } from '@components/session/layout';
+import { useMemo, useEffect, useState } from 'react';
+import { Outlet, useOutletContext, useParams } from 'react-router-dom';
+import { SessionNavbar as Navbar } from '@components/session/navbar';
+import { sessionAPI } from '@services/api';
 
 function SessionLayout() {
-  const { user, games, setGames, createGame, deleteGame, updateGame } = useOutletContext();
   const { sessionId } = useParams();
+  const { games, sessions, setSessions, advanceGame, stopGame } = useOutletContext();
+  const [loading, setLoading] = useState(false);
+  const session = sessions ? sessions[sessionId] : null;
+
+  const game = useMemo(() => {
+    if (!games) return null;
+    return games.find(g => g.active == sessionId || g.oldSessions?.includes(sessionId));
+  }, [games, sessionId]);
+
+  useEffect(() => {
+    if (!session && sessionId) {
+      setLoading(true);
+      const fetchSession = async () => {
+        try {
+          const status = await sessionAPI.getStatus(sessionId);
+          console.log('Fetched session:', status);
+          setSessions((prev) => ({ ...prev, [sessionId]: status }));
+        } catch (error) {
+          console.error('Failed to fetch session:', error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchSession();
+    }
+  }, [sessionId, session]);
+
+  // Poll this specific session every second if active
+  useEffect(() => {
+    if (!session || !session.active) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const updated = await sessionAPI.getStatus(sessionId);
+        setSessions((prev) => ({ ...prev, [sessionId]: updated }));
+        console.log('Updated session:', updated);
+      } catch (err) {
+        console.warn(`Failed to poll session ${sessionId}:`, err);
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [sessionId, session?.active]);
+
+  // wait for session and game to be set
+  if (loading || session === null || game === null) {
+    return <Skeleton className="col-span-2 max-w-2xl" />;
+  }
 
   return (
-    <div className="flex min-h-svh w-full flex-col bg-white lg:bg-zinc-100 dark:bg-zinc-900 dark:lg:bg-zinc-950">
-      {/* Navbar */}
-      <header className="flex items-center px-4">
-        <div className="min-w-0 flex-1">
-          <NavbarComponent sessionId={sessionId}/>
-        </div>
-      </header>
-
-      {/* Content */}
-      <main className="flex min-h-dvh flex-col p-2">
-        <div className="flex grow items-center justify-center p-6 lg:rounded-lg lg:bg-white lg:p-10 lg:shadow-xs lg:ring-1 lg:ring-zinc-950/5 dark:lg:bg-zinc-900 dark:lg:ring-white/10">
-          <Outlet />
-        </div>
-      </main>
-    </div>
+    <Layout navbar={<Navbar sessionId={sessionId} players={session.players || []} />}>
+      <Outlet context={{ session, game, advanceGame, stopGame}} />
+    </Layout>
   );
 }
 

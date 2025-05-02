@@ -1,6 +1,6 @@
-import * as Headless from '@headlessui/react'
-import clsx from 'clsx'
-import React, { forwardRef } from 'react'
+import * as Headless from '@headlessui/react';
+import clsx from 'clsx';
+import { forwardRef } from 'react';
 import { ExclamationCircleIcon } from '@heroicons/react/16/solid';
 
 export function InputGroup({ children }) {
@@ -17,10 +17,10 @@ export function InputGroup({ children }) {
     >
       {children}
     </span>
-  )
+  );
 }
 
-const dateTypes = ['date', 'datetime-local', 'month', 'time', 'week']
+const dateTypes = ['date', 'datetime-local', 'month', 'time', 'week'];
 
 export const Input = forwardRef(function Input(
   { className, ...props },
@@ -53,19 +53,19 @@ export const Input = forwardRef(function Input(
           // Date classes
           props.type &&
             dateTypes.includes(props.type) && [
-              '[&::-webkit-datetime-edit-fields-wrapper]:p-0',
-              '[&::-webkit-date-and-time-value]:min-h-[1.5em]',
-              '[&::-webkit-datetime-edit]:inline-flex',
-              '[&::-webkit-datetime-edit]:p-0',
-              '[&::-webkit-datetime-edit-year-field]:p-0',
-              '[&::-webkit-datetime-edit-month-field]:p-0',
-              '[&::-webkit-datetime-edit-day-field]:p-0',
-              '[&::-webkit-datetime-edit-hour-field]:p-0',
-              '[&::-webkit-datetime-edit-minute-field]:p-0',
-              '[&::-webkit-datetime-edit-second-field]:p-0',
-              '[&::-webkit-datetime-edit-millisecond-field]:p-0',
-              '[&::-webkit-datetime-edit-meridiem-field]:p-0',
-            ],
+            '[&::-webkit-datetime-edit-fields-wrapper]:p-0',
+            '[&::-webkit-date-and-time-value]:min-h-[1.5em]',
+            '[&::-webkit-datetime-edit]:inline-flex',
+            '[&::-webkit-datetime-edit]:p-0',
+            '[&::-webkit-datetime-edit-year-field]:p-0',
+            '[&::-webkit-datetime-edit-month-field]:p-0',
+            '[&::-webkit-datetime-edit-day-field]:p-0',
+            '[&::-webkit-datetime-edit-hour-field]:p-0',
+            '[&::-webkit-datetime-edit-minute-field]:p-0',
+            '[&::-webkit-datetime-edit-second-field]:p-0',
+            '[&::-webkit-datetime-edit-millisecond-field]:p-0',
+            '[&::-webkit-datetime-edit-meridiem-field]:p-0',
+          ],
           // Basic layout
           'relative block w-full appearance-none rounded-lg px-[calc(--spacing(3.5)-1px)] py-[calc(--spacing(2.5)-1px)] sm:px-[calc(--spacing(3)-1px)] sm:py-[calc(--spacing(1.5)-1px)]',
           // Typography
@@ -85,23 +85,27 @@ export const Input = forwardRef(function Input(
         ])}
       />
     </span>
-  )
-})
+  );
+});
 
 // input with validation error
-export function InputError({ ...props }) {
+export function InputError({ className, ...props }) {
+  const { pink } = props;
+  const classes = pink && 'sm:focus-within:after:ring-pink-500';
   return (
-    <div className="my-2 grid grid-cols-1">
-      <Input
-        className='col-start-1 row-start-1 before:hidden'
-        {...props}
-      />
-      {props.invalid && (
-        <ExclamationCircleIcon
-          aria-hidden="true"
-          className="pointer-events-none col-start-1 row-start-1 mr-3 size-5 self-center justify-self-end text-red-500 sm:size-4"
+    <div className={clsx(className, 'relative w-full')}>
+      <div className="my-2 grid grid-cols-1">
+        <Input
+          className={clsx('col-start-1 row-start-1 before:hidden', classes)}
+          {...props}
         />
-      )}
+        {props.invalid && (
+          <ExclamationCircleIcon
+            aria-hidden="true"
+            className="pointer-events-none col-start-1 row-start-1 mr-3 size-5 self-center justify-self-end text-red-500 sm:size-4"
+          />
+        )}
+      </div>
     </div>
-  )
+  );
 }

@@ -5,17 +5,16 @@ import {
   DropdownMenu,
 } from '@components/dropdown';
 import { AlertModal } from '@components/modal';
-import { EllipsisVerticalIcon, EllipsisHorizontalIcon } from '@heroicons/react/16/solid';
-import { useState } from 'react';
+import { EllipsisHorizontalIcon } from '@heroicons/react/16/solid';
 import { useToast } from '@hooks/toast';
+import { useState } from 'react';
 
 // Edit Delete Game Menu
-export default function EditDeleteGameMenu({ game, onDelete }) {
+export default function EditDeleteGameMenu({ game, onDelete, disabled}) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const toastify = useToast();
-
 
   const deleteGame = () => {
     setIsLoading(true);
@@ -32,6 +31,10 @@ export default function EditDeleteGameMenu({ game, onDelete }) {
         toastify.error({ message: error.message, replace: true });
       });
   };
+
+  if (disabled) {
+    return null;
+  }
 
   return (
     <>

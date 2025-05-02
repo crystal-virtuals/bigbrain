@@ -22,8 +22,8 @@ export function Combobox({
     query === ''
       ? options
       : options.filter((option) =>
-          filter ? filter(option, query) : displayValue(option)?.toLowerCase().includes(query.toLowerCase())
-        )
+        filter ? filter(option, query) : displayValue(option)?.toLowerCase().includes(query.toLowerCase())
+      )
 
   return (
     <Headless.Combobox {...props} multiple={false} virtual={{ options: filteredOptions }} onClose={() => setQuery('')}>

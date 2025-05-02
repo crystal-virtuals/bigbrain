@@ -11,7 +11,7 @@ export default function Register() {
 
     try {
       const token = await authAPI.register(credentials);
-      login(token, credentials);
+      login(token, { email, name });
       return {
         message: 'Successfully registered',
         description: `Welcome aboard, ${name}!`,

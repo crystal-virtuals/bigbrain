@@ -14,8 +14,22 @@ import { Cog6ToothIcon, QuestionMarkCircleIcon, SparklesIcon } from '@heroicons/
 import { SidebarProfileDropdown } from './user-dropdown';
 import { actions, navigation } from '@constants/dashboard';
 import { Branding } from '@components/branding';
+import { useLocation } from 'react-router-dom';
 
 export default function DashboardSidebar({ user }) {
+  const location = useLocation();
+  const path = location.pathname;
+
+  const isActive = (url) => {
+    return path === url || path.startsWith(url);
+  };
+
+  const navItems = navigation.map((item) => ({
+    ...item,
+    current: isActive(item.url),
+  }));
+
+
   return (
     <Sidebar>
       <SidebarHeader>
@@ -24,7 +38,7 @@ export default function DashboardSidebar({ user }) {
       <SidebarBody>
         <SidebarSection>
           {/* Navigation items */}
-          {navigation.map(({ label, url, Icon, current }) => (
+          {navItems.map(({ label, url, Icon, current }) => (
             <SidebarItem key={label} href={url} current={current}>
               <Icon />
               <SidebarLabel>{label}</SidebarLabel>
@@ -33,7 +47,7 @@ export default function DashboardSidebar({ user }) {
         </SidebarSection>
         <SidebarDivider />
         <SidebarSection>
-          <SidebarHeading>Start Here</SidebarHeading>
+          <SidebarHeading>Quick Actions</SidebarHeading>
           {/* Action buttons */}
           {actions.map(({ label, url, Icon }) => (
             <SidebarItem key={label} href={url} aria-label={label}>

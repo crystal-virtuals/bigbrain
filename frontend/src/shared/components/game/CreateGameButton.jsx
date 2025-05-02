@@ -9,7 +9,7 @@ export default function CreateGameButton( { onCreate }) {
   return (
     <>
       {/* Button */}
-      <Button type="button" onClick={() => setIsOpen(true)}>
+      <Button type="button" color='white' onClick={() => setIsOpen(true)}>
         <PlusIcon />
         Create Game
       </Button>

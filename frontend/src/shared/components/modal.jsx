@@ -1,13 +1,13 @@
 import { Alert, AlertActions, AlertDescription, AlertTitle } from '@components/alert';
 import { Button } from '@components/button';
-import { Dialog, DialogActions, DialogDescription, DialogTitle } from '@components/dialog';
+import { Dialog, DialogActions, DialogDescription, DialogTitle, DialogBody } from '@components/dialog';
 import { ErrorMessage } from '@components/fieldset';
 import { CheckIcon, ExclamationTriangleIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import { Strong } from '@components/text';
 
 export function AlertModal( { style = 'error', title, description, warning, confirmText = 'Confirm', onConfirm, isOpen, setIsOpen, ...props} ) {
-  const { isLoading, error, ...rest } = props;
+  const { isLoading, error } = props;
 
   style = style || 'error';
   let styles = {
@@ -16,6 +16,11 @@ export function AlertModal( { style = 'error', title, description, warning, conf
     warning: {  color: 'amber', bg: 'bg-yellow-100', text: 'text-yellow-600', icon: ExclamationTriangleIcon },
     info: {  color: 'blue', bg: 'bg-blue-100', text: 'text-blue-600', icon: InformationCircleIcon },
   }[style];
+
+  const handleConfirm = () => {
+    setIsOpen(false);
+    if (onConfirm) onConfirm();
+  }
 
   return (
     <Alert open={isOpen} onClose={setIsOpen}>
@@ -36,13 +41,7 @@ export function AlertModal( { style = 'error', title, description, warning, conf
           <AlertTitle>{title}</AlertTitle>
           <AlertDescription className="flex flex-col gap-2">
             {description}
-            <span className="font-semibold text-gray-900 dark:text-zinc-300">{
-              warning ? (
-                {warning}
-              ) : (
-                'Are you sure? This action cannot be undone.'
-              )
-            }</span>
+            <Strong>{warning}</Strong>
           </AlertDescription>
         </div>
       </div>
@@ -50,7 +49,7 @@ export function AlertModal( { style = 'error', title, description, warning, conf
         <Button plain onClick={() => setIsOpen(false)} disabled={isLoading || false}>
           Cancel
         </Button>
-        <Button type="submit" color={styles.color} onClick={onConfirm} loading={isLoading || false} disabled={isLoading || false}>
+        <Button type="submit" color={styles.color} onClick={handleConfirm} loading={isLoading || false} disabled={isLoading || false}>
           {confirmText}
         </Button>
       </AlertActions>
@@ -68,6 +67,11 @@ export function ConfirmModal( { style, title, description, confirmText = 'Confir
     warning: {  color: 'amber', bg: 'bg-yellow-100', text: 'text-yellow-600', icon: ExclamationTriangleIcon },
     info: {  color: 'blue', bg: 'bg-blue-100', text: 'text-blue-600', icon: InformationCircleIcon },
   }[style];
+
+  const handleConfirm = () => {
+    setIsOpen(false);
+    if (onConfirm) onConfirm();
+  }
 
   return (
     <Dialog open={isOpen} onClose={setIsOpen}>
@@ -95,7 +99,7 @@ export function ConfirmModal( { style, title, description, confirmText = 'Confir
         <Button plain onClick={() => setIsOpen(false)}>
           Cancel
         </Button>
-        <Button color={styles.color} onClick={onConfirm}>
+        <Button color={styles.color} onClick={handleConfirm}>
           {confirmText}
         </Button>
       </DialogActions>
@@ -103,7 +107,7 @@ export function ConfirmModal( { style, title, description, confirmText = 'Confir
   );
 }
 
-export function Modal( { color, title, description, strongText, buttonText, onClick, isOpen, setIsOpen } ) {
+export function Modal( { color, title, description, body, action, onClick, isOpen, setIsOpen } ) {
   let styles = {
     error: {
       color: 'red',
@@ -131,6 +135,11 @@ export function Modal( { color, title, description, strongText, buttonText, onCl
     },
   }[color ?? 'info'];
 
+  const handleClick = () => {
+    setIsOpen(false);
+    if (onClick) onClick();
+  }
+
   return (
     <Dialog open={isOpen} onClose={setIsOpen}>
       <div className="flex items-start">
@@ -145,18 +154,16 @@ export function Modal( { color, title, description, strongText, buttonText, onCl
         </div>
         <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
           <DialogTitle>{title}</DialogTitle>
-          <DialogDescription className="flex flex-col gap-2">
-            {description}
-            <Strong>{strongText}</Strong>
-          </DialogDescription>
+          <DialogDescription>{description}</DialogDescription>
+          {body && <DialogBody>{body}</DialogBody>}
         </div>
       </div>
       <DialogActions className="mt-5 sm:mt-4 flex flex-row">
         <Button plain onClick={() => setIsOpen(false)}>
           Cancel
         </Button>
-        <Button color={styles.color} onClick={onClick}>
-          {buttonText ?? 'Confirm'}
+        <Button onClick={handleClick} color={styles.color}>
+          {action ? action : 'OK'}
         </Button>
       </DialogActions>
     </Dialog>

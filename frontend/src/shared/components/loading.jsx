@@ -30,17 +30,6 @@ export function Loading() {
 }
 
 export function Skeleton({ variant = 'rectangular', className }) {
-  const styles = {
-    skeleton: [
-      // container
-      'animate-pulse w-full max-w-xl',
-    ],
-    skeletonItem: [
-      // item
-      'rounded-xl bg-zinc-200',
-    ],
-  };
-
   if (variant === 'rectangular') {
     return (
       <div

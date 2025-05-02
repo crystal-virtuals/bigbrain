@@ -1,100 +1,98 @@
 /***************************************************************
-                       Session Object
+                      Results
 ***************************************************************/
-class Session {
-  constructor(gameId, position, isoTimeLastQuestionStarted, players, questions, active, status, answerAvailable) {
-    this.gameId = gameId;
-    this.position = position;
-    this.active = active; // true or false
-    this.status = status; // ['started', 'advanced', 'ended']
-    this.players = players;
-    this.questions = questions;
-    this.isoTimeLastQuestionStarted = isoTimeLastQuestionStarted;
-    this.answerAvailable = answerAvailable;
+export function calculatePlayerResults(player, questions, questionStartTimes) {
+  const results = [];
+
+  let totalScore = 0;
+
+  for (let i = 0; i < questions.length; i++) {
+    const question = questions[i];
+    const startedAt = new Date(questionStartTimes[i]).getTime();
+    const answerEntry = player.answers.find(a => a.questionId === question.id);
+
+    if (!answerEntry) {
+      results.push({ questionId: question.id, correct: false, timeTaken: null, score: 0 });
+      continue;
+    }
+
+    const answeredAt = new Date(answerEntry.answeredAt).getTime();
+    const timeTakenSec = Math.min((answeredAt - startedAt) / 1000, question.duration);
+
+    const isCorrect = question.correctAnswers.every(id => answerEntry.answerIds.includes(id)) &&
+                      answerEntry.answerIds.length === question.correctAnswers.length;
+
+    const score = isCorrect
+      ? Math.round(question.points * (1 - timeTakenSec / question.duration) * 100) / 100
+      : 0;
+
+    totalScore += score;
+
+    results.push({
+      questionId: question.id,
+      correct: isCorrect,
+      timeTaken: timeTakenSec,
+      score,
+    });
   }
-}
-const MutationTypeMap = {
-  'START': 'started',
-  'ADVANCE': 'advanced',
-  'END': 'ended',
+
+  return {
+    playerId: player.id,
+    name: player.name,
+    totalScore: Math.round(totalScore * 100) / 100,
+    perQuestion: results,
+  };
 }
 
 /***************************************************************
-                      Start Game Session
+                      Game session management
 ***************************************************************/
-// On starting a new game session, map the response data
-export const mapSessionData = (data) => {
-  const { status, sessionId, position } = data;
-  return {
-    sessionId: sessionId ?? null, // null for 'ended'
-    position: position ?? -1,     // only for advanced
-    status: status,               // ['started', 'advanced', 'ended']
-  };
+const isEqual = (game, gameId) => {
+  return Number(game.id) === Number(gameId);
 }
 
-export const createSession = (gameId, status = 'started', position = -1) => {
+const startActiveSession = (game, sessionId) => {
   return {
-    gameId: gameId,
-    status: MutationTypeMap[status] ?? 'started', // 'started' | 'advanced' | 'ended'
-    position: position || -1, // -1 for 'started'
-    active: true,
-    isoTimeLastQuestionStarted: null,
-    answerAvailable: false,
-    players: [],
-  };
+    ...game,
+    active: sessionId,
+  }
+}
+
+const endActiveSession = (game) => {
+  const sessionId = game.active;
+  return {
+    ...game,
+    active: null,
+    oldSessions: [...(game.oldSessions || []), sessionId],
+  }
+}
+
+/*
+ * Fetch latest session status and update state.
+ */
+export const updateSessionState = async (sessionId, setSessions, sessionAPI) => {
+  const session = await sessionAPI.getStatus(sessionId);
+  setSessions((prev) => ({
+    ...prev,
+    [sessionId]: session,
+  }));
+  return session;
 };
-
-export const endSession = (session) => {
-  return {
-    ...session,
-    active: false,
-    status: MutationTypeMap['END'] ?? 'ended',
-    position: -1,
-    isoTimeLastQuestionStarted: null,
-    answerAvailable: false,
-  };
-}
-
-
 
 
 /**
- * Example session object
- * "sessions": {
-    "129938": {
-      "gameId": "345681",
-      "position": 0,
-      "isoTimeLastQuestionStarted": "2025-04-29T06:24:55.561Z",
-      "players": {},
-      "questions": [],
-      "active": false,
-      "answerAvailable": false
-    },
-    "160107": {
-      "gameId": "331155",
-      "position": 0,
-      "isoTimeLastQuestionStarted": "2025-04-29T22:14:53.088Z",
-      "players": {},
-      "questions": [],
-      "active": false,
-      "answerAvailable": false
-    },
-    "290984": {
-      "gameId": "331155",
-      "position": -1,
-      "isoTimeLastQuestionStarted": null,
-      "players": {},
-      "questions": [],
-      "active": true,
-      "answerAvailable": false
-    },
-    "367174": {
-      "gameId": "848967",
-      "position": -1,
-      "isoTimeLastQuestionStarted": null,
-      "players": {},
-      "questions": [],
-      "active": true,
-      "answerAvailable": false
-    },
+ * Update the game state based on the latest session status.
  */
+export const updateGameState = (games, setGames, gameId, session, sessionId) => {
+  const game = games.find((g) => isEqual(g, gameId));
+  if (!game) return;
+
+  const updatedGame =
+    session.active === false
+      ? endActiveSession(game)
+      : startActiveSession(game, sessionId);
+
+  setGames((prev) =>
+    prev.map((g) => (isEqual(g, gameId) ? updatedGame : g))
+  );
+};
