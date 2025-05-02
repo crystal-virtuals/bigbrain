@@ -47,31 +47,6 @@ function AdminLayout() {
     };
   }, []);
 
-  // Polling for session updates
-  useEffect(() => {
-    if (!games) return;
-    const interval = setInterval(async () => {
-      const activeSessionIds = games.map((g) => g.active).filter(Boolean); // ignore nulls
-
-      const updates = await Promise.all(
-        activeSessionIds.map(async (id) => {
-          try {
-            const status = await sessionAPI.getStatus(id);
-            return [id, status];
-          } catch (err) {
-            console.warn(`Polling failed for session ${id}:`, err);
-            return null;
-          }
-        })
-      );
-
-      const newSessions = Object.fromEntries(updates.filter(Boolean));
-      setSessions((prev) => ({ ...prev, ...newSessions }));
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [games]);
-
   // ---- Game management methods below ----
   const createGame = (name) => {
     const updatedGames = [...games, newGame(name, user)];
@@ -122,7 +97,7 @@ function AdminLayout() {
       const { position } = await gameAPI.advance(gameId);
       const session = await updateSessionState(sessionId, setSessions, sessionAPI);
       updateGameState(games, setGames, gameId, session, sessionId);
-      return sessionId; // return the sessionId
+      return position; // return the sessionId
     } catch (error) {
       throw new Error(error.message || 'Failed to advance game.');
     }
@@ -147,6 +122,7 @@ function AdminLayout() {
   const data = {
     games,
     sessions,
+    setSessions,
     // game functions
     createGame,
     deleteGame,
