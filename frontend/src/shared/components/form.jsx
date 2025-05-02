@@ -199,13 +199,27 @@ function LabelError() {
 export function LabelTab({ type, label, children, invalid = false, ...props }) {
   // type is either 'correct' or 'false'
   const styles = {
-    correct: 'bg-emerald-500',
-    false: 'bg-error',
-    neutral: 'bg-cyan',
-    dark: 'bg-[#113034]',
-  };
+    correct: {
+      text: 'text-white',
+      bg: 'bg-emerald-500',
+    },
+    false: {
+      text: 'text-white',
+      bg: 'bg-error',
+    },
+    neutral: {
+      text: 'text-navy-content',
+      bg: 'bg-navy',
+    },
+    dark: {
+      text: 'text-white',
+      bg: 'bg-[#113034]',
+    },
+  }
 
-  const bgColor = styles[type] || styles.neutral;
+  const bgColor = styles[type] ? styles[type].bg : styles.neutral.bg;
+  const textColor = styles[type] ? styles[type].text : styles.neutral.text;
+
   const style = clsx(
     'relative rounded-t-md inline-block px-3 py-2 leading-none select-none',
     bgColor
@@ -213,7 +227,7 @@ export function LabelTab({ type, label, children, invalid = false, ...props }) {
 
   return (
     <div className="flex flex-col w-full rounded-lg">
-      <div className="flex flex-row justify-start w-full text-sm font-bold text-white -mb-1">
+      <div className={clsx('flex flex-row justify-start w-full text-sm font-bold -mb-1', textColor)}>
         <span className={style}>
           <label {...props}>{label}</label>
           {invalid && <LabelError />}
