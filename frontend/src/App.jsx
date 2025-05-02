@@ -13,19 +13,7 @@ import { NotFound, Unauthorized } from '@pages/errors';
 import { Home, Landing } from '@pages/public';
 import { Outlet, Route, Routes } from 'react-router-dom';
 import { SessionLayout, AdminSession } from '@/session';
-
-
-function PlayJoin() {
-  return (
-    <h1>Enter session id</h1>
-  )
-}
-
-function PlaySession() {
-  return (
-    <h1>Play session</h1>
-  )
-}
+import { PlaySession, PlayJoin } from '@/play';
 
 function AppLayout() {
   const classes =
