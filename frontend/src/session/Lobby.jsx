@@ -1,8 +1,8 @@
-import { LobbyLayout, Section, LobbyContent, LobbyHeader } from '@components/session/lobby';
+import { LobbyLayout, LobbyContent, LobbyHeader } from '@components/session/lobby';
 import { ButtonPrimary as Button } from '@components/button';
 
 function Lobby({ ...props}) {
-  const { sessionId, session, game, lock, setLock, advanceGame, stopGame } = props;
+  const { sessionId, lock, setLock, advanceGame } = props;
 
   return (
     <LobbyLayout>

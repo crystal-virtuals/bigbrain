@@ -26,17 +26,27 @@ export default function QuestionRunner({ session, lock, advanceGame, stopGame })
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const current = calculateTimeLeft(duration, session.isoTimeLastQuestionStarted);
-      setTimeLeft(current);
-      if (current === 0) setShowAnswers(true);
+      const currentTimeLeft = calculateTimeLeft(duration, session.isoTimeLastQuestionStarted);
+      setTimeLeft(currentTimeLeft);
+      if (currentTimeLeft === 0) setShowAnswers(true);  // Automatically show answers when time runs out
     }, 1000);
     return () => clearInterval(interval);
   }, [duration, session.isoTimeLastQuestionStarted]);
 
+  // useEffect(() => {
+  //   setSelected(null);
+  //   setShowAnswers(false);
+  //   setTimeLeft(calculateTimeLeft(duration, session.isoTimeLastQuestionStarted));
+  // }, [session.position, question.id]);
   useEffect(() => {
-    setSelected(null);
-    setShowAnswers(false);
-    setTimeLeft(calculateTimeLeft(duration, session.isoTimeLastQuestionStarted));
+    const newTimeLeft = calculateTimeLeft(duration, session.isoTimeLastQuestionStarted);
+    setTimeLeft(newTimeLeft);
+
+    if (newTimeLeft > 0) {
+      setSelected(null);
+    } else {
+      setShowAnswers(true); // Show answers once time has expired
+    }
   }, [session.position, question.id]);
 
   useEffect(() => {
@@ -128,6 +138,7 @@ export default function QuestionRunner({ session, lock, advanceGame, stopGame })
           <Button
             color="dark"
             onClick={advanceGame}
+            disabled={!showAnswers || lock}
           >
             Next
           </Button>
