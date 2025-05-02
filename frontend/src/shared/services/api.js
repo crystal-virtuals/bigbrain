@@ -146,3 +146,14 @@ export const fetchGamesAndSessions = async () => {
     return { games: [], sessions: {} };
   }
 }
+/***************************************************************
+                         Player API
+***************************************************************/
+export const playerAPI = {
+  joinSession: (sessionId, name) => api.post(`/play/join/${sessionId}`, { name }).then(res => res.playerId),
+  getSessionStatus: (playerId) => api.get(`/play/${playerId}/status`).then(res => res.started),
+  getTimeLastQuestionStarted: (playerId) => api.get(`/play/${playerId}/question`).then(res => res.isoTimeLastQuestionStarted),
+  getAnswer: (playerId) => api.get(`/play/${playerId}/answer`),
+  putAnswer: (playerId, answers) => api.put(`/play/${playerId}/answer`, { answers: answers }),
+  getResults: (playerId) => api.get(`/play/${playerId}/results`),
+}
