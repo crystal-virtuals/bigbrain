@@ -69,7 +69,7 @@ export default function PlayJoin() {
         title="Join a Game"
         description="Enter the session ID to join a game."
       >
-        <div className="px-6 py-4 rounded-xl bg-base-100/80 border-2 border-beige-300 w-full max-w-xl drop-shadow-xl">
+        <div className="px-6 py-4 rounded-xl bg-base-100 dark:bg-dark border-2 border-beige-300 dark:border-indigo-200 w-full max-w-xl drop-shadow-xl">
           <form
             className="flex flex-col gap-4"
             onSubmit={handleSubmit}
@@ -123,7 +123,7 @@ export default function PlayJoin() {
                 </Headless.Field>
               </div>
             </Fieldset>
-            <Button type="submit" className="flex-1 w-full">
+            <Button type="submit" className="flex-1 w-full" color='white'>
               Enter
             </Button>
           </form>
