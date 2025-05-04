@@ -1,9 +1,11 @@
 import { LinkToggle } from '@components/button';
 import { CopyToClipboardLink } from '@components/clipboard';
-import { Heading, HeadingBorder } from '@components/heading';
+import { Heading, Subheading, HeadingBorder } from '@components/heading';
 import { Strong, Text } from '@components/text';
 import { LockClosedIcon, LockOpenIcon } from '@heroicons/react/16/solid';
 import { splitNumber } from '@utils/helpers';
+import clsx from 'clsx';
+import { GameMetadata } from '@components/game/card';
 
 function ToggleLockLink({ lock, setLock }) {
   return (
@@ -48,65 +50,38 @@ function SessionId({ sessionId, lock }) {
   );
 }
 
-export function Section({ children }) {
+export function Section({ children, className }) {
+  const styles = {
+    base: 'dark:bg-black/25 ring-2 ring-green dark:ring-green/50 bg-secondary-100 rounded-2xl overflow-hidden flex flex-col items-center',
+    size: 'w-full h-full max-w-2xl',
+  };
   return (
-    // align center
-    <div className="w-full flex-1 h-full lg:max-h-[800px] flex flex-col items-center justify-center min-h-[300px] max-h-[600px]">
-      <section className="dark:bg-black/25 ring-2 ring-green dark:ring-green/50 bg-secondary-100 rounded-2xl overflow-hidden h-full w-full flex flex-col">
-        {children}
-      </section>
-    </div>
+    <section className={clsx(styles.base, styles.size, className)}>
+      {children}
+    </section>
   );
 }
 
 export function SectionHeader({ children }) {
   return (
-    <div className="px-4 py-5 sm:px-6 w-full dark:bg-zinc-950 bg-secondary-200 text-neutral-content">
+    <div className="h-full w-full px-8 py-8 dark:bg-zinc-950 bg-secondary-200 text-neutral-content">
       {children}
     </div>
   );
 }
 
-export function SectionContent({ children }) {
+export function SectionBody({ children, className }) {
   return (
-    <div className="px-4 py-5 sm:p-6 flex-1 w-full flex flex-col">
-      <div className="flex flex-col justify-between flex-1 h-full items-center">
-        {children}
-      </div>
+    <div className={clsx('relative w-full h-full px-8 py-8 flex-1', className)}>
+      {children}
     </div>
   );
 }
 
-export function LobbyHeader({ sessionId, lock, setLock }) {
-  const sessionUrl = `${window.location.origin}/play/${sessionId}`;
-
+export function AdminLobbyMainSection({ lock, children }) {
   return (
-    <SectionHeader>
-      <div className="flex flex-col items-center justify-center flex-1 gap-2">
-        <Strong>Session ID:</Strong>
-
-        {!lock ? (
-          <SessionId sessionId={sessionId} />
-        ) : (
-          <div className="flex flex-col items-center gap-2">
-            <HeadingBorder size="text-2xl">The ID is hidden</HeadingBorder>
-            <Text>This game is locked. Joining is no longer available.</Text>
-          </div>
-        )}
-
-        <div className="flex flex-row items-center">
-          {!lock && <CopyToClipboardLink value={sessionUrl} className="mr-4" />}
-          <ToggleLockLink lock={!lock} setLock={setLock} />
-        </div>
-      </div>
-    </SectionHeader>
-  );
-}
-
-export function LobbyContent({ lock, children }) {
-  return (
-    <SectionContent>
-      <div className="flex-1 flex items-center justify-center">
+    <>
+      <div className="flex items-center justify-center flex-1">
         {!lock && (
           <Heading className="flex items-end gap-2">
             <p className="text-base md:text-lg">Waiting for players</p>
@@ -114,20 +89,84 @@ export function LobbyContent({ lock, children }) {
           </Heading>
         )}
       </div>
-      {/* Children (bottom-aligned) */}
-      <div className="pb-12">
-        <div>{children}</div>
-      </div>
-    </SectionContent>
+
+      <div className="flex items-center justify-center py-2">{children}</div>
+    </>
+  );
+}
+
+export function LobbyMainSection({ title, sessionId, lock, setLock, children }) {
+  const sessionUrl = `${window.location.origin}/play/${sessionId}`;
+
+  return (
+    <Section className="xl:w-4/6 lg:w-7/12 min-h-[30rem]">
+      <SectionHeader>
+        <div className="flex flex-col items-center justify-center flex-1 h-full gap-4">
+          <Strong>{title}</Strong>
+
+          {!lock ? (
+            <SessionId sessionId={sessionId} />
+          ) : (
+            <div className="flex flex-col items-center space-y-2">
+              <HeadingBorder size="text-2xl">The ID is hidden</HeadingBorder>
+              <Text>This game is locked. Joining is no longer available.</Text>
+            </div>
+          )}
+
+          <div className="flex flex-row items-center">
+            {!lock && (
+              <CopyToClipboardLink value={sessionUrl} className="mr-4" />
+            )}
+            {setLock && <ToggleLockLink lock={!lock} setLock={setLock} />}
+          </div>
+        </div>
+      </SectionHeader>
+
+      <SectionBody className="flex flex-col items-center justify-between gap-4">
+        {children}
+      </SectionBody>
+    </Section>
+  );
+}
+
+export function LobbySecondarySection({ game, session }) {
+  return (
+    <Section className="xl:w-2/6 lg:w-5/12 min-h-[30rem]">
+      <SectionHeader>
+        <div className="flex flex-col items-start justify-start flex-1 h-full gap-4">
+          {game.thumbnail && (
+            <img
+              src={game.thumbnail}
+              alt="Game Thumbnail"
+              className="size-24 flex-none rounded-lg object-cover"
+            />
+          )}
+          <div className="flex flex-col items-start justify-center w-full gap-4">
+            <Strong>{game.name}</Strong>
+            <GameMetadata questions={game.questions} />
+          </div>
+        </div>
+      </SectionHeader>
+      <SectionBody className="flex flex-col items-start justify-start gap-4 text-neutral-content">
+        <Subheading>Players Joined:</Subheading>
+        <ul role="list" className="list list-disc pl-4">
+          {session.players.length > 0 ? (
+            session.players.map((player, index) => (
+              <li key={index}>{player}</li>
+            ))
+          ) : (
+            <Text className="text-sm">No players joined yet</Text>
+          )}
+        </ul>
+      </SectionBody>
+    </Section>
   );
 }
 
 export function LobbyLayout({ children }) {
   return (
-    <div className="container mx-auto md:max-w-xl lg:max-w-2xl">
-      <section className="h-[32rem] flex-1 dark:bg-black/25 ring-2 ring-green dark:ring-green/50 bg-secondary-100 rounded-2xl overflow-hidden flex flex-col">
-        {children}
-      </section>
+    <div className="w-full h-full container mx-auto flex flex-col lg:flex-row gap-8 items-center justify-center lg:max-h-[60rem]">
+      {children}
     </div>
   );
 }
