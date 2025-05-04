@@ -61,6 +61,8 @@ export default function PlayJoin() {
 
     try {
       const playerId = await playerAPI.joinSession(sessionId, name);
+      // store the player name in local storage
+      localStorage.setItem(`player-${playerId}`, name);
       toastify.success({ message: `Joining session ${sessionId} as ${name}` });
       navigate(`/play/${sessionId}/${playerId}`);
     } catch (error) {
@@ -80,7 +82,11 @@ export default function PlayJoin() {
     <PageLayout className="flex flex-col items-center justify-center h-full">
       <PageContent
         title="Join a Game"
-        description="Enter the session ID to join a game."
+        description={
+          params.sessionId
+            ? 'Enter your name to join the game'
+            : 'Enter your name and session ID to join the game'
+        }
       >
         <Form onSubmit={handleSubmit}>
 
