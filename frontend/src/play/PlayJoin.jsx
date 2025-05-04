@@ -7,6 +7,8 @@ import { playerAPI } from '@services/api';
 import { isEmptyString } from '@utils/validation';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { usePlayer  } from '@hooks/player';
+
 
 export default function PlayJoin() {
   const params = useParams();
@@ -15,6 +17,7 @@ export default function PlayJoin() {
     name: '',
   });
   const [errors, setErrors] = useState(new Map());
+  const { updatePlayer } = usePlayer();
   const toastify = useToast();
   const navigate = useNavigate();
 
@@ -61,8 +64,14 @@ export default function PlayJoin() {
 
     try {
       const playerId = await playerAPI.joinSession(sessionId, name);
-      // store the player name in local storage
-      localStorage.setItem(`player-${playerId}`, name);
+
+      // Save player info
+      updatePlayer({
+        id: playerId,
+        name: name,
+        sessionId: sessionId
+      });
+
       toastify.success({ message: `Joining session ${sessionId} as ${name}` });
       navigate(`/play/${sessionId}/${playerId}`);
     } catch (error) {
