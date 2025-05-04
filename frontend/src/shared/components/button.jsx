@@ -338,7 +338,7 @@ export function ButtonPrimary({ children, ...props }) {
     fuchsia: 'bg-fuchsia-500',
     pink: 'bg-pink-300',
     error: 'bg-error',
-    light: 'bg-zinc-100',
+    light: 'bg-white',
   };
 
   let colorClass = colors[color] || 'bg-green';
@@ -371,7 +371,7 @@ export function ButtonPrimary({ children, ...props }) {
       <div className="relative flex flex-row gap-x-4 items-center w-full min-h-full pointer-events-none z-2 transform -translate-y-0.5 group-active:translate-y-0 p-[0.1875rem]">
         <div className="flex flex-col flex-1 items-center">
           <div className="relative">
-            <div className="relative">{children}</div>
+            {children}
           </div>
         </div>
       </div>

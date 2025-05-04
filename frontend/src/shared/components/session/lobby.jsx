@@ -99,7 +99,7 @@ export function LobbyMainSection({ title, sessionId, lock, setLock, children }) 
   const sessionUrl = `${window.location.origin}/play/${sessionId}`;
 
   return (
-    <Section className="xl:w-4/6 lg:w-7/12 min-h-[30rem]">
+    <Section className="xl:w-4/6 lg:w-7/12 min-h-[30rem] min-w-[300px]">
       <SectionHeader>
         <div className="flex flex-col items-center justify-center flex-1 h-full gap-4">
           <Strong>{title}</Strong>
