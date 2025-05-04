@@ -4,37 +4,59 @@ import { ConfirmModal } from '@components/modal';
 import { Strong, Text } from '@components/text';
 import { Textarea } from '@components/textarea';
 import * as Headless from '@headlessui/react';
-import { CheckIcon, XCircleIcon, XMarkIcon } from '@heroicons/react/20/solid';
+import { CheckIcon, XMarkIcon } from '@heroicons/react/20/solid';
 import { PencilIcon, PhotoIcon } from '@heroicons/react/24/solid';
-import { fileToDataUrl, isNullOrUndefined, pluralSuffix } from '@utils/helpers';
+import { fileToDataUrl, isNullOrUndefined } from '@utils/helpers';
 import clsx from 'clsx';
-import { forwardRef, useRef, useState } from 'react';
+import { forwardRef, useRef, useState, useEffect } from 'react';
+import { Notification } from '@components/notification';
 
 /***************************************************************
-                       Form Alert
+                       Form Errors
 ***************************************************************/
-export function FormAlert( { errors, children } ) {
+export function FormErrors({ errors, ...props }) {
+  const [show, setShow] = useState(true);
+  const hasErrors = errors && errors.size > 0;
+
+  // reset the error state when new errors are received
+  useEffect(() => {
+    if (hasErrors) {
+      setShow(true);
+    }
+  }, [errors]);
+
+  if (!hasErrors || !show) return null;
+
+  const errorTitle =
+    errors.size > 1
+      ? `There were ${errors.size} errors with your submission`
+      : 'There was an error with your submission';
+
+  const errorList = Array.from(errors).map(([key, value]) => (
+    <li key={key}>{value}</li>
+  ));
+
   return (
-    <div className="rounded-md bg-red-50 p-4 col-span-full border-2 border-red-100">
-      <div className="flex">
-        <div className="shrink-0">
-          <XCircleIcon aria-hidden="true" className="size-5 text-red-400" />
-        </div>
-        <div className="ml-3">
-          <h3 className="text-sm font-medium text-red-800">There {errors.size === 1 ? 'is' : 'were'} {errors.size || 'some'} error{pluralSuffix(errors.size || 2)} with your submission</h3>
-          <div className="mt-2 text-sm text-red-700">
-            {children}
-          </div>
-        </div>
-      </div>
-    </div>
-  )
+    <Notification
+      type="error"
+      title={errorTitle}
+      onDismiss={() => setShow(false)}
+      {...props}
+    >
+      <ul role="list" className="list-disc space-y-1 pl-5">
+        {errorList}
+      </ul>
+    </Notification>
+  );
 }
 
 /***************************************************************
                        Edit Form Inputs
 ***************************************************************/
-const Input = forwardRef(function Input({ className, readOnly, dark=true, inputclassname='', ...props }, ref) {
+const Input = forwardRef(function Input(
+  { className, readOnly, dark = true, inputclassname = '', ...props },
+  ref
+) {
   return (
     <span
       data-slot="control"
@@ -43,7 +65,8 @@ const Input = forwardRef(function Input({ className, readOnly, dark=true, inputc
         // Basic layout
         'relative block w-full',
         // Background color + shadow applied to inset pseudo element, so shadow blends with border in light mode
-        !readOnly && 'before:absolute before:inset-px before:rounded-[calc(var(--radius-lg)-1px)] before:shadow-sm before:bg-white',
+        !readOnly &&
+          'before:absolute before:inset-px before:rounded-[calc(var(--radius-lg)-1px)] before:shadow-sm before:bg-white',
         // Background color is moved to control and shadow is removed in dark mode so hide `before` pseudo
         dark && 'dark:before:hidden',
         // Focus ring
@@ -51,7 +74,7 @@ const Input = forwardRef(function Input({ className, readOnly, dark=true, inputc
         // Disabled state
         'has-data-disabled:opacity-50 has-data-disabled:before:bg-zinc-950/5 has-data-disabled:before:shadow-none',
         // Invalid state
-        'has-data-invalid:before:shadow-red-500/10'
+        'has-data-invalid:before:shadow-red-500/10',
       ])}
     >
       <Headless.Input
@@ -63,11 +86,13 @@ const Input = forwardRef(function Input({ className, readOnly, dark=true, inputc
           // Basic layout
           'relative block w-full appearance-none rounded-lg py-[calc(--spacing(2.5)-1px)] sm:py-[calc(--spacing(1.5)-1px)]',
           // Padding
-          !readOnly && 'sm:px-[calc(--spacing(3)-1px)] px-[calc(--spacing(3.5)-1px)]',
+          !readOnly &&
+            'sm:px-[calc(--spacing(3)-1px)] px-[calc(--spacing(3.5)-1px)]',
           // Typography
           'text-base/6 text-zinc-950 placeholder:text-zinc-500 sm:text-sm/6',
           // Border
-          !readOnly && 'border border-zinc-950/10 data-hover:border-zinc-950/20',
+          !readOnly &&
+            'border border-zinc-950/10 data-hover:border-zinc-950/20',
           // Background color
           'bg-transparent',
           // Hide default focus styles
@@ -81,7 +106,8 @@ const Input = forwardRef(function Input({ className, readOnly, dark=true, inputc
           // Readonly state
           readOnly && 'cursor-default pointer-events-none',
           // Dark mode
-          dark && 'dark:text-white dark:border-white/10 dark:data-hover:border-white/20',
+          dark &&
+            'dark:text-white dark:border-white/10 dark:data-hover:border-white/20',
           // Readonly state
           !readOnly && 'dark:bg-white/5',
           // Input classes
@@ -92,7 +118,6 @@ const Input = forwardRef(function Input({ className, readOnly, dark=true, inputc
   );
 });
 
-
 export function ControlledTextarea({
   name,
   value,
@@ -101,7 +126,6 @@ export function ControlledTextarea({
   readOnly = false,
   ...props
 }) {
-
   return (
     <>
       <Textarea
@@ -127,7 +151,6 @@ export function ControlledInput({
   correct,
   ...props
 }) {
-
   const styles = {
     true: 'sm:focus-within:after:ring-emerald-600',
     false: 'sm:focus-within:after:ring-pink-600',
@@ -165,9 +188,7 @@ export function CheckboxButton({ className, checked, toggleChecked }) {
       className={clsx(
         className,
         styles.base,
-        checked
-          ? styles.true
-          : styles.false,
+        checked ? styles.true : styles.false
       )}
       onClick={toggleChecked}
     >
@@ -195,7 +216,6 @@ function LabelError() {
   return <div className={clsx(classes)}>!</div>;
 }
 
-
 export function LabelTab({ type, label, children, invalid = false, ...props }) {
   // type is either 'correct' or 'false'
   const styles = {
@@ -215,7 +235,7 @@ export function LabelTab({ type, label, children, invalid = false, ...props }) {
       text: 'text-white',
       bg: 'bg-[#113034]',
     },
-  }
+  };
 
   const bgColor = styles[type] ? styles[type].bg : styles.neutral.bg;
   const textColor = styles[type] ? styles[type].text : styles.neutral.text;
@@ -227,7 +247,12 @@ export function LabelTab({ type, label, children, invalid = false, ...props }) {
 
   return (
     <div className="flex flex-col w-full rounded-lg">
-      <div className={clsx('flex flex-row justify-start w-full text-sm font-bold -mb-1', textColor)}>
+      <div
+        className={clsx(
+          'flex flex-row justify-start w-full text-sm font-bold -mb-1',
+          textColor
+        )}
+      >
         <span className={style}>
           <label {...props}>{label}</label>
           {invalid && <LabelError />}
@@ -283,9 +308,7 @@ export function TextInput({ value, onChange, readOnly, ...props }) {
         inputclassname="w-full truncate"
         {...props}
       />
-      {error && !readOnly && touched && (
-        <ErrorMessage>{error}</ErrorMessage>)
-      }
+      {error && !readOnly && touched && <ErrorMessage>{error}</ErrorMessage>}
     </>
   );
 }
@@ -308,9 +331,7 @@ export function ThumbnailInput({ value, onChange, ...props }) {
       // background
       'bg-white dark:bg-zinc-900 hover:bg-zinc-300 dark:hover:bg-zinc-950',
     ],
-    dashed: [
-      'border border-dashed border-zinc-900/25 dark:border-white/25',
-    ],
+    dashed: ['border border-dashed border-zinc-900/25 dark:border-white/25'],
     base: [
       // Base
       'relative isolate inline-flex items-baseline justify-center gap-x-2 rounded-lg border',
@@ -320,8 +341,8 @@ export function ThumbnailInput({ value, onChange, ...props }) {
     readOnly: [
       // cursor
       'cursor-none pointer-events-none',
-    ]
-  }
+    ],
+  };
 
   const handleFileUpload = () => {
     if (fileInputRef.current) {
@@ -343,7 +364,7 @@ export function ThumbnailInput({ value, onChange, ...props }) {
       })
       .catch((error) => {
         setError(error.message || 'Failed to load image. Please try again.');
-      })
+      });
   };
 
   const handleUploadError = () => {
@@ -372,7 +393,10 @@ export function ThumbnailInput({ value, onChange, ...props }) {
             className={clsx(styles.close)}
             onClick={handleRemoveImage}
           >
-            <XMarkIcon aria-hidden='true' className="size-5 text-zinc-950 dark:text-white" />
+            <XMarkIcon
+              aria-hidden="true"
+              className="size-5 text-zinc-950 dark:text-white"
+            />
           </button>
         </div>
         {error && <ErrorMessage>{error}</ErrorMessage>}
@@ -406,17 +430,13 @@ export function ThumbnailInput({ value, onChange, ...props }) {
               {...props}
             />
           </div>
-          <p className="text-xs/5 text-zinc-600">
-            PNG, JPG, JPEG up to 10MB
-          </p>
+          <p className="text-xs/5 text-zinc-600">PNG, JPG, JPEG up to 10MB</p>
         </div>
       </Button>
       {error && <ErrorMessage>{error}</ErrorMessage>}
     </Field>
   );
 }
-
-
 
 export function FileInput({ value, onChange, readOnly }) {
   const [error, setError] = useState(null);
@@ -490,20 +510,16 @@ export function FileInput({ value, onChange, readOnly }) {
 function AlertPlaceholder({ error, readOnly }) {
   if (isNullOrUndefined(error) || readOnly) return null;
 
-  return (
-    <FormAlert errors={[error]}>
-      {error}
-    </FormAlert>
-  );
+  return <Notification type='error' title={error} />;
 }
 
 export function EditForm({
   onSubmit,
   onCancel,
   error,
-  readOnly=false,
+  readOnly = false,
   setReadOnly,
-  disabled=false,
+  disabled = false,
   isOpen,
   setIsOpen,
   discardChanges,
@@ -516,22 +532,36 @@ export function EditForm({
           <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
             <AlertPlaceholder error={error} readOnly={readOnly} />
             {/* Form fields */}
-            { props.children }
+            {props.children}
           </div>
         </div>
 
         <div className="flex items-center justify-end gap-x-6 border-t border-zinc-900/10 dark:border-white/10 px-4 py-4 sm:px-8">
           {readOnly ? (
-            <Button type="button" color='white' onClick={() => setReadOnly(false)}>
+            <Button
+              type="button"
+              color="white"
+              onClick={() => setReadOnly(false)}
+            >
               <PencilIcon aria-hidden="true" />
               Edit
             </Button>
           ) : (
             <>
-              <Button type="button" onClick={onCancel} disabled={disabled} outline>
+              <Button
+                type="button"
+                onClick={onCancel}
+                disabled={disabled}
+                outline
+              >
                 Cancel
               </Button>
-              <Button type="submit" loading={disabled} disabled={disabled} color='teal'>
+              <Button
+                type="submit"
+                loading={disabled}
+                disabled={disabled}
+                color="teal"
+              >
                 Save
               </Button>
             </>

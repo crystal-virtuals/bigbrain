@@ -89,8 +89,7 @@ export const Input = forwardRef(function Input(
 });
 
 // input with validation error
-export function InputError({ className, ...props }) {
-  const { pink } = props;
+export function InputError({ className, pink, ...props }) {
   const classes = pink && 'sm:focus-within:after:ring-pink-500';
   return (
     <div className={clsx(className, 'relative w-full')}>
