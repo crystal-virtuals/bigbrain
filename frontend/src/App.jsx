@@ -63,8 +63,8 @@ function App() {
         </Route>
 
         {/* Player routes (no auth) */}
-        <Route path="play" element={<PlayJoin />} /> {/* Join a session */}
-        <Route path="play/:sessionId" element={<PlaySession />} /> {/* Play a session */}
+        <Route path="/play" element={<PlayJoin />} />
+        <Route path="/play/:sessionId" element={<PlayJoin />} />
 
         {/* Fallback */}
         <Route path="*" element={<NotFound />} />
