@@ -42,7 +42,6 @@ const apiCall = (method, url, payload) => {
   });
 };
 
-
 export const api = {
   get: (url, payload) => apiCall('GET', url, payload),
   post: (url, payload) => apiCall('POST', url, payload),

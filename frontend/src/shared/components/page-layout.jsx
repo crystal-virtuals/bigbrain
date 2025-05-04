@@ -1,5 +1,6 @@
 import { TextLink } from '@components/text';
 import { Branding } from '@components/branding';
+import clsx from 'clsx';
 
 export function PageNavbar() {
   return (
@@ -30,9 +31,9 @@ export function PageNavbar() {
 
 export function PageFooter() {
   return (
-    <footer className="absolute inset-x-0 bottom-0 z-50 bg-white dark:bg-gray-900">
+    <footer className="absolute inset-x-0 bottom-0 z-50">
       <div className="px-16 border-t border-gray-900/10 dark:border-white/10 py-10 md:flex md:items-center md:justify-between">
-        <p className="mt-8 text-center text-sm/6 text-gray-600 dark:text-gray-400 md:order-1 md:mt-0">
+        <p className="text-center text-sm/6 text-gray-600 dark:text-gray-400 md:order-1 md:mt-0">
           &copy; {new Date().getFullYear()} BigBrain - All rights reserved.
         </p>
       </div>
@@ -58,40 +59,41 @@ export function PageContent({ title, description, children }) {
 
 export function PageLayout({ navbar, footer, children, className }) {
   return (
-    <div className="bg-white dark:bg-gray-900 h-screen w-screen">
+    <div className="relative bg-white dark:bg-gray-900 min-h-screen w-screen">
       {/* Header */}
       {navbar}
 
       {/* Main content */}
-      <main className={className}>
-        <div className="relative isolate px-6 pt-14 lg:px-8">
+      <main className='relative isolate'>
+        <div aria-hidden="true" className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80">
           <div
-            aria-hidden="true"
-            className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
-          >
-            <div
-              style={{
-                clipPath:
-                  'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
-              }}
-              className="relative left-[calc(50%-11rem)] aspect-1155/678 w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-linear-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
-            />
+            style={{
+              clipPath:
+                'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
+            }}
+            className="relative left-[calc(50%-11rem)] aspect-1155/678 w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-linear-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
+          />
+        </div>
+
+        <div className="relative pt-40">
+          <div className="py-24 sm:py-32 mx-auto max-w-7xl px-6 lg:px-8">
+            <div className={clsx('mx-auto max-w-2xl text-center', className)}>
+              {children}
+            </div>
           </div>
-          <div className="mx-auto max-w-2xl py-32 sm:py-48 lg:py-60">
-            <div className="text-center">{children}</div>
-          </div>
+        </div>
+
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 -top-3 -z-10 transform-gpu overflow-hidden px-36 blur-3xl"
+        >
           <div
-            aria-hidden="true"
-            className="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]"
-          >
-            <div
-              style={{
-                clipPath:
-                  'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
-              }}
-              className="relative left-[calc(50%+3rem)] aspect-1155/678 w-[36.125rem] -translate-x-1/2 bg-linear-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%+36rem)] sm:w-[72.1875rem]"
-            />
-          </div>
+            style={{
+              clipPath:
+                'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
+            }}
+            className="relative left-[calc(50%+3rem)] aspect-1155/678 w-[36.125rem] -translate-x-1/2 bg-linear-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%+36rem)] sm:w-[72.1875rem]"
+          />
         </div>
       </main>
       {/* Footer */}
