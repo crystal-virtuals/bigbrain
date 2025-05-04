@@ -52,15 +52,18 @@ export default function QuestionRunner({ session, lock, advanceGame, stopGame })
     if (type == 'singleChoice' || type == 'judgement') {
       setSelected([answerId]);
     } else if (type == 'multipleChoice') {
-      setSelected((prev) =>
-        prev.includes(answerId)
-          ? prev.filter((id) => id != answerId)
-          : [...prev, answerId]
-      );
+      setSelected((prev) => {
+        if (prev === null) return [answerId];
+        if (prev.includes(answerId)) {
+          return prev.filter((id) => id !== answerId);
+        }
+        return [...prev, answerId];
+      });
     }
   };
 
   const isCorrect = (answerId) => {
+    if (correctAnswers === null) return false;
     if (type === 'multipleChoice') return correctAnswers.includes(answerId);
     return correctAnswers[0] === answerId;
   }
@@ -78,8 +81,8 @@ export default function QuestionRunner({ session, lock, advanceGame, stopGame })
       touched: selected !== null,
       correct: showAnswers ? isCorrect(a.id) : null,
       disabled: timeLeft == 0,
-      onClick: () => handleSelect(a.id),
       children: a.name,
+      onClick: () => handleSelect(a.id),
     };
 
     if (type === 'multipleChoice') {

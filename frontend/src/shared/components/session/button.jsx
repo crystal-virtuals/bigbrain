@@ -121,34 +121,41 @@ export function MultipleChoiceOptions({ children }) {
   );
 }
 
-export function MultipleChoiceButton({ children, ...props }) {
-  const { id, disabled, onClick } = props;
-  const [checked, setChecked] = useState(false);
+export function MultipleChoiceButton({
+  children,
+  selected,
+  touched,
+  correct,
+  disabled,
+  onClick,
+  ...props
+}) {
+  const isChecked = selected;
+  const showCorrect = touched && correct !== null;
 
-  const handleClick = () => {
-    setChecked((prev) => !prev);
-    if (onClick) onClick();
-  };
+  let bgColor = 'bg-white';
+  if (showCorrect) {
+    bgColor = correct ? 'bg-green-500' : 'bg-red-500';
+  } else if (isChecked) {
+    bgColor = 'bg-green-500';
+  }
 
   return (
     <button
-      id={id}
+      {...props}
       role="checkbox"
-      aria-checked={checked}
+      aria-checked={isChecked}
       disabled={disabled}
       className="h-12 p-2 rounded-lg relative overflow-hidden flex flex-row items-center justify-start text-base bg-zinc-300/30 text-black w-full"
       type="button"
-      onClick={handleClick}
-      {...props}
+      onClick={onClick}
     >
       <div className="flex flex-row items-center px-2 space-x-6">
-        {checked ? (
-          <div className="w-6 h-6 rounded-full bg-green-500 relative">
+        <div className={`w-6 h-6 rounded-full ${bgColor} relative`}>
+          {isChecked && (
             <div className="top-1/2 left-1/2 absolute w-2 h-2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-full" />
-          </div>
-        ) : (
-          <div className="w-6 h-6 rounded-full bg-white relative" />
-        )}
+          )}
+        </div>
         <div>{children}</div>
       </div>
     </button>
