@@ -1,32 +1,37 @@
 import { Button } from '@components/button';
-import { Fieldset, Label } from '@components/fieldset';
-import { FormAlert } from '@components/form';
-import { InputError } from '@components/input';
+import { FormErrors } from '@components/form';
 import { PageContent, PageLayout } from '@components/page-layout';
-import * as Headless from '@headlessui/react';
+import { Field, FieldGroup, Form, Input, Label } from '@components/play/form';
 import { useToast } from '@hooks/toast';
 import { playerAPI } from '@services/api';
 import { isEmptyString } from '@utils/validation';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 export default function PlayJoin() {
-  const [formdata, setFormdata] = useState({ sessionId: '', name: '' });
+  const params = useParams();
+  const [formdata, setFormdata] = useState({
+    sessionId: params.sessionId || '',
+    name: '',
+  });
   const [errors, setErrors] = useState(new Map());
   const toastify = useToast();
   const navigate = useNavigate();
 
   const validate = () => {
     const newErrors = new Map();
-    const { sessionId, name } = formdata;
-    if (isEmptyString(name)) {
+    // validate the name
+    if (isEmptyString(formdata.name)) {
       newErrors.set('name', 'Name cannot be empty');
     }
-    if (isEmptyString(sessionId)) {
-      newErrors.set('sessionId', 'Session ID cannot be empty');
-    }
-    if (!/^\d+$/.test(sessionId)) {
-      newErrors.set('sessionId', 'Session ID must be a number');
+    // only validate sessionId if it's not provided in the URL
+    if (!params.sessionId) {
+      if (isEmptyString(formdata.sessionId)) {
+        newErrors.set('sessionId', 'Session ID cannot be empty');
+      }
+      if (!/^\d+$/.test(formdata.sessionId)) {
+        newErrors.set('sessionId', 'Session ID must be a number');
+      }
     }
     setErrors(newErrors);
     return newErrors.size === 0;
@@ -53,81 +58,75 @@ export default function PlayJoin() {
     e.preventDefault();
     if (!validate()) return;
     const { sessionId, name } = formdata;
+
     try {
       const playerId = await playerAPI.joinSession(sessionId, name);
       toastify.success({ message: `Joining session ${sessionId} as ${name}` });
       navigate(`/play/${sessionId}/${playerId}`);
     } catch (error) {
-      toastify.error({ message: 'Invalid input', description: error.message });
-      updateError('sessionId', error.message);
+      toastify.error({ message: 'Failed to join session' });
+      if (error.message.toLowerCase().includes('session')) {
+        // handle session errors
+        updateError('sessionId', error.message);
+        navigate('/play');
+      } else {
+        // handle other errors
+        updateError('name', error.message);
+      }
     }
   };
 
   return (
-    <PageLayout className="flex flex-col items-center justify-center h-screen">
+    <PageLayout className="flex flex-col items-center justify-center h-full">
       <PageContent
         title="Join a Game"
         description="Enter the session ID to join a game."
       >
-        <div className="px-6 py-4 rounded-xl bg-base-100 dark:bg-dark border-2 border-beige-300 dark:border-indigo-200 w-full max-w-xl drop-shadow-xl">
-          <form
-            className="flex flex-col gap-4"
-            onSubmit={handleSubmit}
-          >
-            {/* Form errors */}
-            {errors.size > 0 && (
-              <FormAlert errors={errors}>
-                <ul role="list" className="list-disc">
-                  {Array.from(errors).map(([key, value]) => (
-                    <li key={key}>{value}</li>
-                  ))}
-                </ul>
-              </FormAlert>
+        <Form onSubmit={handleSubmit}>
+
+          <FormErrors errors={errors} />
+
+          <FieldGroup>
+
+            <Field>
+              <Label htmlFor="playerName">
+                Name
+              </Label>
+              <Input
+                id="playerName"
+                name="name"
+                type="text"
+                placeholder="Enter your name"
+                value={formdata.name}
+                onChange={handleChange}
+                invalid={errors.has('name')}
+              />
+            </Field>
+
+            {!params.sessionId && (
+              <Field>
+                <Label htmlFor="sessionId">
+                  Session ID
+                </Label>
+                <Input
+                  id="sessionId"
+                  name="sessionId"
+                  type="text"
+                  value={formdata.sessionId}
+                  onChange={handleChange}
+                  placeholder="Session ID"
+                  invalid={errors.has('sessionId')}
+                />
+              </Field>
             )}
-            <Fieldset className="w-full">
-              <div
-                data-slot="control"
-                className="grid grid-cols-1 items-center gap-x-4 gap-y-6 sm:grid-cols-3"
-              >
-                <Headless.Field className="grid grid-cols-subgrid sm:col-span-3 items-center">
-                  <Label htmlFor="playerName" className="col-span-1">
-                    Name
-                  </Label>
-                  <InputError
-                    id="playerName"
-                    name="name"
-                    placeholder="Enter your name"
-                    type="text"
-                    value={formdata.name}
-                    onChange={handleChange}
-                    className="mt-3 sm:col-span-2 sm:mt-0"
-                    invalid={errors.has('name')}
-                    pink
-                  />
-                </Headless.Field>
-                <Headless.Field className="grid grid-cols-subgrid sm:col-span-3 items-center">
-                  <Label htmlFor="sessionId" className="col-span-1">
-                    Session ID
-                  </Label>
-                  <InputError
-                    id="sessionId"
-                    name="sessionId"
-                    type="text"
-                    value={formdata.sessionId}
-                    onChange={handleChange}
-                    placeholder="Session ID"
-                    className="mt-3 sm:col-span-2 sm:mt-0"
-                    invalid={errors.has('sessionId')}
-                    pink
-                  />
-                </Headless.Field>
-              </div>
-            </Fieldset>
-            <Button type="submit" className="flex-1 w-full" color='white'>
-              Enter
-            </Button>
-          </form>
-        </div>
+
+          </FieldGroup>
+
+          <Button type="submit" className="flex-1 w-full" color="white">
+            Enter
+          </Button>
+
+        </Form>
       </PageContent>
     </PageLayout>
   );
