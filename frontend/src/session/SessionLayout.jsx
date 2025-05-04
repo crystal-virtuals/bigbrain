@@ -51,12 +51,12 @@ function SessionLayout() {
   }, [sessionId, session?.active]);
 
   // wait for session and game to be set
-  if (loading || session === null || game === null) {
+  if (loading || !session || !game || !sessionId) {
     return <Skeleton className="col-span-2 max-w-2xl" />;
   }
 
   return (
-    <Layout navbar={<Navbar sessionId={sessionId} players={session.players || []} />}>
+    <Layout navbar={<Navbar sessionId={sessionId} players={session.players} />}>
       <Outlet context={{ session, game, advanceGame, stopGame}} />
     </Layout>
   );

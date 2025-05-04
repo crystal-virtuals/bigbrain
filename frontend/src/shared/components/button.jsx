@@ -311,13 +311,37 @@ export function ButtonLink({ children, ...props }) {
 }
 
 export function ButtonPrimary({ children, ...props }) {
-  const { className, disabled, onClick, ...rest } = props;
+  const { className, color, disabled, onClick, ...rest } = props;
 
   let classes = clsx(
     className,
     'relative flex group text-black touch-manipulation cursor-pointer pointer-events-auto whitespace-nowrap md:px-8 w-full md:w-80 h-12 px-6 py-0 text-base font-bold',
     disabled && 'cursor-not-allowed opacity-50 pointer-events-none'
   );
+
+
+  const colors = {
+    indigo: 'bg-indigo-500',
+    cyan: 'bg-cyan-500',
+    red: 'bg-red-500',
+    orange: 'bg-orange',
+    amber: 'bg-amber-500',
+    yellow: 'bg-yellow-500',
+    lime: 'bg-lime-500',
+    green: 'bg-green',
+    emerald: 'bg-emerald-500',
+    teal: 'bg-teal-500',
+    sky: 'bg-sky-500',
+    blue: 'bg-blue-500',
+    violet: 'bg-violet-500',
+    purple: 'bg-purple-500',
+    fuchsia: 'bg-fuchsia-500',
+    pink: 'bg-pink-300',
+    error: 'bg-error',
+    light: 'bg-zinc-100',
+  };
+
+  let colorClass = colors[color] || 'bg-green';
 
   return (
     <button
@@ -330,10 +354,10 @@ export function ButtonPrimary({ children, ...props }) {
       <div className="-inset-1 absolute z-0 rounded-[2.9375rem]" />
       <div className="absolute inset-x-0 top-0 bottom-0 transform group-active:translate-y-0.5 group-active:bottom-0.5 z-1 bg-black rounded-[3.125rem] p-[0.1875rem]">
         <div className="relative w-full h-full">
-          <div className="top-1 absolute inset-x-0 bottom-0 overflow-hidden rounded-[2.8125rem] bg-success">
+          <div className={clsx('top-1 absolute inset-x-0 bottom-0 overflow-hidden rounded-[2.8125rem]', colorClass)}>
             <div className="opacity-30 absolute inset-0 bg-black" />
           </div>
-          <div className="bottom-1 absolute inset-x-0 top-0 overflow-hidden group-active:bottom-0.5 bg-success rounded-[2.8125rem]">
+          <div className={clsx('bottom-1 absolute inset-x-0 top-0 overflow-hidden group-active:bottom-0.5 rounded-[2.8125rem]', colorClass)}>
             <div className="group-hover:opacity-20 absolute inset-0 opacity-0" />
           </div>
         </div>
