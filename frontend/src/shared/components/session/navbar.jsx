@@ -27,13 +27,19 @@ export function SessionNavbar({ sessionId, players }) {
       </NavbarItem>
       <NavbarDivider />
       <NavbarSection>
-        {sessionId && <NavbarItem className='font-nunito font-black leading-none tracking-wider'>SESSION {sessionId}</NavbarItem>}
-        <NavbarItem>
-          <div className="flex flex-row items-center gap-2">
-            <UserIcon className="size-6" />
-            {players ? players.length : 0}
-          </div>
-        </NavbarItem>
+        {sessionId && (
+          <NavbarItem className="font-nunito font-black leading-none tracking-wider">
+            SESSION {sessionId}
+          </NavbarItem>
+        )}
+        {players && (
+          <NavbarItem>
+            <div className="flex flex-row items-center gap-2">
+              <UserIcon className="size-6" />
+              {players.length}
+            </div>
+          </NavbarItem>
+        )}
       </NavbarSection>
     </Navbar>
   );
