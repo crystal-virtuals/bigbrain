@@ -5,9 +5,7 @@ import { Loading } from '@pages/public';
 import { playerAPI } from '@services/api';
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import QuestionRunner from './QuestionRunner';
-import Lobby from './Lobby';
-import PlayResults from './PlayResults';
+import { QuestionRunner, Lobby, Results } from '@/play';
 import { InputError } from '@services/error';
 
 export default function PlaySession() {
@@ -137,7 +135,7 @@ export default function PlaySession() {
   if (state.status === 'results')
     return (
       <Layout navbar={<Navbar sessionId={sessionId} />}>
-        <PlayResults playerId={playerId} />
+        <Results playerId={playerId} />
       </Layout>
     );
 
