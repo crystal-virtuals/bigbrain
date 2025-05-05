@@ -20,7 +20,7 @@ export default function Landing() {
   return (
     <PageLayout navbar={<PageNavbar />} footer={<PageFooter />}>
       <PageContent title="Welcome to BigBrain" description={description}>
-        <>
+        <div className="flex flex-row justify-between items-center py-20 gap-x-8">
           <button
             type="button"
             onClick={authenticate}
@@ -34,7 +34,7 @@ export default function Landing() {
           >
             Sign up today <span aria-hidden="true">&rarr;</span>
           </TextLink>
-        </>
+        </div>
       </PageContent>
     </PageLayout>
   );
