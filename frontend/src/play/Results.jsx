@@ -81,7 +81,7 @@ export default function Results({ playerId }) {
   ]
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-6">
+    <div className="w-full max-w-4xl mx-auto p-6">
       <div className="flex flex-col space-y-8">
         <div className="border-b border-zinc-950/10 pb-6 dark:border-white/10">
           <Heading>Results</Heading>

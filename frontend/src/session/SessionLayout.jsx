@@ -52,7 +52,11 @@ function SessionLayout() {
 
   // wait for session and game to be set
   if (loading || !session || !game || !sessionId) {
-    return <Skeleton className="col-span-2 max-w-2xl" />;
+    return (
+      <div className="py-12 flex justify-center flex-col items-center">
+        <Skeleton className="col-span-2 max-w-2xl" />;
+      </div>
+    )
   }
 
   return (

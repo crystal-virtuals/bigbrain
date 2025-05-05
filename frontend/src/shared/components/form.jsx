@@ -510,7 +510,11 @@ export function FileInput({ value, onChange, readOnly }) {
 function AlertPlaceholder({ error, readOnly }) {
   if (isNullOrUndefined(error) || readOnly) return null;
 
-  return <Notification type='error' title={error} />;
+  return (
+    <div className="col-span-full">
+      <Notification type="error" title={error} />
+    </div>
+  );
 }
 
 export function EditForm({
