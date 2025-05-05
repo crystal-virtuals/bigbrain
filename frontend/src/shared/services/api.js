@@ -28,7 +28,6 @@ instance.interceptors.request.use((config) => {
 instance.interceptors.response.use(
   (response) => response.data,
   (error) => {
-    console.error('API error:', error);
     return Promise.reject(createError(error));
   }
 );
@@ -151,8 +150,8 @@ export const fetchGamesAndSessions = async () => {
 export const playerAPI = {
   joinSession: (sessionId, name) => api.post(`/play/join/${sessionId}`, { name }).then(res => res.playerId),
   getStatus: (playerId) => api.get(`/play/${playerId}/status`).then(res => res.started),
-  getTimeLastQuestionStarted: (playerId) => api.get(`/play/${playerId}/question`).then(res => res.isoTimeLastQuestionStarted),
-  getAnswer: (playerId) => api.get(`/play/${playerId}/answer`),
-  putAnswer: (playerId, answers) => api.put(`/play/${playerId}/answer`, { answers: answers }),
+  getQuestion: (playerId) => api.get(`/play/${playerId}/question`).then(res => res.question),
+  getAnswers: (playerId) => api.get(`/play/${playerId}/answer`).then(res => res.answers),
+  putAnswers: (playerId, answers) => api.put(`/play/${playerId}/answer`, { answers: answers }),
   getResults: (playerId) => api.get(`/play/${playerId}/results`),
 }
