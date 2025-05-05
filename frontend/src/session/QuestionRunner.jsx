@@ -1,10 +1,10 @@
 import { Button } from '@components/button';
-import { HeadingLight } from '@components/heading';
+import { HeadingLight as Heading } from '@components/heading';
 import {
   SingleChoiceButton,
   MultipleChoiceButton,
 } from '@components/session/button';
-import { Question, Timer } from '@components/session/question';
+import { Question, QuestionAnswers, QuestionActions, Timer } from '@components/session/question';
 import { useEffect, useState } from 'react';
 
 function calculateTimeLeft(duration, isoTimeLastQuestionStarted) {
@@ -104,19 +104,15 @@ export default function QuestionRunner({ session, lock, advanceGame, stopGame })
 
   return (
     <div className="flex-1 max-w-xl">
-      <Question
-        index={session.position}
-        total={session.questions.length}
-        score={0}
-      >
-        <HeadingLight>{question.name}</HeadingLight>
+      <Question index={session.position} total={session.questions.length} score={0}>
+        <Heading>{question.name}</Heading>
         <Timer timeLeft={timeLeft} duration={duration} />
 
         <ul className="flex flex-col items-center w-full space-y-2 mt-4 max-w-lg px-4">
           {question.answers.map(renderAnswerButton)}
         </ul>
 
-        <div className="flex flex-row items-center w-full mt-4 max-w-lg px-4 justify-between">
+        <QuestionActions>
           <Button color="light" onClick={stopGame} disabled={lock}>
             End Game
           </Button>
@@ -127,7 +123,8 @@ export default function QuestionRunner({ session, lock, advanceGame, stopGame })
           >
             Next
           </Button>
-        </div>
+        </QuestionActions>
+
       </Question>
     </div>
   );
