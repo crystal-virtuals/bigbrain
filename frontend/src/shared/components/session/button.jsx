@@ -1,6 +1,6 @@
 import { CheckCircleIcon } from '@heroicons/react/16/solid';
+
 import clsx from 'clsx';
-import { useState } from 'react';
 
 const styles = {
   base: [
@@ -18,9 +18,9 @@ const styles = {
       'bg-orange-neon',
       'bg-red-neon',
       'bg-purple-neon',
-      'bg-navy',
+      'bg-pink-200',
     ],
-    default: 'bg-pink-300',
+    default: 'bg-error',
     success: 'bg-success',
     error: 'bg-error',
   },

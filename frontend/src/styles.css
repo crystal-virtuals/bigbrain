@@ -55,6 +55,10 @@
   --color-beige-100: oklch(97.788% .004 56.375);
   --color-beige-200: oklch(93.982% .007 61.449);
   --color-beige-300: oklch(91.586% .006 53.44);
+  --color-beige: rgb(255, 250, 230);
+
+  --color-gray: rgb(149, 149, 149);
+  --color-gray-content: rgb(232, 228, 211);
 
   --color-secondary-100: oklch(98.71% .02 123.72);
   --color-secondary-200: oklch(91.8% .018 123.72);

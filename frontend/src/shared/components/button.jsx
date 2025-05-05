@@ -319,7 +319,6 @@ export function ButtonPrimary({ children, ...props }) {
     disabled && 'cursor-not-allowed opacity-50 pointer-events-none'
   );
 
-
   const colors = {
     indigo: 'bg-indigo-500',
     cyan: 'bg-cyan-500',
@@ -375,6 +374,92 @@ export function ButtonPrimary({ children, ...props }) {
           </div>
         </div>
       </div>
+    </button>
+  );
+}
+
+export function ButtonSecondary({ id, children, disabled, ...props }) {
+  const styles = {
+    base: [
+      // Base
+      'relative flex group font-bold text-black px-8 py-3 w-full',
+      // Disabled
+      'data-disabled:opacity-50 data-disabled:pointer-events-none',
+      // Cursor
+      'cursor-pointer touch-manipulation pointer-events-auto',
+    ],
+    disabled: [
+      'opacity-50 pointer-events-none',
+    ]
+  };
+
+  const colors = {
+    random: [
+      'bg-blue-neon',
+      'bg-green-neon',
+      'bg-orange-neon',
+      'bg-red-neon',
+      'bg-purple-neon',
+      'bg-pink-300',
+    ],
+    default: 'bg-pink-300',
+  }
+
+  let bgClass = clsx(
+    id
+      ? colors.random[id % colors.random.length]
+      : colors.default
+  );
+
+  const content = (
+    <>
+      <div className="-inset-1 absolute z-0 rounded-md" />
+      <div className="absolute inset-x-0 top-0 bottom-0 transform group-active:translate-y-0.5 group-active:bottom-0.5 z-1 bg-black rounded-[0.65rem] p-[0.1875rem]">
+        <div className="relative w-full h-full">
+          <div
+            className={clsx(
+              'top-1 absolute inset-x-0 bottom-0 overflow-hidden rounded-[0.4375rem]',
+              bgClass
+            )}
+          >
+            <div className="opacity-30 absolute inset-0 bg-black" />
+          </div>
+          <div
+            className={clsx(
+              'bottom-1 absolute inset-x-0 top-0 overflow-hidden group-active:bottom-0.5 rounded-[0.4375rem]',
+              bgClass
+            )}
+          >
+            <div className="group-hover:opacity-20 absolute inset-0 opacity-0" />
+          </div>
+        </div>
+      </div>
+      <div className="z-1 absolute inset-0 overflow-hidden hidden rounded-[0.4375rem] ">
+        <div
+          className="opacity-20 absolute top-0 left-0 w-full h-full bg-black"
+          style={{ left: '-100%' }}
+        />
+      </div>
+      <div className="relative flex flex-row gap-x-4 items-center w-full min-h-full pointer-events-none z-2 transform -translate-y-0.5 group-active:translate-y-0 p-[0.1875rem]">
+        <div className="flex flex-col flex-1 items-center">
+          <div className="relative">
+            {children}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+
+  const classes = clsx(styles.base, disabled && styles.disabled);
+
+  return (
+    <button
+      type="button"
+      className={classes}
+      disabled={disabled}
+      {...props}
+    >
+      {content}
     </button>
   );
 }
