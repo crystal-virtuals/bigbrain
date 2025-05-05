@@ -1,6 +1,27 @@
 /***************************************************************
                       Results
 ***************************************************************/
+export function calculateAverageTime(results) {
+  const totalTime = results.reduce((sum, q) => sum + (q.timeTaken || 0), 0);
+  const answeredCount = results.filter((q) => q.timeTaken !== null).length;
+  return answeredCount > 0 ? Math.round(totalTime / answeredCount) : 0;
+}
+
+export function calculateTimeTaken(startedAt, answeredAt) {
+  if (!startedAt || !answeredAt) return null;
+  return Math.round((new Date(answeredAt) - new Date(startedAt)) / 1000);
+}
+
+export function calculateSuccessRate(results) {
+  const correctCount = results.filter((q) => q.correct).length;
+  return Math.round((correctCount / results.length) * 100);
+}
+
+export function calculateTotalAnswered(results) {
+  return results.filter((q) => q.answers.length > 0).length;
+}
+
+
 export function calculatePlayerResults(player, questions, questionStartTimes) {
   const results = [];
 
