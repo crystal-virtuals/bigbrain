@@ -1,5 +1,6 @@
-import * as Headless from '@headlessui/react'
-import clsx from 'clsx'
+import * as Headless from '@headlessui/react';
+import clsx from 'clsx';
+import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/16/solid';
 
 export function RadioGroup({ className, ...props }) {
   return (
@@ -14,7 +15,7 @@ export function RadioGroup({ className, ...props }) {
         'has-data-[slot=description]:space-y-6 has-data-[slot=description]:**:data-[slot=label]:font-medium'
       )}
     />
-  )
+  );
 }
 
 export function RadioField({ className, ...props }) {
@@ -36,7 +37,7 @@ export function RadioField({ className, ...props }) {
         'has-data-[slot=description]:**:data-[slot=label]:font-medium'
       )}
     />
-  )
+  );
 }
 
 const base = [
@@ -66,7 +67,7 @@ const base = [
   'group-data-disabled:opacity-50',
   'group-data-disabled:border-zinc-950/25 group-data-disabled:bg-zinc-950/5 group-data-disabled:[--radio-checked-indicator:var(--color-zinc-950)]/50 group-data-disabled:before:bg-transparent',
   'dark:group-data-disabled:border-white/20 dark:group-data-disabled:bg-white/[2.5%] dark:group-data-disabled:[--radio-checked-indicator:var(--color-white)]/50 dark:group-data-checked:group-data-disabled:after:hidden',
-]
+];
 
 const colors = {
   'dark/zinc': [
@@ -107,7 +108,7 @@ const colors = {
     '[--radio-checked-indicator:var(--color-white)] [--radio-checked-bg:var(--color-fuchsia-500)] [--radio-checked-border:var(--color-fuchsia-600)]/90',
   pink: '[--radio-checked-indicator:var(--color-white)] [--radio-checked-bg:var(--color-pink-500)] [--radio-checked-border:var(--color-pink-600)]/90',
   rose: '[--radio-checked-indicator:var(--color-white)] [--radio-checked-bg:var(--color-rose-500)] [--radio-checked-border:var(--color-rose-600)]/90',
-}
+};
 
 export function Radio({ color = 'dark/zinc', className, ...props }) {
   return (
@@ -126,5 +127,138 @@ export function Radio({ color = 'dark/zinc', className, ...props }) {
         />
       </span>
     </Headless.Radio>
-  )
+  );
+}
+
+/***************************************************************
+                      Radio Button
+***************************************************************/
+export function RadioButtonGroup({ className, ...props }) {
+  return (
+    <Headless.RadioGroup
+      data-slot="control"
+      {...props}
+      className={clsx(
+        className,
+        // Basic groups
+        'flex flex-col items-center w-full space-y-2 mt-4 max-w-lg px-4'
+      )}
+    />
+  );
+}
+
+export function RadioButtonField({ className, children, correct, ...props }) {
+  return (
+    <Headless.Field
+      data-slot="field"
+      {...props}
+      className={clsx(
+        className,
+        // Base layout
+        'flex flex-row justify-center w-full'
+      )}
+    >
+      <div className="relative w-full">
+        {children}
+        {correct === true && (
+          <div className="top-1/2 translate-x-1/4 absolute right-0 z-10 overflow-hidden transform -translate-y-1/2 size-6 rounded-full bg-white">
+            <CheckCircleIcon className="fill-green-600 size-6" />
+          </div>
+        )}
+        {correct === false && (
+          <div className="top-1/2 translate-x-1/4 absolute right-0 z-10 overflow-hidden transform -translate-y-1/2 size-6 rounded-full bg-white">
+            <XCircleIcon className="fill-error size-6" />
+          </div>
+        )}
+      </div>
+    </Headless.Field>
+  );
+}
+
+export function RadioButton({ id, className, children, ...props }) {
+  const main = [
+    // Base
+    'group relative flex w-full touch-manipulation cursor-pointer',
+    // Disabled
+    'data-disabled:pointer-events-none',
+    // Checked state
+    'data-checked:opacity-100',
+    // Cursor
+    'cursor-pointer touch-manipulation pointer-events-auto',
+  ];
+
+  const base = [
+    'relative flex group font-bold text-black px-8 py-3 w-full',
+    // Cursor
+    'cursor-pointer touch-manipulation pointer-events-auto',
+    // Disabled state
+    'group-data-disabled:pointer-events-none',
+  ];
+
+  const colors = {
+    random: [
+      'bg-blue-neon',
+      'bg-green-neon',
+      'bg-orange-neon',
+      'bg-red-neon',
+      'bg-purple-neon',
+      'bg-pink-200',
+    ],
+    default: 'bg-pink-200',
+    success: 'bg-success',
+    error: 'bg-error',
+  };
+
+  let bgClass = id ? colors.random[id % colors.random.length] : colors.default;
+
+  const content = (
+    <>
+      <div className="-inset-1 absolute z-0 rounded-md" />
+      <div className="absolute inset-x-0 top-0 bottom-0 transform group-active:translate-y-0.5 group-active:bottom-0.5 z-1 bg-black rounded-[0.65rem] p-[0.1875rem]">
+        <div className="relative w-full h-full">
+          <div
+            className={clsx(
+              'top-1 absolute inset-x-0 bottom-0 overflow-hidden rounded-[0.4375rem]',
+              bgClass
+            )}
+          >
+            <div className="opacity-30 absolute inset-0 bg-black" />
+          </div>
+          <div
+            className={clsx(
+              'bottom-1 absolute inset-x-0 top-0 overflow-hidden group-active:bottom-0.5 rounded-[0.4375rem]',
+              bgClass
+            )}
+          >
+            <div className="group-hover:opacity-20 absolute inset-0 opacity-0" />
+          </div>
+        </div>
+      </div>
+      <div className="z-1 absolute inset-0 overflow-hidden hidden rounded-[0.4375rem] ">
+        <div
+          className="opacity-20 absolute top-0 left-0 w-full h-full bg-black"
+          style={{ left: '-100%' }}
+        />
+      </div>
+      <div className="relative flex flex-row gap-x-4 items-center w-full min-h-full pointer-events-none z-2 transform -translate-y-0.5 group-active:translate-y-0 p-[0.1875rem]">
+        <div className="flex flex-col flex-1 items-center">
+          <div className="relative">
+            <div className="relative">{children}</div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+
+  return (
+    <Headless.Radio
+      data-slot="control"
+      {...props}
+      className={clsx(className, main)}
+    >
+      <button className={clsx(base)} type="button">
+        {content}
+      </button>
+    </Headless.Radio>
+  );
 }
