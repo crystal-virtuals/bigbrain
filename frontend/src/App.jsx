@@ -1,12 +1,8 @@
 import { AuthLayout, Login, Logout, Register } from '@/auth';
-import {
-  AdminLayout,
-  GameLayout,
-  QuestionLayout,
-  EditGame,
-  EditQuestion,
-} from '@/admin';
+import { AdminLayout } from '@/admin';
 import { Dashboard } from '@/dashboard';
+import { GameLayout, EditGame } from '@/game';
+import { QuestionLayout, EditQuestion } from '@/question';
 import { AuthProvider } from '@hooks/auth';
 import { ToastProvider } from '@hooks/toast';
 import { NotFound, Unauthorized } from '@pages/errors';
