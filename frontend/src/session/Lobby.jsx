@@ -9,6 +9,10 @@ import { Heading } from '@components/heading';
 function Lobby({ ...props }) {
   const { game, session, sessionId, lock, setLock, advanceGame } = props;
 
+  if (!session || !game) {
+    return null;
+  }
+
   return (
     <LobbyLayout>
       <LobbyMainSection title="Session ID:" sessionId={sessionId} lock={lock} setLock={setLock}>

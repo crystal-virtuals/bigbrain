@@ -12,6 +12,19 @@ import clsx from 'clsx';
 import { Skeleton } from '@components/loading';
 
 /***************************************************************
+                        Question Layout
+***************************************************************/
+export function QuestionLayout({ children }) {
+  return (
+    <div className="w-full h-full container mx-auto flex flex-col lg:flex-row gap-8 items-center justify-center lg:max-h-[60rem]">
+      <div className='flex-1 max-w-xl'>
+        {children}
+      </div>
+    </div>
+  )
+}
+
+/***************************************************************
                         Timer
 ***************************************************************/
 export function Timer({ timeLeft, duration }) {

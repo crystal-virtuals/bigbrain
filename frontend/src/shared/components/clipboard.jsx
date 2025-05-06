@@ -5,6 +5,7 @@ import { LinkIcon } from '@heroicons/react/16/solid';
 import { useState } from 'react';
 import { useToast } from '@hooks/toast';
 import clsx from 'clsx';
+import { HeadingBorder } from '@components/heading';
 
 export function CopyToClipboardLink({ color, value, className }) {
   const [copied, setCopied] = useState(false);
@@ -48,15 +49,13 @@ export function CopyToClipboardInput({ value, copied, onCopy }) {
         className={clsx([
           // Basic layout
           'relative block w-full appearance-none rounded-lg px-[calc(--spacing(3.5)-1px)] py-[calc(--spacing(2.5)-1px)] sm:px-[calc(--spacing(3)-1px)] sm:py-[calc(--spacing(1.5)-1px)]',
-          // Typography
-          'font-nunito text-4xl font-black leading-none tracking-wider text-accent dark:text-accent',
           // Border
           'border border-zinc-950/10 data-hover:border-zinc-950/20 dark:border-white/10 dark:data-hover:border-white/20',
           // Background color
           'bg-transparent dark:bg-white/5',
         ])}
       >
-        {value}
+        <HeadingBorder size='text-4xl' className='relative text-left'>{value}</HeadingBorder>
       </span>
 
       <button

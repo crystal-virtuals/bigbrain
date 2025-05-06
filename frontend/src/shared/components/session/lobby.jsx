@@ -133,7 +133,10 @@ export function LobbySecondarySection({ game, session }) {
       </SectionHeader>
       <SectionBody className="flex flex-col items-start justify-start gap-4 text-neutral-content">
         <Subheading>Players Joined:</Subheading>
-        <ul role="list" className="list list-disc pl-4 text-base/6 text-zinc-500 sm:text-sm/6 dark:text-zinc-400">
+        <ul
+          role="list"
+          className="list list-disc pl-4 text-base/6 text-zinc-500 sm:text-sm/6 dark:text-zinc-400"
+        >
           {session.players.length > 0 ? (
             session.players.map((player, index) => (
               <li key={index}>{player}</li>
@@ -149,8 +152,10 @@ export function LobbySecondarySection({ game, session }) {
 
 export function LobbyLayout({ children }) {
   return (
-    <div className="w-full h-full container mx-auto flex flex-col lg:flex-row gap-8 items-center justify-center lg:max-h-[60rem]">
-      {children}
+    <div className="flex grow items-center justify-center p-6 lg:rounded-lg lg:bg-white lg:p-10 lg:shadow-xs lg:ring-1 lg:ring-zinc-950/5 dark:lg:bg-zinc-900 dark:lg:ring-white/10">
+      <div className="w-full h-full container mx-auto flex flex-col lg:flex-row gap-8 items-center justify-center lg:max-h-[60rem]">
+        {children}
+      </div>
     </div>
   );
 }

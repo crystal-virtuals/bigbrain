@@ -4,7 +4,7 @@ import {
   SingleChoiceButton,
   MultipleChoiceButton,
 } from '@components/session/button';
-import { Question, QuestionActions, Timer } from '@components/session/question';
+import { QuestionLayout, Question, QuestionActions, Timer } from '@components/session/question';
 import { useEffect, useState } from 'react';
 import { calculateTimeLeft } from '@utils/session';
 
@@ -97,7 +97,7 @@ export default function QuestionRunner({ session, lock, advanceGame, stopGame })
   };
 
   return (
-    <div className="flex-1 max-w-xl">
+    <QuestionLayout>
       <Question index={session.position} total={session.questions.length} score={0}>
         <Heading>{question.name}</Heading>
         <Timer timeLeft={timeLeft} duration={duration} />
@@ -120,6 +120,6 @@ export default function QuestionRunner({ session, lock, advanceGame, stopGame })
         </QuestionActions>
 
       </Question>
-    </div>
+    </QuestionLayout>
   );
 }

@@ -53,7 +53,7 @@ export function Header({ title }) {
 }
 
 export function HeadingBorder({ children, ...props }) {
-  const { color, size, ...rest } = props;
+  const { className, color, size, ...rest } = props;
 
   const styles = [
     'font-nunito font-black leading-none text-center tracking-widest',
@@ -62,7 +62,7 @@ export function HeadingBorder({ children, ...props }) {
   ]
 
   return (
-    <h1 className={clsx(styles)} {...rest}>
+    <h1 className={clsx(className, styles)} {...rest}>
       <div className="relative inline-block">
         <div className="px-0 z-3 relative top-0 left-0">
           {children}
