@@ -27,11 +27,7 @@ const PlayerProvider = ({ children }) => {
 
     const updated = [
       ...questions,
-      {
-        id: question.id,
-        name: question.name,
-        points: question.points ?? 100,
-      },
+      question, // add the entire question object
     ];
 
     setQuestions(updated);

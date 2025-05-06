@@ -79,7 +79,7 @@ export function CopyToClipboardInput({ value, copied, onCopy }) {
       >
         {copied ? (
           <svg
-            className="w-3.5 h-3.5 text-green dark:text-green"
+            className="w-3.5 h-3.5 text-green-500 dark:text-green"
             aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"

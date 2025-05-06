@@ -1,11 +1,11 @@
 import { LinkToggle } from '@components/button';
 import { CopyToClipboardLink } from '@components/clipboard';
-import { Heading, Subheading, HeadingBorder } from '@components/heading';
+import { GameMetadata } from '@components/game/card';
+import { HeadingBorder, Subheading } from '@components/heading';
 import { Strong, Text } from '@components/text';
 import { LockClosedIcon, LockOpenIcon } from '@heroicons/react/16/solid';
 import { splitNumber } from '@utils/helpers';
 import clsx from 'clsx';
-import { GameMetadata } from '@components/game/card';
 
 function ToggleLockLink({ lock, setLock }) {
   return (
@@ -78,22 +78,6 @@ export function SectionBody({ children, className }) {
   );
 }
 
-export function AdminLobbyMainSection({ lock, children }) {
-  return (
-    <>
-      <div className="flex items-center justify-center flex-1">
-        {!lock && (
-          <Heading className="flex items-end gap-2">
-            <p className="text-base md:text-lg">Waiting for players</p>
-            <span className="loading loading-dots loading-sm"></span>
-          </Heading>
-        )}
-      </div>
-
-      <div className="flex items-center justify-center py-2">{children}</div>
-    </>
-  );
-}
 
 export function LobbyMainSection({ title, sessionId, lock, setLock, children }) {
   const sessionUrl = `${window.location.origin}/play/${sessionId}`;
@@ -149,13 +133,13 @@ export function LobbySecondarySection({ game, session }) {
       </SectionHeader>
       <SectionBody className="flex flex-col items-start justify-start gap-4 text-neutral-content">
         <Subheading>Players Joined:</Subheading>
-        <ul role="list" className="list list-disc pl-4">
+        <ul role="list" className="list list-disc pl-4 text-base/6 text-zinc-500 sm:text-sm/6 dark:text-zinc-400">
           {session.players.length > 0 ? (
             session.players.map((player, index) => (
               <li key={index}>{player}</li>
             ))
           ) : (
-            <Text className="text-sm">No players joined yet</Text>
+            <Text>No players joined yet</Text>
           )}
         </ul>
       </SectionBody>
