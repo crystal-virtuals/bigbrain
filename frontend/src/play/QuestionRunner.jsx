@@ -1,6 +1,6 @@
 import { HeadingLight as Heading } from '@components/heading';
 import { Skeleton } from '@components/loading';
-import { Question, QuestionAnswers, Timer } from '@components/session/question';
+import { QuestionLayout, Question, QuestionAnswers, Timer } from '@components/session/question';
 import { playerAPI } from '@services/api';
 import { useEffect, useState } from 'react';
 import { usePlayer } from '@hooks/player';
@@ -100,7 +100,7 @@ export default function QuestionRunner({
   }
 
   return (
-    <div className="flex-1 max-w-xl">
+    <QuestionLayout>
       <Question index={getQuestionCount()} score={score}>
         <Heading>{question.name}</Heading>
         <Timer timeLeft={timeLeft} duration={question.duration} />
@@ -113,6 +113,6 @@ export default function QuestionRunner({
           onSelect={handleAnswerSelect}
         />
       </Question>
-    </div>
+    </QuestionLayout>
   );
 }

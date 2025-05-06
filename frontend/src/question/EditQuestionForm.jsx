@@ -2,9 +2,6 @@ import { Button } from '@components/button';
 import { Card } from '@components/card';
 import { Skeleton } from '@components/loading';
 import { ConfirmModal } from '@components/modal';
-import {
-  InputQuestionName, SelectQuestionType, SelectDuration, SelectPoints, InputQuestionThumbnail, InputQuestionAnswers
-} from '@components/questions/controls';
 import { useToast } from '@hooks/toast';
 import {
   convertToQuestion,
@@ -13,6 +10,14 @@ import {
 } from '@utils/game';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  InputQuestionAnswers,
+  InputQuestionName,
+  InputQuestionThumbnail,
+  SelectDuration,
+  SelectPoints,
+  SelectQuestionType,
+} from './components';
 
 function EditQuestionForm({ question, setErrors, onSubmit }) {
   const [prevFormData, setPrevFormData] = useState(convertToQuestion(question));
@@ -94,7 +99,6 @@ function EditQuestionForm({ question, setErrors, onSubmit }) {
         <form onSubmit={handleSubmit}>
           <div className="px-4 py-6 sm:p-8">
             <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-
               {/* Question name */}
               <InputQuestionName
                 question={formData}
@@ -105,7 +109,9 @@ function EditQuestionForm({ question, setErrors, onSubmit }) {
               <InputQuestionAnswers
                 type={formData.type}
                 answers={formData.answers}
-                setAnswers={(answers) => setFormData((prev) => ({ ...prev, answers }))}
+                setAnswers={(answers) =>
+                  setFormData((prev) => ({ ...prev, answers }))
+                }
               />
 
               {/* Question type */}
