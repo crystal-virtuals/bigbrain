@@ -3,12 +3,13 @@ import { Skeleton } from '@components/loading';
 import { playerAPI } from '@services/api';
 import { useEffect, useState } from 'react';
 import { usePlayer } from '@hooks/player';
-import { calculateAverageTime, calculateTimeTaken, calculateSuccessRate, calculateTotalAnswered } from '@utils/session';
-import { PlayerResultsTable, StatsList } from '@components/session/results';
+import { generatePlayerResults, generatePlayerStats } from '@utils/results';
+import { PlayerResultsTable, StatsList } from '@components/results';
 
 export default function Results({ playerId }) {
-  const { player, questions } = usePlayer();
+  const { questions } = usePlayer();
   const [results, setResults] = useState(null);
+  const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -17,28 +18,10 @@ export default function Results({ playerId }) {
       try {
         setLoading(true);
         const response = await playerAPI.getResults(playerId);
-
-        const newResults = response.map((q, index) => {
-
-          const timeTaken = calculateTimeTaken(
-            q.questionStartedAt,
-            q.answeredAt
-          );
-
-          const points = questions[index]?.points || 0;
-          const score = q.correct ? points : 0;
-
-          return {
-            index: index + 1,
-            timeTaken,
-            score,
-            points,
-            correct: q.correct,
-            answers: q.answers,
-          };
-        });
-
+        const newResults = generatePlayerResults(response, questions);
+        const stats = generatePlayerStats(newResults);
         setResults(newResults);
+        setStats(stats);
       } catch (err) {
         console.error('Failed to fetch results:', err);
         setError('Failed to load results. Please try again.');
@@ -46,7 +29,6 @@ export default function Results({ playerId }) {
         setLoading(false);
       }
     }
-
     fetchResults();
   }, [playerId, questions]);
 
@@ -62,23 +44,6 @@ export default function Results({ playerId }) {
     return <div className="text-center py-8 text-red-600">{error}</div>;
   }
 
-  const stats = [
-    {
-      name: 'Total Answered',
-      value: calculateTotalAnswered(results),
-      unit: '/ ' + results.length,
-    },
-    {
-      name: 'Average Time',
-      value: calculateAverageTime(results),
-      unit: 'secs',
-    },
-    {
-      name: 'Success Rate',
-      value: calculateSuccessRate(results),
-      unit: '%',
-    }
-  ]
 
   return (
     <div className="w-full max-w-4xl mx-auto p-6">
@@ -91,7 +56,7 @@ export default function Results({ playerId }) {
           <PlayerResultsTable results={results} />
         </div>
 
-        {results && (
+        {stats && (
           <div className="bg-zinc-50 dark:bg-zinc-800/50 p-6 rounded-lg">
             <StatsList stats={stats} />
           </div>
