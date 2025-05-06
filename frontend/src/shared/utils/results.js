@@ -132,3 +132,80 @@ export function generatePlayerStats(results) {
 
   return stats;
 }
+
+/***************************************************************
+                     Admin Session Results
+***************************************************************/
+function generateAnswerResults(resultAnswers, sessionQuestions) {
+  return resultAnswers
+    .map((answer, index) => {
+      const question = sessionQuestions[index];
+      if (!question) {
+        console.warn(`Missing question for answer index ${index}`);
+        return null;
+      }
+      const timeTaken = calculateTimeTaken(
+        answer.questionStartedAt,
+        answer.answeredAt
+      );
+      const score = answer.correct
+        ? calculateQuestionScore(timeTaken, question.duration, question.points)
+        : 0;
+
+      return {
+        index: index + 1,
+        name: question.name,
+        id: question.id,
+        questionType: question.type,
+        correct: answer.correct,
+        timeTaken: timeTaken,
+        score: score,
+        points: question.points,
+        answered: answer.answeredAt !== null,
+      };
+    })
+    .filter(Boolean); // Filter out null values
+}
+
+export function generateAdminPlayerResults(adminResults, adminSession) {
+  if (!adminResults || !adminSession) return [];
+
+  return adminResults.map((playerResult) => {
+    const answerResults = generateAnswerResults(
+      playerResult.answers,
+      adminSession.questions
+    );
+
+    const answeredQuestions = answerResults.filter((a) => a.answered);
+    const correctAnswers = answerResults.filter((a) => a.correct);
+
+    const totalScore = parseFloat(
+      answerResults.reduce((sum, a) => sum + a.score, 0).toFixed(2)
+    );
+    const totalPoints = answerResults.reduce((sum, a) => sum + a.points, 0);
+    const totalCorrect = correctAnswers.length;
+    const totalQuestions = answerResults.length;
+    const totalTimeTaken = answeredQuestions.reduce(
+      (sum, a) => sum + (a.timeTaken || 0),
+      0
+    );
+
+    const avgTime = Math.round(totalTimeTaken / totalQuestions);
+    const successRate = Math.round((totalCorrect / totalQuestions) * 100);
+
+    return {
+      name: playerResult.name,
+      answers: answerResults,
+      totalScore: totalScore,
+      totalPoints: totalPoints,
+      totalAnswered: answeredQuestions.length,
+      totalCorrect: totalCorrect,
+      totalQuestions: totalQuestions,
+      totalTimeTaken: totalTimeTaken,
+      averageTime: avgTime,
+      // Additional metrics
+      successRate: successRate,
+      accuracyByType: calculateAccuracyByType(answerResults),
+    };
+  });
+}
