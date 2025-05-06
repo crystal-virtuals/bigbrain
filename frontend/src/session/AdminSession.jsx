@@ -62,6 +62,7 @@ function AdminSession() {
   if (state === 'in_progress') {
     return <QuestionRunner {...sharedProps} />;
   }
+
   return <NotFound />;
 }
 

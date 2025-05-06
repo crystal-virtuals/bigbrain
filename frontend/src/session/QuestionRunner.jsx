@@ -4,7 +4,7 @@ import {
   SingleChoiceButton,
   MultipleChoiceButton,
 } from '@components/session/button';
-import { Question, QuestionAnswers, QuestionActions, Timer } from '@components/session/question';
+import { Question, QuestionActions, Timer } from '@components/session/question';
 import { useEffect, useState } from 'react';
 
 function calculateTimeLeft(duration, isoTimeLastQuestionStarted) {
