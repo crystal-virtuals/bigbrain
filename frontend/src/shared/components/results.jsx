@@ -160,3 +160,142 @@ export function ResultsDashboard({ playerResults }) {
     </div>
   );
 }
+
+/***************************************************************
+                      Stats
+***************************************************************/
+export function StatsList({ stats }) {
+  return (
+    <div>
+      <Subheading>Summary</Subheading>
+      <dl className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-3 lg:grid-cols-4">
+        {stats.map((item, index) => (
+          <StatCard
+            key={index}
+            name={item.name}
+            value={item.value}
+            unit={item.unit}
+          />
+        ))}
+      </dl>
+    </div>
+  );
+}
+
+function StatCard({ name, value, unit = '' }) {
+  return (
+    <div className="overflow-hidden rounded-lg bg-white dark:bg-white/5 shadow-sm px-6 py-3">
+      <DescriptionTerm className="truncate text-sm/6 font-medium">
+        {name}
+      </DescriptionTerm>
+      <DescriptionDetails className="mt-2 flex items-baseline gap-x-2">
+        <span className="text-4xl font-semibold tracking-tight text-neutral dark:text-white">
+          {value}
+        </span>
+        {unit ? (
+          <span className="text-sm dark:text-gray-400 text-gray-500">
+            {unit}
+          </span>
+        ) : null}
+      </DescriptionDetails>
+    </div>
+  );
+}
+
+/***************************************************************
+                      Table
+***************************************************************/
+// A table of up to top 5 users and their scores
+export function TopPlayerResultsTable({ playerResults }) {
+  if (!playerResults || playerResults.length === 0) return null;
+  const topPlayers = playerResults
+    .sort((a, b) => b.totalScore - a.totalScore)
+    .slice(0, 5);
+
+  return (
+    <Table dense className="[--gutter:--spacing(6)] sm:[--gutter:--spacing(8)]">
+      <TableHead>
+        <TableRow>
+          <TableHeader>Rank</TableHeader>
+          <TableHeader>Player</TableHeader>
+          <TableHeader className="text-right hidden md:block">
+            Accuracy
+          </TableHeader>
+          <TableHeader className="text-right">Score</TableHeader>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {topPlayers.map((player, index) => (
+          <TableRow key={index}>
+            <TableCell className="tabular-nums">{index + 1}</TableCell>
+            <TableCell className="font-medium">{player.name}</TableCell>
+            <TableCell className="text-right tabular-nums hidden md:block">
+              {player.successRate}%
+            </TableCell>
+            <TableCell className="text-right tabular-nums">
+              {player.totalScore}
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+}
+
+export function PlayerResultsTable({ results }) {
+  if (!results || results.length === 0) {
+    return (
+      <div className="py-8 text-center">
+        <Text>No results available</Text>
+      </div>
+    );
+  }
+
+  return (
+    <Table dense>
+      <TableHead>
+        <TableRow>
+          <TableHeader>Question</TableHeader>
+          <TableHeader className="text-right">Score</TableHeader>
+          <TableHeader className="text-right">Response Time (s)</TableHeader>
+          <TableHeader>Status</TableHeader>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {results.answers.map((answer) => (
+          <TableRow key={answer.index}>
+            <TableCell className="tabular-nums">{answer.index}</TableCell>
+            <TableCell className="text-right tabular-nums">
+              {answer.score}
+            </TableCell>
+
+            <TableCell className="text-right tabular-nums">
+              {answer.timeTaken ?? 'N/A'}
+            </TableCell>
+            <TableCell>
+              <span
+                className={`inline-flex items-center gap-1.5 ${
+                  answer.correct
+                    ? 'text-green-500 dark:text-success'
+                    : 'text-rose-400'
+                }`}
+              >
+                {answer.correct ? (
+                  <>
+                    <CheckIcon className="size-4" />{' '}
+                    <span className="hidden md:block">Correct</span>
+                  </>
+                ) : (
+                  <>
+                    <XMarkIcon className="size-4" />{' '}
+                    <span className="hidden md:block">Incorrect</span>
+                  </>
+                )}
+              </span>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+}
