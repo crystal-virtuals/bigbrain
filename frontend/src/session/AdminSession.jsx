@@ -7,7 +7,7 @@ import Results from './Results';
 
 function getSessionState(session) {
   if (!session) return 'invalid';
-  if (session.active === false && session.position !== -1) return 'finished';
+  if (session.active === false) return 'finished';
   if (session.active === true && session.position === -1) return 'not_started';
   if (session.active === true && session.position !== -1) return 'in_progress';
   return 'invalid';
