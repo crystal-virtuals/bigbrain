@@ -1,3 +1,5 @@
+import { questionTypeOptions } from '@constants/questions';
+
 /***************************************************************
                      Helper Functions
 ***************************************************************/
@@ -53,44 +55,62 @@ function calculateAccuracyByType(answerResults) {
 /***************************************************************
                      Player Results
 ***************************************************************/
-export function generateAnswerResultsFromPlayer(playerResults, sessionQuestions) {
-  return playerResults.map((answer, index) => {
-    const question = sessionQuestions[index];
-    if (!question) {
-      console.warn(`Missing question for answer index ${index}`);
-      return null;
-    }
-    const timeTaken = calculateTimeTaken(answer.questionStartedAt, answer.answeredAt);
-    const score = answer.correct
-      ? calculateQuestionScore(timeTaken, question.duration, question.points)
-      : 0;
+export function generateAnswerResultsFromPlayer(
+  playerResults,
+  sessionQuestions
+) {
+  return playerResults
+    .map((answer, index) => {
+      const question = sessionQuestions[index];
+      if (!question) {
+        console.warn(`Missing question for answer index ${index}`);
+        return null;
+      }
+      const timeTaken = calculateTimeTaken(
+        answer.questionStartedAt,
+        answer.answeredAt
+      );
+      const score = answer.correct
+        ? calculateQuestionScore(timeTaken, question.duration, question.points)
+        : 0;
 
-    return {
-      index: index + 1,
-      name: question.name,
-      id: question.id,
-      questionType: question.type,
-      correct: answer.correct,
-      timeTaken,
-      score,
-      points: question.points,
-      answered: answer.answeredAt !== null,
-    };
-  }).filter(Boolean);
+      return {
+        index: index + 1,
+        name: question.name,
+        id: question.id,
+        questionType: question.type,
+        correct: answer.correct,
+        timeTaken,
+        score,
+        points: question.points,
+        answered: answer.answeredAt !== null,
+      };
+    })
+    .filter(Boolean);
 }
 
 export function generatePlayerResults(playerResults, sessionQuestions) {
-  const answers = generateAnswerResultsFromPlayer(playerResults, sessionQuestions);
+  const answers = generateAnswerResultsFromPlayer(
+    playerResults,
+    sessionQuestions
+  );
 
   const totalQuestions = answers.length;
-  const totalAnswered = answers.filter(a => a.answered).length;
-  const totalCorrect = answers.filter(a => a.correct).length;
+  const totalAnswered = answers.filter((a) => a.answered).length;
+  const totalCorrect = answers.filter((a) => a.correct).length;
   const totalPoints = answers.reduce((sum, a) => sum + a.points, 0);
-  const totalScore = parseFloat(answers.reduce((sum, a) => sum + a.score, 0).toFixed(2));
-  const totalTimeTaken = answers.reduce((sum, a) => sum + (a.timeTaken || 0), 0);
+  const totalScore = parseFloat(
+    answers.reduce((sum, a) => sum + a.score, 0).toFixed(2)
+  );
+  const totalTimeTaken = answers.reduce(
+    (sum, a) => sum + (a.timeTaken || 0),
+    0
+  );
 
-  const averageTime = totalAnswered > 0 ? Math.round(totalTimeTaken / totalAnswered) : 0;
-  const successRate = totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : 0;
+  const averageTime =
+    totalAnswered > 0 ? Math.round(totalTimeTaken / totalAnswered) : 0;
+  const successRate =
+    totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : 0;
 
   return {
     answers,
@@ -208,4 +228,78 @@ export function generateAdminPlayerResults(adminResults, adminSession) {
       accuracyByType: calculateAccuracyByType(answerResults),
     };
   });
+}
+
+/***************************************************************
+                      Admin Session Stats
+***************************************************************/
+export function getQuestionAccuracy(results) {
+  const questionCount = results[0].answers.length;
+  const correctnessByQuestion = Array(questionCount).fill(0);
+  const totalPlayers = results.length;
+  results.forEach((player) => {
+    player.answers.forEach((answer, i) => {
+      if (answer.correct) {
+        correctnessByQuestion[i] += 1;
+      }
+    });
+  });
+
+  return correctnessByQuestion.map((correctCount, index) => ({
+    question: `Q${index + 1}`,
+    percentCorrect: Math.round((correctCount / totalPlayers) * 100),
+  }));
+}
+
+export function getAverageTimePerQuestion(results) {
+  const questionCount = results[0].answers.length;
+  const timeTotals = Array(questionCount).fill(0);
+  const answerCounts = Array(questionCount).fill(0);
+
+  results.forEach((player) => {
+    player.answers.forEach((answer, i) => {
+      if (answer.answered && answer.timeTaken !== null) {
+        timeTotals[i] += answer.timeTaken;
+        answerCounts[i] += 1;
+      }
+    });
+  });
+
+  return timeTotals.map((totalTime, index) => ({
+    question: `Q${index + 1}`,
+    avgTime: answerCounts[index]
+      ? Math.round(totalTime / answerCounts[index])
+      : 0,
+  }));
+}
+
+export function getQuestionTypeAccuracy(results) {
+  const typeStats = {};
+
+  results.forEach((player) => {
+    player.answers.forEach((answer) => {
+      const type = answer.questionType || 'unknown';
+      if (!typeStats[type]) {
+        typeStats[type] = { correct: 0, total: 0 };
+      }
+      typeStats[type].total += 1;
+      if (answer.correct) typeStats[type].correct += 1;
+    });
+  });
+
+  const data = Object.entries(typeStats)
+    .map(([type, stats]) => {
+      const percentage = stats.total ? (stats.correct / stats.total) * 100 : 0;
+      const typeLabel = questionTypeOptions.find(
+        (option) => option.value === type
+      ).label;
+      return {
+        id: type,
+        value: parseFloat(percentage.toFixed(1)),
+        label: `${typeLabel} (${stats.correct}/${stats.total})`,
+      };
+    })
+    .sort((a, b) => b.value - a.value);
+
+  return data;
 }
