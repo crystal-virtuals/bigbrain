@@ -1,4 +1,4 @@
-import { Text, TextLink } from '@components/text'
+import { TextLink } from '@components/text'
 
 export function Breadcrumbs({ crumbs }) {
   return (
