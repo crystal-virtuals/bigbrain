@@ -2,7 +2,7 @@ import {
   DescriptionDetails,
   DescriptionTerm,
 } from '@components/description-list';
-import { Heading, Subheading } from '@components/heading';
+import { Subheading } from '@components/heading';
 import {
   Table,
   TableBody,
@@ -52,8 +52,7 @@ export function PointsScoringSystem() {
               <li className="flex items-center gap-2">
                 <CheckCircleIcon className="size-6 text-green-500" />
                 <span>
-                  <strong>Correct answers</strong> earn the question's base
-                  points
+                  <strong>Correct answers</strong> earn the question&apos;s base points
                 </span>
               </li>
               <li className="flex items-center gap-2">
@@ -70,7 +69,7 @@ export function PointsScoringSystem() {
               </li>
             </ul>
             <p className="text-sm flex flex-col items-start gap-2">
-              <strong>Example:</strong> A 5-point question answered correctly in 3 seconds (within a 10s duration) would earn:
+              <span><u>Example:</u> A 5-point question answered correctly in 3 seconds (within a 10s duration) would earn:</span>
               <code>5 × (1 + (10 - 3)/10) = 5 × 1.7 = 8.5 points</code>
             </p>
           </div>
