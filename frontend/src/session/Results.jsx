@@ -6,7 +6,7 @@ import { Navigate } from 'react-router-dom';
 import { Heading } from '@components/heading';
 import { Breadcrumbs } from '@components/breadcrumbs';
 import { generateAdminPlayerResults } from '@utils/results';
-import { ResultsDashboard } from '@components/results';
+import { ResultsDashboard, PointsScoringSystem } from '@components/results';
 
 const breadcrumbs = [
   { label: 'Dashboard', link: '/dashboard' },
@@ -55,6 +55,7 @@ export default function Results({ ...props }) {
         <Heading>Results</Heading>
       </div>
       <div className="w-full min-h-[calc(100vh-8rem)]">
+        <PointsScoringSystem />
         <ResultsDashboard playerResults={results} />
       </div>
     </div>

@@ -2,7 +2,7 @@ import {
   DescriptionDetails,
   DescriptionTerm,
 } from '@components/description-list';
-import { Subheading } from '@components/heading';
+import { Heading, Subheading } from '@components/heading';
 import {
   Table,
   TableBody,
@@ -12,23 +12,70 @@ import {
   TableRow,
 } from '@components/table';
 import { Text } from '@components/text';
-import { CheckIcon, XMarkIcon } from '@heroicons/react/20/solid';
+import { CheckIcon, XMarkIcon, BoltIcon, CheckCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/20/solid';
 import { BarChart } from '@mui/x-charts/BarChart';
 import { LineChart } from '@mui/x-charts/LineChart';
 import { PieChart } from '@mui/x-charts/PieChart';
 import {
   getAverageTimePerQuestion,
   getQuestionAccuracy,
-  getQuestionTypeAccuracy
+  getQuestionTypeAccuracy,
 } from '@utils/results';
-
+import { Accordion } from './accordion';
 /***************************************************************
                       Card
 ***************************************************************/
 export function Card({ children }) {
   return (
-    <div className="bg-zinc-50 dark:bg-zinc-800/50 p-6 rounded-lg">
+    <div className="bg-zinc-50 dark:bg-white/5 p-6 rounded-lg">
       <div className="flex flex-col space-y-4">{children}</div>
+    </div>
+  );
+}
+
+/***************************************************************
+                      Points Scoring System
+***************************************************************/
+export function PointsScoringSystem() {
+  return (
+    <div className="mx-auto w-full divide-y divide-white/5 my-6 border border-white/5">
+      <Accordion title="Points Scoring System">
+        <div className="bg-blue-50 p-6 rounded-lg border border-blue-200">
+          <h2 className="text-md font-semibold text-blue-800 mb-4">
+            How Your Score Was Calculated
+          </h2>
+          <div className="prose text-blue-700 flex flex-col space-y-4">
+            <p>
+              Your score is based on both <strong>accuracy</strong> and <strong>speed</strong>:
+            </p>
+            <ul className="list-inside space-y-2">
+              <li className="flex items-center gap-2">
+                <CheckCircleIcon className="size-6 text-green-500" />
+                <span>
+                  <strong>Correct answers</strong> earn the question's base
+                  points
+                </span>
+              </li>
+              <li className="flex items-center gap-2">
+                <BoltIcon className="size-6 text-yellow-500" />
+                <span>
+                  <strong>Fast response</strong> times earn bonus points (up to 2× the base points)
+                </span>
+              </li>
+              <li className="flex items-center gap-2">
+                <ExclamationTriangleIcon className="size-6 text-red-500" />
+                <span>
+                 Incorrect answers earn 0 points
+                </span>
+              </li>
+            </ul>
+            <p className="text-sm flex flex-col items-start gap-2">
+              <strong>Example:</strong> A 5-point question answered correctly in 3 seconds (within a 10s duration) would earn:
+              <code>5 × (1 + (10 - 3)/10) = 5 × 1.7 = 8.5 points</code>
+            </p>
+          </div>
+        </div>
+      </Accordion>
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { playerAPI } from '@services/api';
 import { useEffect, useState } from 'react';
 import { usePlayer } from '@hooks/player';
 import { generatePlayerResults, generatePlayerStats } from '@utils/results';
-import { PlayerResultsTable, StatsList } from '@components/results';
+import { PlayerResultsTable, StatsList, PointsScoringSystem } from '@components/results';
 
 export default function Results({ playerId }) {
   const { questions } = usePlayer();
@@ -44,23 +44,25 @@ export default function Results({ playerId }) {
     return <div className="text-center py-8 text-red-600">{error}</div>;
   }
 
-
   return (
     <div className="w-full max-w-4xl mx-auto p-6">
-      <div className="flex flex-col space-y-8">
+      <div className="flex flex-col space-y-2">
         <div className="border-b border-zinc-950/10 pb-6 dark:border-white/10">
           <Heading>Results</Heading>
         </div>
+        <div className="w-full h-full">
+          <PointsScoringSystem />
 
-        <div className="bg-zinc-50 dark:bg-zinc-800/50 p-6 rounded-lg">
-          <PlayerResultsTable results={results} />
-        </div>
-
-        {stats && (
           <div className="bg-zinc-50 dark:bg-zinc-800/50 p-6 rounded-lg">
-            <StatsList stats={stats} />
+            <PlayerResultsTable results={results} />
           </div>
-        )}
+
+          {stats && (
+            <div className="bg-zinc-50 dark:bg-zinc-800/50 p-6 rounded-lg">
+              <StatsList stats={stats} />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
