@@ -6,13 +6,7 @@ import {
 } from '@components/session/button';
 import { Question, QuestionActions, Timer } from '@components/session/question';
 import { useEffect, useState } from 'react';
-
-function calculateTimeLeft(duration, isoTimeLastQuestionStarted) {
-  if (!isoTimeLastQuestionStarted) return duration;
-  const started = new Date(isoTimeLastQuestionStarted);
-  const elapsed = Math.floor((Date.now() - started.getTime()) / 1000);
-  return Math.max(duration - elapsed, 0);
-}
+import { calculateTimeLeft } from '@utils/session';
 
 export default function QuestionRunner({ session, lock, advanceGame, stopGame }) {
   const question = session.questions[session.position];

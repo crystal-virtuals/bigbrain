@@ -4,13 +4,7 @@ import { Question, QuestionAnswers, Timer } from '@components/session/question';
 import { playerAPI } from '@services/api';
 import { useEffect, useState } from 'react';
 import { usePlayer } from '@hooks/player';
-
-function calculateTimeLeft(duration, isoTimeLastQuestionStarted) {
-  if (!isoTimeLastQuestionStarted) return duration;
-  const started = new Date(isoTimeLastQuestionStarted);
-  const elapsed = Math.ceil((Date.now() - started.getTime()) / 1000);
-  return Math.max(duration - elapsed, 0);
-}
+import { calculateTimeLeft } from '@utils/session';
 
 export default function QuestionRunner({
   playerId,
@@ -22,14 +16,6 @@ export default function QuestionRunner({
   const [selected, setSelected] = useState([]);
   const [touched, setTouched] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
-
-  useEffect(() => {
-    console.log('QuestionRunner props updated:', {
-      showAnswers,
-      questionId: question?.id,
-      correctAnswers,
-    });
-  }, [question, correctAnswers, showAnswers]);
 
   // Reset state when a new question comes in
   useEffect(() => {
