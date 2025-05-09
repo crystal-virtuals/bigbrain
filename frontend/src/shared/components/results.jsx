@@ -40,7 +40,7 @@ export function PointsScoringSystem() {
   return (
     <div className="mx-auto w-full divide-y divide-white/5 my-6 border border-white/5">
       <Accordion title="Points Scoring System">
-        <div className="bg-blue-50 p-6 rounded-lg border border-blue-200">
+        <div className="bg-blue-50/90 p-6 rounded-lg border border-blue-200">
           <h2 className="text-md font-semibold text-blue-800 mb-4">
             How Your Score Was Calculated
           </h2>

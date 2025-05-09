@@ -77,11 +77,7 @@ function QuestionHeader({ index, total, score }) {
     <div className="bg-base-200 px-8 py-4 flex flex-row items-center justify-between text-base text-neutral">
       <div>
         Question <strong>{index + 1}</strong>
-        {total && (
-          <span>
-            of <strong>{total}</strong>
-          </span>
-        )}
+        {total && <span> of <strong>{total}</strong></span>}
       </div>
       <div className="bg-green-50 text-success-content px-2 py-1 rounded-lg">
         Score: <strong>{score}</strong>
@@ -131,6 +127,7 @@ export function QuestionAnswers({ question, touched, selectedAnswers, correctAns
     return null; // No mark
   }
 
+
   if (question.type === 'multipleChoice') {
     return (
       <CheckboxButtonGroup>
@@ -142,12 +139,7 @@ export function QuestionAnswers({ question, touched, selectedAnswers, correctAns
               checked={selectedAnswers.includes(a.id)}
               onChange={(checked) => onSelect(a.id, checked)}
               disabled={showAnswers}
-              className={clsx(
-                showAnswers && !isSelected(a.id)
-                  ? 'opacity-30'
-                  : 'opacity-100'
-              )}
-            >
+              className={!isSelected(a.id) && touched ? 'opacity-50' : 'opacity-100'}>
               {a.name}
             </CheckboxButton>
           </CheckboxButtonField>
@@ -167,10 +159,7 @@ export function QuestionAnswers({ question, touched, selectedAnswers, correctAns
           <RadioButton
             id={idx}
             value={a.id}
-            className={clsx(
-              (showAnswers || touched) && !isSelected(a.id) ? 'opacity-30' : 'opacity-100',
-            )}
-          >
+            className={!isSelected(a.id) && touched ? 'opacity-50' : 'opacity-100'}>
             {a.name}
           </RadioButton>
         </RadioButtonField>

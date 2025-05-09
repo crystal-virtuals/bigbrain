@@ -12,7 +12,7 @@ export default function QuestionRunner({
   correctAnswers,
   showAnswers,
 }) {
-  const { score, updateScore, getQuestionCount, cacheQuestion } = usePlayer();
+  const { score, updateScore, questions, cacheQuestion } = usePlayer();
   const [selected, setSelected] = useState([]);
   const [touched, setTouched] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
@@ -22,6 +22,7 @@ export default function QuestionRunner({
     if (!question) return;
     cacheQuestion(question);
     setSelected([]);
+    setTouched(false);
     const initialTimeLeft = calculateTimeLeft(
       question.duration,
       question.isoTimeLastQuestionStarted
@@ -70,7 +71,6 @@ export default function QuestionRunner({
   const handleAnswerSelect = async (answerId, checked = null) => {
     // Prevent selection if answers are shown OR no question exists
     if (showAnswers || !question || timeLeft <= 0) return;
-
     if (touched === false) setTouched(true);
 
     let newAnswers;
@@ -101,7 +101,7 @@ export default function QuestionRunner({
 
   return (
     <QuestionLayout>
-      <Question index={getQuestionCount()} score={score}>
+      <Question index={questions.length} score={score}>
         <Heading>{question.name}</Heading>
         <Timer timeLeft={timeLeft} duration={question.duration} />
         <QuestionAnswers
