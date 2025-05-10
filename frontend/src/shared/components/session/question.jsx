@@ -107,7 +107,7 @@ export function QuestionActions({ children }) {
 /***************************************************************
                         Answer Buttons
 ***************************************************************/
-export function QuestionAnswers({ question, touched, selectedAnswers, correctAnswers, showAnswers, onSelect }) {
+export function QuestionAnswers({ question, touched, selectedAnswers, correctAnswers, onSelect }) {
   if (!question) return <Skeleton />;
 
   const isSelected = (answerId) => selectedAnswers.includes(answerId);
@@ -119,7 +119,7 @@ export function QuestionAnswers({ question, touched, selectedAnswers, correctAns
   };
 
   const isCorrectProp = (id) => {
-    if (!showAnswers || !correctAnswers) return null;
+    if (!correctAnswers) return null;
     const correct = isCorrect(id);
     const selected = isSelected(id);
     if (correct) return true; // Mark as correct
@@ -138,7 +138,7 @@ export function QuestionAnswers({ question, touched, selectedAnswers, correctAns
               name={a.id}
               checked={selectedAnswers.includes(a.id)}
               onChange={(checked) => onSelect(a.id, checked)}
-              disabled={showAnswers}
+              disabled={correctAnswers !== null}
               className={!isSelected(a.id) && touched ? 'opacity-50' : 'opacity-100'}>
               {a.name}
             </CheckboxButton>
@@ -152,7 +152,7 @@ export function QuestionAnswers({ question, touched, selectedAnswers, correctAns
     <RadioButtonGroup
       value={selectedAnswers[0] || null}
       onChange={(value) => onSelect(value)}
-      disabled={showAnswers}
+      disabled={correctAnswers !== null}
     >
       {question.answers.map((a, idx) => (
         <RadioButtonField key={a.id} correct={isCorrectProp(a.id)}>

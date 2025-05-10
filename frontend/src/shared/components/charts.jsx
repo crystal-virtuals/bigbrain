@@ -1,5 +1,6 @@
 import { ThemeProvider, createTheme, useMediaQuery } from '@mui/material';
 import { BarChart } from '@mui/x-charts/BarChart';
+import { rainbowSurgePalette } from '@mui/x-charts/colorPalettes';
 import { LineChart } from '@mui/x-charts/LineChart';
 import { PieChart } from '@mui/x-charts/PieChart';
 import {
@@ -8,21 +9,6 @@ import {
   getQuestionTypeAccuracy,
 } from '@utils/results';
 import * as React from 'react';
-import {
-  blueberryTwilightPalette,
-  mangoFusionPalette,
-  cheerfulFiestaPalette,
-  strawberrySkyPalette,
-  rainbowSurgePalette,
-  bluePalette,
-  greenPalette,
-  purplePalette,
-  redPalette,
-  orangePalette,
-  yellowPalette,
-  cyanPalette,
-  pinkPalette,
-} from '@mui/x-charts/colorPalettes';
 
 export function MuiColorTemplate({ children }) {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -42,20 +28,24 @@ export function MuiColorTemplate({ children }) {
 /***************************************************************
                       Charts
 ***************************************************************/
+const emptySeries = {
+  series: [],
+  height: 300,
+};
+
 export function QuestionAccuracyChart({ playerResults }) {
   // Calculate the percentage of players who answered each question correctly
-  const chartData =
-    playerResults && playerResults.length > 0
-      ? getQuestionAccuracy(playerResults)
-      : [];
+  const chartData = getQuestionAccuracy(playerResults);
+  const isEmpty = chartData.every((q) => q.percentCorrect === null);
 
-  const series = [
-    {
+  const nonEmptySeries = {
+    series: [{
       data: chartData.map((q) => q.percentCorrect),
       label: 'Accuracy (%)',
       area: true,
-    },
-  ]
+    }],
+    height: 300,
+  }
 
   const xAxis = [
     {
@@ -66,6 +56,8 @@ export function QuestionAccuracyChart({ playerResults }) {
 
   const yAxis = [
     {
+      min: 0,
+      max: 100,
       label: 'Percent of Players (%)',
     },
   ];
@@ -76,27 +68,25 @@ export function QuestionAccuracyChart({ playerResults }) {
       colors={rainbowSurgePalette}
       xAxis={xAxis}
       yAxis={yAxis}
-      series={series}
-      height={300}
+      {...isEmpty ? emptySeries : nonEmptySeries}
     />
   );
 }
 
 export function ResponseTimeChart({ playerResults }) {
   // Calculate average time per question
-  const chartData =
-    playerResults && playerResults.length > 0
-      ? getAverageTimePerQuestion(playerResults)
-      : [];
+  const chartData =getAverageTimePerQuestion(playerResults);
+  const isEmpty = chartData.every((q) => q.avgTime === null);
 
-  const series = [
-    {
+  const nonEmptySeries = {
+    series: [{
       data: chartData.map((q) => q.avgTime),
       label: 'Average Time (sec)',
       area: true,
       color: '#ff9da7',
-    },
-  ];
+    }],
+    height: 300,
+  }
 
   const xAxis = [
     {
@@ -107,6 +97,8 @@ export function ResponseTimeChart({ playerResults }) {
 
   const yAxis = [
     {
+      min: 0,
+      max: Math.max(...playerResults.map((q) => q.maxDuration)),
       label: 'Average Time (sec)',
     },
   ];
@@ -116,22 +108,15 @@ export function ResponseTimeChart({ playerResults }) {
       loading={!playerResults}
       xAxis={xAxis}
       yAxis={yAxis}
-      series={series}
-      height={300}
+      colors={rainbowSurgePalette}
+      {...isEmpty ? emptySeries : nonEmptySeries}
     />
   );
 }
 
 export function QuestionTypeAccuracyChart({ playerResults }) {
-  const series = [
-    {
-      data: getQuestionTypeAccuracy(playerResults),
-      innerRadius: 40,
-      outerRadius: 100,
-      paddingAngle: 5,
-      cornerRadius: 5,
-    },
-  ];
+  const chartData = getQuestionTypeAccuracy(playerResults);
+  const isEmpty = chartData === null;
 
   const legendPlacement = {
     slotProps: {
@@ -142,12 +127,23 @@ export function QuestionTypeAccuracyChart({ playerResults }) {
     },
   };
 
+  const nonEmptySeries = {
+    series: [{
+      data: chartData,
+      innerRadius: 40,
+      outerRadius: 100,
+      paddingAngle: 5,
+      cornerRadius: 5,
+    }],
+    height: 300,
+  }
+
+
   return (
     <PieChart
       loading={!playerResults}
       colors={rainbowSurgePalette}
-      series={series}
-      height={300}
+      {...isEmpty ? emptySeries : nonEmptySeries}
       {...legendPlacement}
     />
   );

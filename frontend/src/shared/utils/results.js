@@ -79,6 +79,7 @@ export function generateAnswerResultsFromPlayer(
         name: question.name,
         id: question.id,
         questionType: question.type,
+        duration: question.duration,
         correct: answer.correct,
         timeTaken,
         score,
@@ -177,6 +178,7 @@ function generateAnswerResults(resultAnswers, sessionQuestions) {
         name: question.name,
         id: question.id,
         questionType: question.type,
+        duration: question.duration,
         correct: answer.correct,
         timeTaken: timeTaken,
         score: score,
@@ -212,10 +214,14 @@ export function generateAdminPlayerResults(adminResults, adminSession) {
 
     const avgTime = Math.round(totalTimeTaken / totalQuestions);
     const successRate = Math.round((totalCorrect / totalQuestions) * 100);
+    const maxQuestionDuration = Math.max(
+      ...answerResults.map((a) => a.duration)
+    );
 
     return {
       name: playerResult.name,
       answers: answerResults,
+      maxDuration: maxQuestionDuration,
       totalScore: totalScore,
       totalPoints: totalPoints,
       totalAnswered: answeredQuestions.length,
@@ -245,6 +251,14 @@ export function getQuestionAccuracy(results) {
     });
   });
 
+  // If no players answered a question, return null
+  if (totalPlayers === 0 || correctnessByQuestion.every((count) => count === 0)) {
+    return correctnessByQuestion.map((_, index) => ({
+      question: `Q${index + 1}`,
+      percentCorrect: null,
+    }));
+  }
+
   return correctnessByQuestion.map((correctCount, index) => ({
     question: `Q${index + 1}`,
     percentCorrect: Math.round((correctCount / totalPlayers) * 100),
@@ -255,6 +269,14 @@ export function getAverageTimePerQuestion(results) {
   const questionCount = results[0].answers.length;
   const timeTotals = Array(questionCount).fill(0);
   const answerCounts = Array(questionCount).fill(0);
+
+  // If no players answered a question, return null
+  if (results.length === 0 || timeTotals.every((time) => time === 0)) {
+    return timeTotals.map((_, index) => ({
+      question: `Q${index + 1}`,
+      avgTime: null,
+    }));
+  }
 
   results.forEach((player) => {
     player.answers.forEach((answer, i) => {
@@ -275,6 +297,11 @@ export function getAverageTimePerQuestion(results) {
 
 export function getQuestionTypeAccuracy(results) {
   const typeStats = {};
+
+  // If no players answered a question, return null
+  if (results.length === 0 || results.every((player) => player.answers.length === 0)) {
+    return null;
+  }
 
   results.forEach((player) => {
     player.answers.forEach((answer) => {
