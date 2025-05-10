@@ -5,41 +5,58 @@ import {
   MultipleChoiceButton,
 } from '@components/session/button';
 import { QuestionLayout, Question, QuestionActions, Timer } from '@components/session/question';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { calculateTimeLeft } from '@utils/session';
 
 export default function QuestionRunner({ session, lock, advanceGame, stopGame }) {
   const question = session.questions[session.position];
   const { duration, type, correctAnswers } = question;
-
+  const { isoTimeLastQuestionStarted } = session;
   const [selected, setSelected] = useState(null);
   const [showAnswers, setShowAnswers] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(() =>
-    calculateTimeLeft(duration, session.isoTimeLastQuestionStarted)
-  );
+  const [timeLeft, setTimeLeft] = useState(() => calculateTimeLeft(duration, isoTimeLastQuestionStarted));
 
+  // Timer countdown
   useEffect(() => {
     const interval = setInterval(() => {
-      const currentTimeLeft = calculateTimeLeft(duration, session.isoTimeLastQuestionStarted);
+      const currentTimeLeft = calculateTimeLeft(duration, isoTimeLastQuestionStarted);
       setTimeLeft(currentTimeLeft);
-      if (currentTimeLeft === 0) setShowAnswers(true);  // Automatically show answers when time runs out
+      // Automatically show answers when time runs out
+      if (currentTimeLeft === 0 && !showAnswers) {
+        setShowAnswers(true);
+      }
     }, 1000);
     return () => clearInterval(interval);
-  }, [duration, session.isoTimeLastQuestionStarted]);
+  }, [duration, isoTimeLastQuestionStarted]);
 
+  // Reset state when question changes
   useEffect(() => {
     setSelected(null);
     setShowAnswers(false);
-    setTimeLeft(calculateTimeLeft(duration, session.isoTimeLastQuestionStarted));
+    setTimeLeft(calculateTimeLeft(duration, isoTimeLastQuestionStarted));
   }, [session.position, question.id]);
 
+  // Auto-advance game after 3 seconds of showing answers
   useEffect(() => {
     if (!showAnswers || lock) return;
+
     const timeout = setTimeout(() => {
       advanceGame();
     }, 3000);
+
     return () => clearTimeout(timeout);
   }, [showAnswers]);
+
+  // Handle advancing game to next question
+  const onNextQuestion = () => {
+    if (!showAnswers) {
+      // If answers aren't shown yet, show them and start timer
+      
+    } else {
+      // If answers are already shown, advance immediately
+      advanceGame();
+    }
+  };
 
   const handleSelect = (answerId) => {
     if (timeLeft === 0) return;

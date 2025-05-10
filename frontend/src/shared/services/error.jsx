@@ -87,3 +87,38 @@ export const createError = (error) => {
   return new Error(error.message, { cause: error });
 
 };
+
+/***************************************************************
+                    Player API Errors
+***************************************************************/
+export class ActiveSessionError extends Error {
+  constructor (message) {
+    super(message);
+    this.name = 'ActiveSessionError';
+  }
+}
+
+export class InactiveSessionError extends Error {
+  constructor (message) {
+    super(message);
+    this.name = 'InactiveSessionError';
+  }
+}
+
+export const createPlayerError = (error) => {
+  if (error.response && error.response.status === 400) {
+    // Throw custom errors for specific 400 Bad Request
+    const { error: errorMessage } = error.response.data;
+
+    if (errorMessage === 'Player ID does not refer to valid player id') {
+      return new InputError(errorMessage);
+    }
+    else if (errorMessage === 'Session ID is not an active session') {
+      return new InactiveSessionError(errorMessage);
+    }
+    else {
+      return new ActiveSessionError(errorMessage);
+    }
+  }
+  return createError(error);
+};

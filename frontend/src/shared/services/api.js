@@ -4,7 +4,7 @@
 import axios from 'axios'
 import { BACKEND_PORT } from '@frontend/backend.config.json'
 import { getAuthToken } from './token.js'
-import { createError } from './error.jsx'
+import { createError, createPlayerError } from './error.jsx'
 
 const instance = axios.create({
   baseURL: `http://localhost:${BACKEND_PORT}`,
@@ -28,6 +28,9 @@ instance.interceptors.request.use((config) => {
 instance.interceptors.response.use(
   (response) => response.data,
   (error) => {
+    const isPlayerError = error.config.url.startsWith('/play');
+    // Player API errors
+    if (isPlayerError) return Promise.reject(createPlayerError(error));
     return Promise.reject(createError(error));
   }
 );
@@ -144,6 +147,7 @@ export const fetchGamesAndSessions = async () => {
     return { games: [], sessions: {} };
   }
 }
+
 /***************************************************************
                          Player API
 ***************************************************************/
