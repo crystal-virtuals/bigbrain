@@ -5,7 +5,7 @@ import { Loading } from '@pages/public';
 import { playerAPI } from '@services/api';
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { QuestionRunner, Lobby, Results } from '@/play';
+import { PlayQuestionRunner, Lobby, Results } from '@/play';
 import { InputError } from '@services/error';
 
 export default function PlaySession() {
@@ -18,7 +18,6 @@ export default function PlaySession() {
   });
   const toastify = useToast();
   const navigate = useNavigate();
-
   const lastQuestionId = useRef(null);
   const pollingAnswers = useRef(false);
 
@@ -36,8 +35,8 @@ export default function PlaySession() {
         }
 
         const hasStarted = await playerAPI.getStatus(playerId);
-
         if (!hasStarted) {
+          // if the game has not started yet, it is either in lobby or results
           setState((prev) => ({
             ...prev,
             status:
@@ -56,7 +55,6 @@ export default function PlaySession() {
         if (!lastQuestionId.current || question.id !== lastQuestionId.current) {
           lastQuestionId.current = question.id;
           pollingAnswers.current = false;
-
           setState((prev) => ({
             ...prev,
             status: 'question',
@@ -95,6 +93,7 @@ export default function PlaySession() {
         }
       } catch (err) {
         console.error('Polling error:', err.message);
+
         if (err instanceof InputError) {
           setState((prev) => ({
             ...prev,
@@ -112,7 +111,7 @@ export default function PlaySession() {
     };
 
     pollStatus();
-    statusInterval = setInterval(pollStatus, 2000);
+    statusInterval = setInterval(pollStatus, 1000);
 
     return () => {
       clearInterval(statusInterval);
@@ -148,7 +147,7 @@ export default function PlaySession() {
 
   return (
     <Layout navbar={<Navbar sessionId={sessionId} />}>
-      <QuestionRunner
+      <PlayQuestionRunner
         playerId={playerId}
         question={state.currentQuestion}
         correctAnswers={state.correctAnswers}

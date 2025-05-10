@@ -1,76 +1,83 @@
 import { HeadingLight as Heading } from '@components/heading';
 import { Skeleton } from '@components/loading';
-import { QuestionLayout, Question, QuestionAnswers, Timer } from '@components/session/question';
+import {
+  QuestionLayout,
+  Question,
+  QuestionAnswers,
+  Timer,
+} from '@components/session/question';
 import { playerAPI } from '@services/api';
 import { useEffect, useState } from 'react';
 import { usePlayer } from '@hooks/player';
 import { calculateTimeLeft } from '@utils/session';
 
-export default function QuestionRunner({
+export default function PlayQuestionRunner({
   playerId,
   question,
   correctAnswers,
   showAnswers,
 }) {
   const { score, updateScore, questions, cacheQuestion } = usePlayer();
-  const [selected, setSelected] = useState([]);
   const [touched, setTouched] = useState(false);
+  const [selected, setSelected] = useState([]);
   const [timeLeft, setTimeLeft] = useState(0);
+  const [answerSubmittedAt, setAnswerSubmittedAt] = useState(null);
 
   // Reset state when a new question comes in
   useEffect(() => {
     if (!question) return;
+
     cacheQuestion(question);
     setSelected([]);
     setTouched(false);
-    const initialTimeLeft = calculateTimeLeft(
-      question.duration,
-      question.isoTimeLastQuestionStarted
-    );
+    setAnswerSubmittedAt(null);
+
+    const initialTimeLeft = calculateTimeLeft(question.duration, question.isoTimeLastQuestionStarted);
     setTimeLeft(initialTimeLeft);
+
   }, [question?.id]);
 
   // Timer countdown
   useEffect(() => {
     if (!question || showAnswers) return;
 
-    const initialTimeLeft = calculateTimeLeft(
-      question.duration,
-      question.isoTimeLastQuestionStarted
-    );
-    setTimeLeft(initialTimeLeft);
-
     const interval = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 0) {
-          clearInterval(interval);
-          return 0;
-        }
-        return prev - 1;
-      });
+      const currentTimeLeft = calculateTimeLeft(question.duration, question.isoTimeLastQuestionStarted);
+      setTimeLeft(currentTimeLeft);
+
+      if (currentTimeLeft <= 0) {
+        clearInterval(interval);
+      }
+
     }, 1000);
 
     return () => clearInterval(interval);
   }, [question?.isoTimeLastQuestionStarted, showAnswers, question?.duration]);
 
-  // Update score when answers are shown
   useEffect(() => {
-    if (correctAnswers && selected.length > 0) {
-      const isCorrect =
-        question.type === 'multipleChoice'
-          ? correctAnswers.every((a) => selected.includes(a))
-          : correctAnswers[0] === selected[0];
+    if (!correctAnswers || showAnswers) return;
 
-      if (isCorrect) {
-        updateScore(question.points);
-      }
-    }
+    const isCorrect =
+      question.type === 'multipleChoice'
+        ? correctAnswers.every((a) => selected.includes(a))
+        : correctAnswers[0] === selected[0];
+
+    if (isCorrect) {
+      updateScore(question.points);
+    };
+
   }, [correctAnswers]);
 
   // Handle selection
   const handleAnswerSelect = async (answerId, checked = null) => {
     // Prevent selection if answers are shown OR no question exists
-    if (showAnswers || !question || timeLeft <= 0) return;
+    if (showAnswers || !question || timeLeft <= 0) {
+      console.warn('Cannot select answer, question not available or answers shown');
+      console.warn('Question:', question);
+      console.warn('Show Answers:', showAnswers);
+      return;
+    }
+
     if (touched === false) setTouched(true);
 
     let newAnswers;
@@ -83,7 +90,6 @@ export default function QuestionRunner({
     }
 
     try {
-      console.log('Submitting answers:', newAnswers);
       await playerAPI.putAnswers(playerId, newAnswers);
       setSelected(newAnswers);
     } catch (err) {
@@ -101,7 +107,7 @@ export default function QuestionRunner({
 
   return (
     <QuestionLayout>
-      <Question index={questions.length} score={score}>
+      <Question index={questions.length - 1} score={score}>
         <Heading>{question.name}</Heading>
         <Timer timeLeft={timeLeft} duration={question.duration} />
         <QuestionAnswers

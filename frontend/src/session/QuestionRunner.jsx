@@ -10,7 +10,7 @@ import { calculateTimeLeft } from '@utils/session';
 
 export default function QuestionRunner({ session, lock, advanceGame, stopGame }) {
   const question = session.questions[session.position];
-  const { questions, duration, type, correctAnswers } = question;
+  const { duration, type, correctAnswers } = question;
 
   const [selected, setSelected] = useState(null);
   const [showAnswers, setShowAnswers] = useState(false);

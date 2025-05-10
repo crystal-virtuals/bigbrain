@@ -4,16 +4,13 @@ import PlayerContext from './PlayerContext';
 const PlayerProvider = ({ children }) => {
   const [score, setScore] = useState(0);
   const [questions, setQuestions] = useState([]);
-  const [player, setPlayer] = useState(() => {
-    const saved = localStorage.getItem('player');
-    return saved ? JSON.parse(saved) : null;
-  });
+  const [player, setPlayer] = useState(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem('questions');
-    if (saved) {
-      setQuestions(JSON.parse(saved));
-    }
+    const savedQuestions = localStorage.getItem('questions');
+    const savedPlayer = localStorage.getItem('player');
+    if (savedPlayer) setPlayer(JSON.parse(savedPlayer));
+    if (savedQuestions) setQuestions(JSON.parse(savedQuestions));
   }, []);
 
   const updatePlayer = (data) => {
@@ -42,7 +39,9 @@ const PlayerProvider = ({ children }) => {
 
   const clear = () => {
     setPlayer(null);
-    setQuestions({});
+    setQuestions([]);
+    setScore(0);
+    localStorage.removeItem('score');
     localStorage.removeItem('player');
     localStorage.removeItem('questions');
   };
