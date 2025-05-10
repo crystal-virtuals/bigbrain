@@ -11,26 +11,21 @@ import { useEffect, useState } from 'react';
 import { usePlayer } from '@hooks/player';
 import { calculateTimeLeft } from '@utils/session';
 
-export default function PlayQuestionRunner({
-  playerId,
-  question,
-  correctAnswers,
-  showAnswers,
-}) {
+export default function QuestionRunner({ playerId, question, answers = null }) {
   const { score, updateScore, questions, cacheQuestion } = usePlayer();
   const [touched, setTouched] = useState(false);
   const [selected, setSelected] = useState([]);
-  const [timeLeft, setTimeLeft] = useState(0);
-  const [answerSubmittedAt, setAnswerSubmittedAt] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(() =>
+    calculateTimeLeft(question.duration, question.isoTimeLastQuestionStarted)
+  );
 
-  // Reset state when a new question comes in
+  // Reset state when a new question comes in or when answers are available
   useEffect(() => {
     if (!question) return;
 
     cacheQuestion(question);
     setSelected([]);
     setTouched(false);
-    setAnswerSubmittedAt(null);
 
     const initialTimeLeft = calculateTimeLeft(question.duration, question.isoTimeLastQuestionStarted);
     setTimeLeft(initialTimeLeft);
@@ -39,7 +34,7 @@ export default function PlayQuestionRunner({
 
   // Timer countdown
   useEffect(() => {
-    if (!question || showAnswers) return;
+    if (!question || answers !== null) return;
 
     const interval = setInterval(() => {
       const currentTimeLeft = calculateTimeLeft(question.duration, question.isoTimeLastQuestionStarted);
@@ -52,31 +47,26 @@ export default function PlayQuestionRunner({
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [question?.isoTimeLastQuestionStarted, showAnswers, question?.duration]);
+  }, [question?.id, answers]);
 
+  // Calculate score on show answers
   useEffect(() => {
-    if (!correctAnswers || showAnswers) return;
+    if (!answers || selected.length === 0) return;
 
     const isCorrect =
       question.type === 'multipleChoice'
-        ? correctAnswers.every((a) => selected.includes(a))
-        : correctAnswers[0] === selected[0];
+        ? answers.every((a) => selected.includes(a))
+        : answers[0] === selected[0];
 
     if (isCorrect) {
       updateScore(question.points);
     };
 
-  }, [correctAnswers]);
+  }, [answers]);
 
   // Handle selection
   const handleAnswerSelect = async (answerId, checked = null) => {
-    // Prevent selection if answers are shown OR no question exists
-    if (showAnswers || !question || timeLeft <= 0) {
-      console.warn('Cannot select answer, question not available or answers shown');
-      console.warn('Question:', question);
-      console.warn('Show Answers:', showAnswers);
-      return;
-    }
+    if (!question || answers !== null || timeLeft <= 0) return;
 
     if (touched === false) setTouched(true);
 
@@ -114,8 +104,7 @@ export default function PlayQuestionRunner({
           question={question}
           touched={touched}
           selectedAnswers={selected}
-          correctAnswers={correctAnswers}
-          showAnswers={showAnswers}
+          correctAnswers={answers}
           onSelect={handleAnswerSelect}
         />
       </Question>
