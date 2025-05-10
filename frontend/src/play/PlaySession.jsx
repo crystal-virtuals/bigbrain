@@ -1,158 +1,169 @@
+import { Lobby, QuestionRunner, Results } from '@/play';
 import { Layout } from '@components/session/layout';
 import { SessionNavbar as Navbar } from '@components/session/navbar';
 import { useToast } from '@hooks/toast';
 import { Loading } from '@pages/public';
 import { playerAPI } from '@services/api';
-import { useEffect, useState, useRef } from 'react';
+import { InactiveSessionError } from '@services/error';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { PlayQuestionRunner, Lobby, Results } from '@/play';
-import { InputError } from '@services/error';
+import { Skeleton } from '@components/loading';
+
+const STATE = {
+  LOADING: 'loading',
+  LOBBY: 'lobby',
+  QUESTION: 'question',
+  RESULTS: 'results',
+  ERROR: 'error',
+}
+
+async function getSession(playerId) {
+  try {
+    const started = await playerAPI.getStatus(playerId);
+
+    // session not started (waiting in lobby)
+    if (!started) {
+      return { state: STATE.LOBBY, data: null };
+    }
+
+    // session started (in progress, question available)
+    const question = await playerAPI.getQuestion(playerId);
+
+    // see if answers are available
+    try {
+
+      // question and answers are available
+      const answers = await playerAPI.getAnswers(playerId);
+      return { state: STATE.QUESTION, data: { question, answers } };
+
+    } catch (answersError) {
+
+      // question is available but answers are not
+      if (answersError.message === 'Answers are not available yet') {
+        return { state: STATE.QUESTION, data: { question } };
+      }
+
+      throw answersError;
+    }
+
+  } catch (error) {
+
+    // inactive session (session finished)
+    if (error instanceof InactiveSessionError) {
+      const results = await playerAPI.getResults(playerId);
+      return { state: STATE.RESULTS, data: { results } };
+    }
+
+    // other errors
+    throw error;
+  }
+}
+
+function isSessionEqual(a, b) {
+  if (a.state !== b.state) return false;
+  if (a.data?.question?.id !== b.data?.question?.id) return false;
+  if (a.data?.answers?.length !== b.data?.answers?.length) return false;
+  return true;
+}
 
 export default function PlaySession() {
   const { sessionId, playerId } = useParams();
-  const [state, setState] = useState({
-    status: 'loading',
-    error: null,
-    currentQuestion: null,
-    correctAnswers: null,
-  });
   const toastify = useToast();
   const navigate = useNavigate();
-  const lastQuestionId = useRef(null);
-  const pollingAnswers = useRef(false);
+  // state variables
+  const [session, setSession] = useState({
+    state: STATE.LOADING,
+    data: null,
+  });
+  // save the interval ID
+  const intervalRef = useRef(null);
 
   useEffect(() => {
-    let statusInterval = null;
-    let answersInterval = null;
-
-    const pollStatus = async () => {
+    const poll = async () => {
       try {
-        // stop polling if we are in results
-        if (state.status === 'results')  {
-          clearInterval(statusInterval);
-          clearInterval(answersInterval);
-          return;
+        const newSession = await getSession(playerId);
+
+        setSession(prev => {
+          return isSessionEqual(prev, newSession) ? prev : newSession;
+        });
+
+        // Stop polling if error or results
+        if ([STATE.RESULTS, STATE.ERROR].includes(newSession.state)) {
+          clearInterval(intervalRef.current);
         }
 
-        const hasStarted = await playerAPI.getStatus(playerId);
-        if (!hasStarted) {
-          // if the game has not started yet, it is either in lobby or results
-          setState((prev) => ({
-            ...prev,
-            status:
-              prev.status === 'question' || prev.status === 'answers'
-                ? 'results'
-                : 'lobby',
-            currentQuestion: null,
-            correctAnswers: null,
-          }));
-          return;
-        }
 
-        const question = await playerAPI.getQuestion(playerId);
+      } catch (error) {
+        console.error('Error fetching session:', error);
 
-        // Only update if question changed
-        if (!lastQuestionId.current || question.id !== lastQuestionId.current) {
-          lastQuestionId.current = question.id;
-          pollingAnswers.current = false;
-          setState((prev) => ({
-            ...prev,
-            status: 'question',
-            currentQuestion: question,
-            correctAnswers: null,
-          }));
-        }
+        setSession({
+          state: STATE.ERROR,
+          data: { error: error.message },
+        });
 
-        // Start answers polling
-        if (!pollingAnswers.current && state.status !== 'results') {
-          pollingAnswers.current = true;
-          if (answersInterval) clearInterval(answersInterval);
-
-          answersInterval = setInterval(async () => {
-            try {
-              const answers = await playerAPI.getAnswers(playerId);
-              setState((prev) => {
-                // Only transition to answers if we're still on a question
-                if (prev.status === 'question') {
-                  return {
-                    ...prev,
-                    status: 'answers',
-                    correctAnswers: answers,
-                  };
-                }
-                return prev;
-              });
-
-              clearInterval(answersInterval);
-              pollingAnswers.current = false;
-              setTimeout(pollStatus, 3000);
-            } catch (err) {
-              console.log('Waiting for answers:', err.message);
-            }
-          }, 2000);
-        }
-      } catch (err) {
-        console.error('Polling error:', err.message);
-
-        if (err instanceof InputError) {
-          setState((prev) => ({
-            ...prev,
-            status: 'results',
-            currentQuestion: null,
-            correctAnswers: null,
-          }));
-        } else {
-          setState((prev) => ({
-            ...prev,
-            error: err.message,
-          }));
-        }
+        clearInterval(intervalRef.current);
       }
     };
 
-    pollStatus();
-    statusInterval = setInterval(pollStatus, 1000);
+    // Start polling every second
+    poll();
+    intervalRef.current = setInterval(poll, 1000);
 
     return () => {
-      clearInterval(statusInterval);
-      clearInterval(answersInterval);
+      clearInterval(intervalRef.current);
     };
-  }, [playerId, state.status]);
 
+  }, [playerId, sessionId]);
+
+
+  // handle errors
   useEffect(() => {
-    if (state.error) {
+    if (session.state === STATE.ERROR) {
       toastify.error({
-        message: state.error,
+        message: session.data.error,
         description: 'Please check the link or rejoin the session.',
       });
       navigate('/play');
     }
-  }, [state.error]);
+  }, [session.state]);
 
-  if (state.status === 'loading') return <Loading />;
 
-  if (state.status === 'results')
-    return (
-      <Layout navbar={<Navbar sessionId={sessionId} />}>
-        <Results playerId={playerId} />
-      </Layout>
-    );
+  // loading
+  if (session.state === STATE.LOADING) {
+    return <Loading />;
+  }
 
-  if (state.status === 'lobby')
+  // lobby
+  if (session.state === STATE.LOBBY) {
     return (
       <Layout navbar={<Navbar sessionId={sessionId} />}>
         <Lobby sessionId={sessionId} playerId={playerId} />
       </Layout>
     );
+  }
 
-  return (
-    <Layout navbar={<Navbar sessionId={sessionId} />}>
-      <PlayQuestionRunner
-        playerId={playerId}
-        question={state.currentQuestion}
-        correctAnswers={state.correctAnswers}
-        showAnswers={state.status === 'answers'}
-      />
-    </Layout>
-  );
+  // results
+  if (session.state === STATE.RESULTS) {
+    return (
+      <Layout navbar={<Navbar sessionId={sessionId} />}>
+        <Results playerId={playerId} />
+      </Layout>
+    );
+  }
+
+  // question
+  if (session.state === STATE.QUESTION) {
+    return (
+      <Layout navbar={<Navbar sessionId={sessionId} />}>
+        <QuestionRunner
+          playerId={playerId}
+          question={session.data.question}
+          answers={session.data.answers}
+        />
+      </Layout>
+    );
+  }
+
+  // fallback
+  return null;
 }

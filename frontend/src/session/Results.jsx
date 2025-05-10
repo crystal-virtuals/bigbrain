@@ -49,7 +49,7 @@ export default function Results({ ...props }) {
   }
 
   return (
-    <div className="w-full max-w-2xl mx-auto">
+    <div className="w-full max-w-2xl mx-auto pb-16">
       <Breadcrumbs crumbs={breadcrumbs} />
       <div className="border-b border-zinc-950/10 pb-6 dark:border-white/10 my-6">
         <Heading>Results</Heading>

@@ -50,7 +50,8 @@ export default function Results({ playerId }) {
         <div className="border-b border-zinc-950/10 pb-6 dark:border-white/10">
           <Heading>Results</Heading>
         </div>
-        <div className="w-full h-full">
+
+        <div className="w-full h-full flex flex-col space-y-6 pb-16">
           <PointsScoringSystem />
 
           <div className="bg-zinc-50 dark:bg-zinc-800/50 p-6 rounded-lg">
