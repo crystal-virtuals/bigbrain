@@ -7,16 +7,16 @@ import { playerAPI } from '@services/api';
 import { isEmptyString } from '@utils/validation';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { usePlayer } from '@hooks/player';
+import { useSession } from '@hooks/session';
 
-export default function PlayJoin() {
+export default function PlayerJoin() {
   const params = useParams();
   const [formdata, setFormdata] = useState({
     sessionId: params.sessionId || '',
     name: '',
   });
   const [errors, setErrors] = useState(new Map());
-  const { updatePlayer, clear } = usePlayer();
+  const { updatePlayer, clear } = useSession();
   const toastify = useToast();
   const navigate = useNavigate();
 
