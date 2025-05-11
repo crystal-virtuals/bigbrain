@@ -5,11 +5,12 @@ import { GameLayout, EditGame } from '@/game';
 import { QuestionLayout, EditQuestion } from '@/question';
 import { AuthProvider } from '@hooks/auth';
 import { ToastProvider } from '@hooks/toast';
+import { SessionProvider } from '@hooks/session';
 import { NotFound, Unauthorized } from '@pages/errors';
 import { Home, Landing } from '@pages/public';
 import { Outlet, Route, Routes } from 'react-router-dom';
 import { SessionLayout, AdminSession } from '@/session';
-import { PlayLayout, PlaySession, PlayJoin } from '@/play';
+import { PlayerLayout, PlayerSession, PlayerJoin } from '@/player';
 
 function AppLayout() {
   const classes =
@@ -19,7 +20,9 @@ function AppLayout() {
     <div className={classes}>
       <ToastProvider>
         <AuthProvider>
-          <Outlet />
+          <SessionProvider>
+            <Outlet />
+          </SessionProvider>
         </AuthProvider>
       </ToastProvider>
     </div>
@@ -59,10 +62,10 @@ function App() {
         </Route>
 
         {/* Player routes (no auth) */}
-        <Route path="/play" element={<PlayLayout />}>
-          <Route index element={<PlayJoin />} />
-          <Route path=":sessionId" element={<PlayJoin />} />
-          <Route path=":sessionId/:playerId" element={<PlaySession />} />
+        <Route path="/play" element={<PlayerLayout />}>
+          <Route index element={<PlayerJoin />} />
+          <Route path=":sessionId" element={<PlayerJoin />} />
+          <Route path=":sessionId/:playerId" element={<PlayerSession />} />
         </Route>
 
         {/* Fallback */}
