@@ -1,5 +1,5 @@
 /***************************************************************
-                        Validate Input
+                        Validate Values
 ***************************************************************/
 export const isEmpty = (value) => {
   return value === undefined || value === null || value === '' || !value;
@@ -9,6 +9,19 @@ export const isEmptyString = (value) => {
   return !value || value.trim() === '';
 }
 
+/**
+ * Check if a value is null or undefined
+ * @param {*} value
+ * @returns {boolean}
+ */
+export const isNullish = (value) => {
+  return value === null || value === undefined;
+}
+
+
+/***************************************************************
+                      Validate Form Input
+***************************************************************/
 const validatePasswordMatch = (password, confirmPassword) => {
   if (password !== confirmPassword) return 'Both passwords must match';
   return '';
