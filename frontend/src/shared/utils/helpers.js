@@ -59,7 +59,6 @@ export const isNullOrUndefined = (value) => {
   return  (value === null || value === undefined || value === '');
 }
 
-
 export const splitNumber = (number) => {
   const str = number.toString();
   // split in half

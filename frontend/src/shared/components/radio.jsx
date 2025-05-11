@@ -198,9 +198,9 @@ export function RadioButton({ id, className, children, ...props }) {
   const colors = {
     random: [
       'bg-blue-neon',
-      'bg-green-neon',
       'bg-orange-neon',
       'bg-red-neon',
+      'bg-green-neon',
       'bg-purple-neon',
       'bg-pink-200',
     ],
@@ -209,7 +209,8 @@ export function RadioButton({ id, className, children, ...props }) {
     error: 'bg-error',
   };
 
-  let bgClass = id ? colors.random[id % colors.random.length] : colors.default;
+  // priority: color > id > default
+  const bgClass = colors[props.color] || colors.random[id % colors.random.length] || colors.default;
 
   const content = (
     <>

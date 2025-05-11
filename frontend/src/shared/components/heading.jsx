@@ -2,27 +2,9 @@ import clsx from 'clsx'
 
 export function Heading({ className, level = 1, ...props }) {
   let Element = `h${level}`
-  let { light } = props;
   let classes = clsx(
     className,
-    'text-2xl/8 font-semibold text-zinc-950 sm:text-xl/8',
-    !light && 'dark:text-white',
-  )
-
-  return (
-    <Element
-      {...props}
-      className={classes}
-    />
-  )
-}
-
-
-export function HeadingLight({ className, level = 1, ...props }) {
-  let Element = `h${level}`
-  let classes = clsx(
-    className,
-    'text-2xl/8 font-semibold text-zinc-950 sm:text-xl/8',
+    'text-2xl/8 font-semibold text-zinc-950 sm:text-xl/8 dark:text-white',
   )
 
   return (

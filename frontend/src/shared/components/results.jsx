@@ -1,4 +1,10 @@
 import {
+  MuiColorTemplate,
+  QuestionAccuracyChart,
+  QuestionTypeAccuracyChart,
+  ResponseTimeChart,
+} from '@components/charts';
+import {
   DescriptionDetails,
   DescriptionTerm,
 } from '@components/description-list';
@@ -11,23 +17,16 @@ import {
   TableHeader,
   TableRow,
 } from '@components/table';
-import { Text } from '@components/text';
+import { CheckIcon, XMarkIcon } from '@heroicons/react/20/solid';
 import {
-  CheckIcon,
-  XMarkIcon,
-  BoltIcon,
-  CheckCircleIcon,
-  ExclamationTriangleIcon,
-} from '@heroicons/react/20/solid';
-import {
-  MuiColorTemplate,
-  QuestionAccuracyChart,
-  ResponseTimeChart,
-  QuestionTypeAccuracyChart,
-} from '@components/charts';
-
+  NumberedList,
+  NumberedListItem,
+  List,
+  ListItemIcon,
+} from '@components/list';
+import { Maths } from '@components/maths';
 import { Accordion } from './accordion';
-
+import { Text, Strong } from '@components/text';
 /***************************************************************
                       Card
 ***************************************************************/
@@ -42,47 +41,54 @@ export function Card({ children }) {
 /***************************************************************
                       Points Scoring System
 ***************************************************************/
+
 export function PointsScoringSystem() {
+  const steps = [
+    {
+      title: 'Divide response time by the question duration.',
+      description: 'For example, if the player answered 3 seconds after a 10-second question timer started, the value would be 3/10 = 0.3.',
+    },
+    {
+      title: "Multiply that value by the question's total point value.",
+      description:
+        'For example, if the question was worth 5 points, then 5 × 0.3 = 1.5.',
+    },
+    {
+      title: 'Round to the nearest whole number.',
+      description: 'For example, 1.5 would round up to 2 points.',
+    },
+  ];
+
   return (
     <div className="mx-auto w-full divide-y divide-white/5 my-6 border border-white/5">
       <Accordion title="Points Scoring System">
-        <div className="bg-blue-50/90 p-6 rounded-lg border border-blue-200">
-          <h2 className="text-md font-semibold text-blue-800 mb-4">
-            How Your Score Was Calculated
-          </h2>
-          <div className="prose text-blue-700 flex flex-col space-y-4">
-            <p>
-              Your score is based on both <strong>accuracy</strong> and{' '}
-              <strong>speed</strong>:
-            </p>
-            <ul className="list-inside space-y-2">
-              <li className="flex items-center gap-2">
-                <CheckCircleIcon className="size-6 text-green-500" />
-                <span>
-                  <strong>Correct answers</strong> earn the question&apos;s base
-                  points
-                </span>
-              </li>
-              <li className="flex items-center gap-2">
-                <BoltIcon className="size-6 text-yellow-500" />
-                <span>
-                  <strong>Fast response</strong> times earn bonus points (up to
-                  2× the base points)
-                </span>
-              </li>
-              <li className="flex items-center gap-2">
-                <ExclamationTriangleIcon className="size-6 text-red-500" />
-                <span>Incorrect answers earn 0 points</span>
-              </li>
-            </ul>
-            <p className="text-sm flex flex-col items-start gap-2">
-              <span>
-                <u>Example:</u> A 5-point question answered correctly in 3
-                seconds (within a 10s duration) would earn:
-              </span>
-              <code>5 × (1 + (10 - 3)/10) = 5 × 1.7 = 8.5 points</code>
-            </p>
-          </div>
+        <div className="p-6 rounded-lg border flex flex-col items-start space-y-4">
+
+          <Subheading>How Your Score Was Calculated</Subheading>
+
+          <Text>
+            Points are awarded based on the speed of the answer. The faster you
+            answer, the more points you earn!
+          </Text>
+
+          <Text>Here’s how it works: </Text>
+          <NumberedList>
+            {steps.map((step, index) => (
+              <NumberedListItem key={index} number={index + 1} color="dark">
+                <Text><Strong>{step.title}</Strong>{step.description}</Text>
+              </NumberedListItem>
+            ))}
+          </NumberedList>
+
+          <Text> For math wizards, this can be expressed as:</Text>
+          <List>
+            <ListItemIcon type="success">
+              <Text><Strong>Correct answers</Strong> earn <Maths>⌈ points × ( response time / question timer )⌉</Maths> possible points.</Text>
+            </ListItemIcon>
+            <ListItemIcon type="error">
+              <Text><Strong>Incorrect answers</Strong> earn <Maths>0</Maths> points.</Text>
+            </ListItemIcon>
+          </List>
         </div>
       </Accordion>
     </div>
@@ -93,6 +99,14 @@ export function PointsScoringSystem() {
                   Admin Results Dashboard
 ***************************************************************/
 export function ResultsDashboard({ playerResults }) {
+  if (!playerResults || playerResults.length === 0) {
+    return (
+      <div className="py-8 text-center">
+        <Text>No results available</Text>
+      </div>
+    );
+  }
+
   return (
     <MuiColorTemplate>
       <div className="flex flex-col space-y-8">

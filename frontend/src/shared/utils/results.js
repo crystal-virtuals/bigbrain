@@ -17,23 +17,18 @@ function calculateTimeTaken(startedAt, answeredAt) {
 }
 
 /**
- * Calculates score based on time taken to answer the question,
- * where faster times = more points.
- * @param {number|null} timeTaken - Time in seconds
+ * Calculates score based on speed of answering the question,
+ * where score = points * (remaining time / total time)
+ * @param {number|null} timeTaken - Time in seconds (null if not answered)
  * @param {number} duration - Question time limit in seconds
  * @param {number} points - Question points
- * @returns {number} Calculated score
+ * @returns {number} Calculated score, rounded to the nearest whole number
  */
 function calculateQuestionScore(timeTaken, duration, points) {
-  if (!timeTaken || !duration || timeTaken < 0) return points;
-
-  // Cap timeTaken at duration
-  const clampedTime = Math.min(duration, Math.max(0, timeTaken));
-
-  // Calculate time bonus multiplier (1.0 to 2.0 range)
-  const timeBonus = 1 + (duration - clampedTime) / duration;
-
-  return parseFloat((points * timeBonus).toFixed(2));
+  if (!timeTaken || !duration || timeTaken < 0) return 0;
+  const time = Math.min(duration, Math.max(0, timeTaken));
+  const multiplier = (duration - time) / duration;
+  return Math.round(points * multiplier);
 }
 
 function calculateAccuracyByType(answerResults) {
@@ -300,7 +295,11 @@ export function getQuestionTypeAccuracy(results) {
 
   // If no players answered a question, return null
   if (results.length === 0 || results.every((player) => player.answers.length === 0)) {
-    return null;
+    return questionTypeOptions.map((option) => ({
+      id: option.value,
+      value: null,
+      label: `${option.label} (0/0)`,
+    }));
   }
 
   results.forEach((player) => {

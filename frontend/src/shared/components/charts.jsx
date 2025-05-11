@@ -116,12 +116,12 @@ export function ResponseTimeChart({ playerResults }) {
 
 export function QuestionTypeAccuracyChart({ playerResults }) {
   const chartData = getQuestionTypeAccuracy(playerResults);
-  const isEmpty = chartData === null;
+  const isEmpty = chartData.every((q) => q.value === 0 || q.value === null);
 
   const legendPlacement = {
     slotProps: {
       legend: {
-        direction: 'row',
+        direction: 'horizontal',
         position: { vertical: 'bottom', horizontal: 'middle' },
       },
     },
@@ -132,7 +132,7 @@ export function QuestionTypeAccuracyChart({ playerResults }) {
       data: chartData,
       innerRadius: 40,
       outerRadius: 100,
-      paddingAngle: 5,
+      paddingAngle: 4,
       cornerRadius: 5,
     }],
     height: 300,

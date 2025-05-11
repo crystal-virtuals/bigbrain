@@ -1,13 +1,6 @@
 /***************************************************************
                       Game session management
 ***************************************************************/
-export function calculateTimeLeft(duration, isoTimeLastQuestionStarted) {
-  if (!isoTimeLastQuestionStarted) return duration;
-  const started = new Date(isoTimeLastQuestionStarted);
-  const elapsed = Math.floor((Date.now() - started.getTime()) / 1000);
-  return Math.max(duration - elapsed, 0);
-}
-
 const isEqual = (game, gameId) => {
   return Number(game.id) === Number(gameId);
 };
