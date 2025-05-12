@@ -29,7 +29,6 @@ instance.interceptors.response.use(
   (response) => response.data,
   (error) => {
     const isPlayerError = error.config.url.startsWith('/play');
-    // Player API errors
     if (isPlayerError) return Promise.reject(createPlayerError(error));
     return Promise.reject(createError(error));
   }
