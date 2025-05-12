@@ -2,6 +2,7 @@ import { apiCall } from '@services/api';
 import { InputError, NetworkError } from '@constants/errors';
 import { useErrorBoundary } from 'react-error-boundary';
 import { useToast } from '@hooks/toast';
+import { useEffect, useState } from 'react';
 
 export function useApi() {
   const { showBoundary } = useErrorBoundary();
@@ -15,13 +16,9 @@ export function useApi() {
       if (error instanceof InputError) {
         throw error;
       }
-      // Handle network errors
-      // if (error instanceof NetworkError) {
-      //   toastify.error({ message: error.message, replace: true });
-      //   return;
-      // }
-      // Show fallback UI for everything else
+
       showBoundary(error);
+      return null;
     }
   };
 
