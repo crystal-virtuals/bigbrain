@@ -4,21 +4,22 @@ import { Heading } from '@components/heading';
 import { InputError } from '@components/input';
 import { Link } from '@components/link';
 import { Strong, Text } from '@components/text';
-import { useToast } from '@hooks/toast';
 import { getFormErrors, getInputErrors } from '@utils/validation.js';
 import { useState } from 'react';
 import { Branding } from '@components/branding';
 
-const initialFormData = {
-  login: { email: '', password: ''},
-  register : { email: '', password: '', name: '', confirmPassword: '' }
+const emptyFormData = (isLogin) => {
+  return {
+    email: '',
+    password: '',
+    ...(isLogin ? {} : { name: '', confirmPassword: '' }),
+  };
 }
 
 export default function AuthForm({ isLogin, onSubmit }) {
-  const toastify = useToast();
   const [errors, setErrors] = useState(new Map());
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState(initialFormData[isLogin ? 'login' : 'register']);
+  const [formData, setFormData] = useState(emptyFormData(isLogin));
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -27,30 +28,27 @@ export default function AuthForm({ isLogin, onSubmit }) {
     setErrors(newErrors);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
 
     // validate the form
     const newErrors = getFormErrors(formData);
     setErrors(newErrors);
     if (newErrors.size > 0) {
-      setLoading(false);
       return;
     }
 
     // send the form data to the server
+    setLoading(true);
     onSubmit(formData)
-      .then((response) => {
-        setFormData(initialFormData[isLogin ? 'login' : 'register']);
+      .then(() => {
+        setFormData(emptyFormData(isLogin));
         setErrors(new Map());
-        toastify.success(response);
       })
       .catch((error) => {
         const newErrors = new Map();
         newErrors.set('email', error.message);
         setErrors(newErrors);
-        toastify.error(error.toast);
       })
       .finally(() => {
         setLoading(false);
