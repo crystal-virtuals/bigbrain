@@ -1,7 +1,6 @@
-import * as Headless from '@headlessui/react'
-import clsx from 'clsx'
-
-import { Text } from './text'
+import * as Headless from '@headlessui/react';
+import clsx from 'clsx';
+import { Strong, Text } from './text';
 
 const sizes = {
   xs: 'sm:max-w-xs',
@@ -13,7 +12,7 @@ const sizes = {
   '3xl': 'sm:max-w-3xl',
   '4xl': 'sm:max-w-4xl',
   '5xl': 'sm:max-w-5xl',
-}
+};
 
 export function Alert({ size = 'md', className, children, ...props }) {
   return (
@@ -39,7 +38,7 @@ export function Alert({ size = 'md', className, children, ...props }) {
         </div>
       </div>
     </Headless.Dialog>
-  )
+  );
 }
 
 export function AlertTitle({ className, ...props }) {
@@ -47,11 +46,11 @@ export function AlertTitle({ className, ...props }) {
     <Headless.DialogTitle
       {...props}
       className={clsx(
-        'text-center text-base font-semibold text-balance text-zinc-950 sm:text-left sm:text-wrap dark:text-white'
-        ,className
+        'text-center text-base font-semibold text-balance text-zinc-950 sm:text-left sm:text-wrap dark:text-white',
+        className
       )}
     />
-  )
+  );
 }
 
 export function AlertDescription({ className, ...props }) {
@@ -61,11 +60,21 @@ export function AlertDescription({ className, ...props }) {
       {...props}
       className={clsx(className, 'mt-2 text-center text-pretty sm:text-left')}
     />
-  )
+  );
+}
+
+export function AlertWarning({ className, ...props }) {
+  return (
+    <Headless.Description
+      as={Strong}
+      {...props}
+      className={clsx(className, 'mt-2 text-center text-pretty sm:text-left')}
+    />
+  );
 }
 
 export function AlertBody({ className, ...props }) {
-  return <div {...props} className={clsx(className, 'mt-4')} />
+  return <div {...props} className={clsx(className, 'mt-4')} />;
 }
 
 export function AlertActions({ className, ...props }) {
@@ -77,5 +86,5 @@ export function AlertActions({ className, ...props }) {
         'mt-6 flex flex-col-reverse items-center justify-end gap-3 *:w-full sm:mt-4 sm:flex-row sm:*:w-auto'
       )}
     />
-  )
+  );
 }

@@ -1,7 +1,6 @@
 import { Button } from '@components/button';
 import { Card } from '@components/card';
 import { Skeleton } from '@components/loading';
-import { ConfirmModal } from '@components/modal';
 import { useToast } from '@hooks/toast';
 import {
   convertToQuestion,
@@ -18,6 +17,7 @@ import {
   SelectPoints,
   SelectQuestionType,
 } from './components';
+import { DialogWithIcon } from '@components/dialog';
 
 function EditQuestionForm({ question, setErrors, onSubmit }) {
   const [prevFormData, setPrevFormData] = useState(convertToQuestion(question));
@@ -153,14 +153,17 @@ function EditQuestionForm({ question, setErrors, onSubmit }) {
       </Card>
 
       {/* Confirm Dialog */}
-      <ConfirmModal
+      <DialogWithIcon
+        icon="warning"
+        open={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={() => {
+          setIsConfirmOpen(false);
+          discardChanges();
+        }}
         title="Unsaved changes"
         description="You have unsaved changes. Are you sure you want to discard them?"
         confirmText="Discard"
-        style="warning"
-        isOpen={isConfirmOpen}
-        setIsOpen={setIsConfirmOpen}
-        onConfirm={discardChanges}
       />
     </>
   );

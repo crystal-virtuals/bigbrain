@@ -10,6 +10,7 @@ export function ErrorFallback({ error, resetErrorBoundary }) {
     // show dialog
     return (
       <DialogWithIcon
+        icon="error"
         onConfirm={resetErrorBoundary}
         confirmText="Retry"
         title='Network Error'

@@ -1,8 +1,8 @@
 import { ButtonLink } from '@components/button';
-import { ConfirmModal } from '@components/modal'; // Removed ConfirmModal import
 import { useToast } from '@hooks/toast';
 import { useState } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
+import { DialogWithIcon } from '@components/dialog';
 
 function ConfirmStopButton({ onStop }) {
   const [isConfirmOpen, setConfirmOpen] = useState(false);
@@ -24,13 +24,14 @@ function ConfirmStopButton({ onStop }) {
         <span className="md:hidden inline">Stop</span>
       </ButtonLink>
 
-      <ConfirmModal
+      <DialogWithIcon
+        icon='info'
         title="View results?"
         description="All players have been sent to the results screen. Would you like to view the results?"
         confirmText="View Results"
         onConfirm={handleStop}
-        isOpen={isConfirmOpen}
-        setIsOpen={setConfirmOpen}
+        open={isConfirmOpen}
+        onClose={() => setConfirmOpen(false)}
       />
     </>
   );

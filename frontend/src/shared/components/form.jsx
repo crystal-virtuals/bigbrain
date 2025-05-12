@@ -1,6 +1,5 @@
 import { Button } from '@components/button';
 import { ErrorMessage, Field } from '@components/fieldset';
-import { ConfirmModal } from '@components/modal';
 import { Strong, Text } from '@components/text';
 import { Textarea } from '@components/textarea';
 import * as Headless from '@headlessui/react';
@@ -10,6 +9,7 @@ import { fileToDataUrl, isNullOrUndefined } from '@utils/helpers';
 import clsx from 'clsx';
 import { forwardRef, useRef, useState, useEffect } from 'react';
 import { Notification } from '@components/notification';
+import { DialogWithIcon } from '@components/dialog';
 
 /***************************************************************
                        Form Errors
@@ -574,14 +574,17 @@ export function EditForm({
       </form>
 
       {/* Confirm Dialog */}
-      <ConfirmModal
+      <DialogWithIcon
+        icon="warning"
         title="Unsaved changes"
         description="You have unsaved changes. Are you sure you want to discard them?"
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
-        onConfirm={discardChanges}
+        open={isOpen}
+        onClose={() => setIsOpen(false)}
+        onConfirm={() => {
+          setIsOpen(false);
+          discardChanges();
+        }}
         confirmText="Discard"
-        style="warning"
       />
     </>
   );

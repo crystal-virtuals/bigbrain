@@ -1,11 +1,12 @@
 import * as Headless from '@headlessui/react';
 import {
   EyeIcon,
-  EyeSlashIcon
+  EyeSlashIcon,
 } from '@heroicons/react/16/solid';
 import clsx from 'clsx';
 import { forwardRef } from 'react';
 import { Link } from './link';
+import { XMarkIcon } from '@heroicons/react/24/outline'
 
 const styles = {
   base: [
@@ -525,5 +526,26 @@ export function LinkToggle({
         {isOn ? textOn : textOff}
       </div>
     </Link>
+  );
+}
+
+export function ButtonClose({ onClick, className, ...props }) {
+  const classes = clsx(
+    'absolute top-0 right-0 pt-4 pr-4',
+    'text-zinc-400 hover:text-zinc-500',
+  );
+
+  return (
+    <div className={clsx('absolute top-0 right-0 pt-4 pr-4', className)}>
+      <Button
+        plain
+        onClick={onClick}
+        className={classes}
+        {...props}
+      >
+        <span className="sr-only">Close</span>
+        <XMarkIcon aria-hidden="true" className="size-6" />
+      </Button>
+    </div>
   );
 }

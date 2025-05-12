@@ -1,9 +1,10 @@
 import { ButtonLink } from '@components/button';
 import { CopySessionId } from '@components/clipboard';
-import { Modal } from '@components/modal';
+import { DialogWithIcon } from '@components/dialog';
 import { useToast } from '@hooks/toast';
 import { useEffect, useState } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
+import { Text } from '@components/text';
 
 function StartButton({ game, onStart }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -31,14 +32,17 @@ function StartButton({ game, onStart }) {
         </span>
       </ButtonLink>
 
-      <Modal
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
-        color="error"
+      <DialogWithIcon
+        icon="error"
+        open={isOpen}
+        onClose={() => setIsOpen(false)}
         title="This game has no questions!"
         description="Please add questions to the game before starting it."
-        action="Edit Game"
-        onClick={() => navigate(`/game/${game.id}`)}
+        confirmText="Edit Game"
+        onConfirm={() => {
+          setIsOpen(false);
+          navigate(`/game/${game.id}`, { replace: true });
+        }}
       />
     </>
   );
@@ -81,15 +85,22 @@ export default function StartGameButton({ game }) {
       <StartButton game={game} onStart={handleClick} />
 
       {/* Modal */}
-      <Modal
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
-        color="info"
+      <DialogWithIcon
+        icon="info"
+        open={isOpen}
+        onClose={() => setIsOpen(false)}
         title="Game Started!"
-        description="Share the link below with your friends."
-        body={<CopySessionId sessionId={sessionId} />}
-        action={<>Lobby <span aria-hidden="true">&rarr;</span></>}
-        onClick={() => navigate(`/session/${sessionId}`)}
+        description={
+          <div className="flex flex-col gap-2">
+            <Text>Share the link below with your friends.</Text>
+            <CopySessionId sessionId={sessionId} />
+          </div>
+        }
+        confirmText={<>Lobby <span aria-hidden="true">&rarr;</span></>}
+        onConfirm={() => {
+          setIsOpen(false);
+          navigate(`/session/${sessionId}`);
+        }}
       />
     </>
   );

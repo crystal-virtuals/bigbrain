@@ -1,7 +1,7 @@
 import { Logo } from '@components/logo'
 import clsx from 'clsx'
 
-export function Branding({ size, className }) {
+export function Branding({ size, className, light = false}) {
   // Default size is small
   size = size || 'xs';
   let sizeClasses = {
@@ -19,7 +19,7 @@ export function Branding({ size, className }) {
   return (
     <div className={clsx('flex items-center gap-2.5 px-2 py-2.5 w-full', className)}>
       <Logo className={sizeClasses.logo} />
-      <span className={clsx('font-bold leading-none tracking-wider hidden sm:block text-zinc-950 dark:text-zinc-100', sizeClasses.text)}>
+      <span className={clsx('font-bold leading-none tracking-wider hidden sm:block text-zinc-950 ', !light && 'dark:text-zinc-100', sizeClasses.text)}>
         BigBrain
       </span>
     </div>
