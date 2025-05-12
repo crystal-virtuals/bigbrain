@@ -1,28 +1,26 @@
-import { api } from '@services/api';
-import { InputError } from '@services/error';
+import { apiCall } from '@services/api';
+import { InputError, NetworkError } from '@constants/errors';
 import { useErrorBoundary } from 'react-error-boundary';
-import { useNavigate } from 'react-router-dom';
+import { useToast } from '@hooks/toast';
 
 export function useApi() {
   const { showBoundary } = useErrorBoundary();
-  const navigate = useNavigate();
+  const toastify = useToast();
 
   const request = async (method, url, payload) => {
     try {
-      return await api[method](url, payload);
+      return await apiCall(method, url, payload);
     } catch (error) {
-      // Let InputError be handled by the caller
+      // Let InputErrors be handled by the caller
       if (error instanceof InputError) {
         throw error;
       }
-
-      // Handle redirection errors
-      if (error.redirect && error.redirectPath) {
-        navigate(error.redirectPath);
-        return;
-      }
-
-      // Show fallback UI for unknown errors
+      // Handle network errors
+      // if (error instanceof NetworkError) {
+      //   toastify.error({ message: error.message, replace: true });
+      //   return;
+      // }
+      // Show fallback UI for everything else
       showBoundary(error);
     }
   };

@@ -4,14 +4,16 @@
 import axios from 'axios'
 import { BACKEND_PORT } from '@frontend/backend.config.json'
 import { getAuthToken } from './token.js'
-import { createError, createPlayerError } from './error.jsx'
+import { APIError } from '@constants/errors'
 
-const instance = axios.create({
+export const DEFAULT_CONFIG = {
   baseURL: `http://localhost:${BACKEND_PORT}`,
   headers: {
     'Content-Type': 'application/json'
   }
-});
+}
+// Create an axios instance
+const instance = axios.create(DEFAULT_CONFIG);
 
 // Intercept the request before it is sent and use the latest token
 instance.interceptors.request.use((config) => {
@@ -28,50 +30,26 @@ instance.interceptors.request.use((config) => {
 instance.interceptors.response.use(
   (response) => response.data,
   (error) => {
-    const isPlayerError = error.config.url.startsWith('/play');
-    if (isPlayerError) return Promise.reject(createPlayerError(error));
-    return Promise.reject(createError(error));
+    return Promise.reject(APIError(error));
   }
 );
 
-const apiCall = (method, url, payload) => {
+export const apiCall = (method, url, payload) => {
+  method = method.toLowerCase();
   return instance({
     method,
     url,
-    data: ['POST', 'PUT'].includes(method) ? payload : undefined,
-    params: ['GET', 'DELETE'].includes(method) ? payload : undefined,
+    data: ['post', 'put'].includes(method) ? payload : undefined,
+    params: ['get', 'delete'].includes(method) ? payload : undefined,
   });
 };
 
 export const api = {
-  get: (url, payload) => apiCall('GET', url, payload),
-  post: (url, payload) => apiCall('POST', url, payload),
-  put: (url, payload) => apiCall('PUT', url, payload),
-  delete: (url, payload) => apiCall('DELETE', url, payload),
+  get: (url, payload) => apiCall('get', url, payload),
+  post: (url, payload) => apiCall('post', url, payload),
+  put: (url, payload) => apiCall('put', url, payload),
+  delete: (url, payload) => apiCall('delete', url, payload),
 };
-
-/***************************************************************
-                      Authentication
-***************************************************************/
-async function register({ email, password, name }) {
-  return api.post('/admin/auth/register', { email, password, name })
-    .then(res => res.token);
-}
-
-async function login ({ email, password }) {
-  return api.post('/admin/auth/login', { email, password })
-    .then(res => res.token);
-}
-
-async function logout () {
-  return api.post('/admin/auth/logout')
-}
-
-export const authAPI = {
-  register,
-  login,
-  logout,
-}
 
 /***************************************************************
                          Game API
