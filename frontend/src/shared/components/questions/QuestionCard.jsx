@@ -4,7 +4,7 @@ import { Dropdown, DropdownButton, DropdownItem, DropdownMenu } from '@component
 import { Field, Label } from '@components/fieldset';
 import { CheckboxButton } from '@components/form';
 import { Link } from '@components/link';
-import { AlertModal } from '@components/modal';
+import { DialogWithIcon } from '@components/dialog';
 import { Strong } from '@components/text';
 import { durationOptions, questionTypeOptions, questionTypes } from '@constants/questions';
 import { EllipsisVerticalIcon } from '@heroicons/react/20/solid';
@@ -169,15 +169,15 @@ function QuestionCard({ index, question, deleteQuestion }) {
       </Card>
 
       {/* Delete Dialog */}
-      <AlertModal
-        Container="Delete this question?"
-        description="You are about to delete this question and all of its data. No one will be able to access this question ever again."
+      <DialogWithIcon
+        icon="error"
+        title="Delete this question?"
+        description="Are you sure you want to delete this question? This action cannot be undone."
         confirmText="Delete"
-        isOpen={isDeleteOpen}
-        setIsOpen={setIsDeleteOpen}
+        open={isDeleteOpen}
+        onClose={() => setIsDeleteOpen(false)}
         onConfirm={deleteThisQuestion}
       />
-
     </>
   )
 }

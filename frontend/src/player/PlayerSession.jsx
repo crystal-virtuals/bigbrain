@@ -2,7 +2,7 @@ import { Lobby, QuestionRunner, Results } from '@/player';
 import { useToast } from '@hooks/toast';
 import { Loading } from '@pages/public';
 import { playerAPI } from '@services/api';
-import { InactiveSessionError } from '@services/error';
+import { InactiveSessionError } from '@constants/errors';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 

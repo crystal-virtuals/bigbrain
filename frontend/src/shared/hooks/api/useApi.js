@@ -1,12 +1,9 @@
+import { InputError } from '@constants/errors';
 import { apiCall } from '@services/api';
-import { InputError, NetworkError } from '@constants/errors';
 import { useErrorBoundary } from 'react-error-boundary';
-import { useToast } from '@hooks/toast';
-import { useEffect, useState } from 'react';
 
 export function useApi() {
   const { showBoundary } = useErrorBoundary();
-  const toastify = useToast();
 
   const request = async (method, url, payload) => {
     try {
