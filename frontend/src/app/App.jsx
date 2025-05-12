@@ -1,33 +1,14 @@
 import { AuthLayout, Login, Logout, Register } from '@/auth';
+import { AppLayout } from '@/app';
 import { AdminLayout } from '@/admin';
 import { Dashboard } from '@/dashboard';
 import { GameLayout, EditGame } from '@/game';
 import { QuestionLayout, EditQuestion } from '@/question';
-import { AuthProvider } from '@hooks/auth';
-import { ToastProvider } from '@hooks/toast';
-import { SessionProvider } from '@hooks/session';
-import { NotFound, Unauthorized } from '@pages/errors';
+import { NotFound } from '@/errors';
 import { Home, Landing } from '@pages/public';
 import { Outlet, Route, Routes } from 'react-router-dom';
 import { SessionLayout, AdminSession } from '@/session';
 import { PlayerLayout, PlayerSession, PlayerJoin } from '@/player';
-
-function AppLayout() {
-  const classes =
-    'h-screen w-screen bg-white lg:bg-zinc-100 dark:bg-zinc-900 dark:lg:bg-zinc-950';
-
-  return (
-    <div className={classes}>
-      <ToastProvider>
-        <AuthProvider>
-          <SessionProvider>
-            <Outlet />
-          </SessionProvider>
-        </AuthProvider>
-      </ToastProvider>
-    </div>
-  );
-}
 
 function App() {
   return (
@@ -35,8 +16,6 @@ function App() {
       <Route path="/" element={<AppLayout />}>
         <Route index element={<Landing />} />
         <Route path="home" element={<Home />} />
-        <Route path="403" element={<Unauthorized />} />
-        <Route path="404" element={<NotFound />} />
 
         {/* Auth routes */}
         <Route element={<AuthLayout />}>
