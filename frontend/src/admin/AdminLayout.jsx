@@ -1,9 +1,9 @@
+import { useGamesApi, useSessionApi } from '@hooks/api';
 import { useAuth } from '@hooks/auth';
-import { gamesAPI, gameAPI, sessionAPI, fetchGamesAndSessions } from '@services/api';
+import { isEqual, mapToGame, newGame } from '@utils/game';
+import { updateGameState, updateSessionState } from '@utils/session';
 import { useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import { isEqual, mapToGame, newGame } from '@utils/game';
-import { updateSessionState, updateGameState } from '@utils/session';
 
 function Authenticate({ user, redirectPath = '/login', children }) {
   // wait for user to be set
@@ -18,116 +18,109 @@ function Authenticate({ user, redirectPath = '/login', children }) {
 }
 
 function AdminLayout() {
-  const [games, setGames] = useState(null);
-  const [sessions, setSessions] = useState(null);
+  const [games, setGames] = useState([]);
+  const [sessions, setSessions] = useState({});
+  const [loading, setLoading] = useState(true);
+  const gamesAPI = useGamesApi();
+  const sessionAPI = useSessionApi();
   const { user } = useAuth();
 
-  // on first render, fetch all games and sessions
+  // ---- Fetch all games and sessions on first render ----
   useEffect(() => {
-    let isMounted = true;
     const load = async () => {
       try {
-        const { games, sessions } = await fetchGamesAndSessions();
-        if (!isMounted) return;
+        // Fetch the list of games
+        const games = await gamesAPI.getGames();
+        // Collect all session IDs from each game
+        const sessionIds = games.flatMap(game => {
+          const ids = [];
+          if (game.active) ids.push(game.active);
+          if (game.oldSessions) ids.push(...game.oldSessions);
+          return ids;
+        });
+        // Fetch the status of each session
+        const sessionEntries = await Promise.all(
+          sessionIds.map(async (sessionId) => {
+            try {
+              const status = await sessionAPI.getStatus(sessionId);
+              return [sessionId, status];
+            } catch {
+              return [sessionId, null];
+            }
+          })
+        );
         setGames(games);
-        setSessions(sessions);
-        console.log('Running useEffect to fetch games and sessions in AdminLayout');
-        console.log('Fetched games:', games);
-        console.log('Fetched sessions:', sessions);
-      } catch (error) {
-        if (!isMounted) return;
-        console.error('Error fetching games and sessions:', error);
-        setGames([]);
-        setSessions({});
+        setSessions(Object.fromEntries(sessionEntries));
+      } finally {
+        setLoading(false);
       }
     };
     load();
-    return () => {
-      isMounted = false;
-    };
   }, []);
 
-  // ---- Game management methods below ----
-  const createGame = (name) => {
-    const updatedGames = [...games, newGame(name, user)];
-    return gamesAPI
-      .updateGames(updatedGames)
-      .then(() => setGames(updatedGames));
+  // ---- Game Management ----
+  const createGame = async (name) => {
+    const updated = [...games, newGame(name, user)];
+    await gamesAPI.updateGames(updated);
+    setGames(updated);
   };
 
-  const deleteGame = (gameId) => {
-    const updatedGames = games.filter((game) => !isEqual(game, gameId));
-    return gamesAPI
-      .updateGames(updatedGames)
-      .then(() => setGames(updatedGames));
+  const deleteGame = async (gameId) => {
+    const updated = games.filter((g) => !isEqual(g, gameId));
+    await gamesAPI.updateGames(updated);
+    setGames(updated);
   };
 
-  const updateGame = (editedGame) => {
-    const updatedGames = games.map((game) =>
-      isEqual(game, editedGame.id) ? mapToGame(editedGame) : game
+  const updateGame = async (editedGame) => {
+    const updated = games.map((g) =>
+      isEqual(g, editedGame.id) ? mapToGame(editedGame) : g
     );
-    return gamesAPI
-      .updateGames(updatedGames)
-      .then(() => setGames(updatedGames));
+    await gamesAPI.updateGames(updated);
+    setGames(updated);
   };
 
-  // ---- Session management methods below ----
+  // ---- Session Management ----
   const startGame = async (gameId) => {
     const game = games.find((g) => isEqual(g, gameId));
     if (!game) throw new Error('Game not found');
     if (game.active) throw new Error('Game already has an active session');
 
-    try {
-      const { sessionId } = await gameAPI.start(gameId);
-      const session = await updateSessionState(sessionId, setSessions, sessionAPI);
-      updateGameState(games, setGames, gameId, session, sessionId);
-      return sessionId; // return the sessionId
-    } catch (error) {
-      throw new Error(error.message || 'Failed to start game.');
-    }
+    const { sessionId } = await gamesAPI.start(gameId);
+    const session = await updateSessionState(sessionId, setSessions, sessionAPI);
+    updateGameState(games, setGames, gameId, session, sessionId);
+    return sessionId;
   };
 
   const advanceGame = async (gameId) => {
     const game = games.find((g) => isEqual(g, gameId));
     if (!game || !game.active) throw new Error('Game not found or inactive');
 
-    const sessionId = game.active;
-
-    try {
-      const { position } = await gameAPI.advance(gameId);
-      const session = await updateSessionState(sessionId, setSessions, sessionAPI);
-      updateGameState(games, setGames, gameId, session, sessionId);
-      return position; // return the sessionId
-    } catch (error) {
-      throw new Error(error.message || 'Failed to advance game.');
-    }
+    const { position } = await gamesAPI.advance(gameId);
+    const session = await updateSessionState(game.active, setSessions, sessionAPI);
+    updateGameState(games, setGames, gameId, session, game.active);
+    return position;
   };
 
   const stopGame = async (gameId) => {
     const game = games.find((g) => isEqual(g, gameId));
     if (!game || !game.active) throw new Error('Game not found or inactive');
 
-    const sessionId = game.active;
-
-    try {
-      await gameAPI.end(gameId);
-      const session = await updateSessionState(sessionId, setSessions, sessionAPI);
-      updateGameState(games, setGames, gameId, session, sessionId);
-      return sessionId; // return the sessionId
-    } catch (error) {
-      throw new Error(error.message || 'Failed to end game.');
-    }
+    await gamesAPI.end(gameId);
+    const session = await updateSessionState(game.active, setSessions, sessionAPI);
+    updateGameState(games, setGames, gameId, session, game.active);
+    return game.active;
   };
 
   const data = {
     games,
     sessions,
+    loading,
     setSessions,
-    // game functions
+    // Game management methods
     createGame,
     deleteGame,
     updateGame,
-    // session functions
+    // Session management methods
     startGame,
     advanceGame,
     stopGame,
