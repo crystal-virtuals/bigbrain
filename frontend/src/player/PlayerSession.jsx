@@ -1,10 +1,10 @@
 import { Lobby, QuestionRunner, Results } from '@/player';
 import { useToast } from '@hooks/toast';
 import { Loading } from '@pages/public';
-import { playerAPI } from '@services/api';
-import { InactiveSessionError } from '@constants/errors';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { playerAPI } from '@services/api';
+import { isSessionEqual } from '@utils/session';
 
 const STATE = {
   LOADING: 'loading',
@@ -13,50 +13,6 @@ const STATE = {
   RESULTS: 'results',
   ERROR: 'error',
 };
-
-async function getSession(playerId) {
-  try {
-    const started = await playerAPI.getStatus(playerId);
-
-    // session not started (waiting in lobby)
-    if (!started) {
-      return { state: STATE.LOBBY, data: null };
-    }
-
-    // session started (in progress, question available)
-    const question = await playerAPI.getQuestion(playerId);
-
-    // see if answers are available
-    try {
-      // question and answers are available
-      const answers = await playerAPI.getAnswers(playerId);
-      return { state: STATE.QUESTION, data: { question, answers } };
-    } catch (answersError) {
-      // question is available but answers are not
-      if (answersError.message === 'Answers are not available yet') {
-        return { state: STATE.QUESTION, data: { question } };
-      }
-
-      throw answersError;
-    }
-  } catch (error) {
-    // inactive session (session finished)
-    if (error instanceof InactiveSessionError) {
-      const results = await playerAPI.getResults(playerId);
-      return { state: STATE.RESULTS, data: { results } };
-    }
-
-    // other errors
-    throw error;
-  }
-}
-
-function isSessionEqual(a, b) {
-  if (a.state !== b.state) return false;
-  if (a.data?.question?.id !== b.data?.question?.id) return false;
-  if (a.data?.answers?.length !== b.data?.answers?.length) return false;
-  return true;
-}
 
 export default function PlayerSession() {
   const { sessionId, playerId } = useParams();
@@ -73,7 +29,7 @@ export default function PlayerSession() {
   useEffect(() => {
     const poll = async () => {
       try {
-        const newSession = await getSession(playerId);
+        const newSession = await playerAPI.getSession(playerId);
 
         setSession((prev) => {
           return isSessionEqual(prev, newSession) ? prev : newSession;
@@ -83,6 +39,7 @@ export default function PlayerSession() {
         if ([STATE.RESULTS, STATE.ERROR].includes(newSession.state)) {
           clearInterval(intervalRef.current);
         }
+
       } catch (error) {
         console.error('Error fetching session:', error);
 

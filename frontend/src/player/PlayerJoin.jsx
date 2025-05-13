@@ -3,7 +3,7 @@ import { FormErrors } from '@components/form';
 import { PageContent, PageLayout } from '@components/page-layout';
 import { Field, FieldGroup, Form, Input, Label } from '@components/play/form';
 import { useToast } from '@hooks/toast';
-import { playerAPI } from '@services/api';
+import { usePlayerApi } from '@hooks/api';
 import { isEmptyString } from '@utils/validation';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -19,6 +19,7 @@ export default function PlayerJoin() {
   const { updatePlayer, clear } = useSession();
   const toastify = useToast();
   const navigate = useNavigate();
+  const playerAPI = usePlayerApi();
 
   const validate = () => {
     const newErrors = new Map();
@@ -69,7 +70,7 @@ export default function PlayerJoin() {
       updatePlayer({
         id: playerId,
         name: name,
-        sessionId: sessionId
+        sessionId: sessionId,
       });
 
       toastify.success({ message: `Joining session ${sessionId} as ${name}` });
@@ -98,15 +99,11 @@ export default function PlayerJoin() {
         }
       >
         <Form onSubmit={handleSubmit}>
-
           <FormErrors errors={errors} />
 
           <FieldGroup>
-
             <Field>
-              <Label htmlFor="playerName">
-                Name
-              </Label>
+              <Label htmlFor="playerName">Name</Label>
               <Input
                 id="playerName"
                 name="name"
@@ -120,9 +117,7 @@ export default function PlayerJoin() {
 
             {!params.sessionId && (
               <Field>
-                <Label htmlFor="sessionId">
-                  Session ID
-                </Label>
+                <Label htmlFor="sessionId">Session ID</Label>
                 <Input
                   id="sessionId"
                   name="sessionId"
@@ -134,13 +129,11 @@ export default function PlayerJoin() {
                 />
               </Field>
             )}
-
           </FieldGroup>
 
           <Button type="submit" className="flex-1 w-full" color="white">
             Enter
           </Button>
-
         </Form>
       </PageContent>
     </PageLayout>

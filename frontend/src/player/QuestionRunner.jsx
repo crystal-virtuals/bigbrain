@@ -5,16 +5,16 @@ import {
   QuestionAnswers
 } from '@components/session/question';
 import { useSession, useQuestionCountdown } from '@hooks/session';
-import { playerAPI } from '@services/api';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Countdown } from '@components/countdown';
 import { isNullish } from '@utils/validation';
+import { playerAPI } from '@services/api';
 
 export default function QuestionRunner({ playerId, question, answers = null }) {
   const [touched, setTouched] = useState(false);
   const [selected, setSelected] = useState([]);
   const { answerAvailable, showAnswers, resetAnswers, score, updateScore, questions, cacheQuestion } = useSession();
-  const { timeLeft, stopCountdown } = useQuestionCountdown({
+  const { timeLeft } = useQuestionCountdown({
     isoTimeStart: question?.isoTimeLastQuestionStarted,
     duration: question?.duration,
   });
@@ -23,9 +23,11 @@ export default function QuestionRunner({ playerId, question, answers = null }) {
   useEffect(() => {
     if (!question) return;
     cacheQuestion(question);
+    // Reset state for new question
     resetAnswers();
     setSelected([]);
     setTouched(false);
+
   }, [question?.id]);
 
   // Show answers when countdown reaches zero
@@ -35,19 +37,17 @@ export default function QuestionRunner({ playerId, question, answers = null }) {
     }
   }, [timeLeft, answerAvailable, showAnswers]);
 
-  // Calculate score when answers become available
+  // Update score if the question is answered correctly
+  const isCorrect = useMemo(() => {
+    if (!answers || !answerAvailable || selected.length === 0) return false;
+    return question.type === 'multipleChoice'
+      ? answers.every((a) => selected.includes(a)) && selected.length === answers.length
+      : answers[0] === selected[0];
+  }, [answerAvailable, selected, question?.type, answers]);
+
   useEffect(() => {
-    if (!answerAvailable || selected.length === 0) return;
-
-    const isCorrect =
-      question.type === 'multipleChoice'
-        ? answers?.every((a) => selected.includes(a)) && selected.length === answers.length
-        : answers?.[0] === selected[0];
-
-    if (isCorrect) {
-      updateScore(question.points);
-    }
-  }, [answerAvailable]);
+    if (isCorrect) updateScore(question.points);
+  }, [isCorrect, question?.id]);
 
   // Handle answer selection
   const handleAnswerSelect = async (answerId, checked = null) => {
@@ -63,12 +63,8 @@ export default function QuestionRunner({ playerId, question, answers = null }) {
       newAnswers = [answerId];
     }
 
-    try {
-      await playerAPI.putAnswers(playerId, newAnswers);
-      setSelected(newAnswers);
-    } catch (err) {
-      console.error('Failed to submit answer:', err.message);
-    }
+    setSelected(newAnswers);
+    await playerAPI.putAnswers(playerId, newAnswers);
   };
 
   if (isNullish(question)) {
