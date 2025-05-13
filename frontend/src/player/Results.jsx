@@ -1,6 +1,6 @@
 import { Heading } from '@components/heading';
 import { Skeleton } from '@components/loading';
-import { playerAPI } from '@services/api';
+import { usePlayerApi } from '@hooks/api';
 import { useEffect, useState } from 'react';
 import { useSession } from '@hooks/session';
 import { generatePlayerResults, generatePlayerStats } from '@utils/results';
@@ -12,6 +12,7 @@ export default function Results({ playerId }) {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const playerAPI = usePlayerApi();
 
   useEffect(() => {
     async function fetchResults() {

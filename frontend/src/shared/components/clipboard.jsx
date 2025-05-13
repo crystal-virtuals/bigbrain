@@ -108,7 +108,7 @@ export function CopyToClipboardInput({ value, copied, onCopy }) {
   );
 }
 
-export function CopySessionId({ sessionId }) {
+export function CopySessionId({ sessionId, ...props }) {
   const [copied, setCopied] = useState(false);
   const toastify = useToast();
 
@@ -129,7 +129,7 @@ export function CopySessionId({ sessionId }) {
 
   return (
     <>
-      <Field>
+      <Field {...props}>
         <Label htmlFor="session-url">Game PIN:</Label>
         <CopyToClipboardInput
           id="session-url"

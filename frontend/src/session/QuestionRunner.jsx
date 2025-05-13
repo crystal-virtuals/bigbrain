@@ -17,7 +17,6 @@ export default function QuestionRunner({ session, advanceGame, stopGame }) {
 
   // Reset state when a new question comes in
   useEffect(() => {
-    console.log('QuestionRunner: question', question);
     resetAnswers();
     setSelected([]);
     setTouched(false);
@@ -72,7 +71,6 @@ export default function QuestionRunner({ session, advanceGame, stopGame }) {
     <Question
       index={session.position}
       total={session.questions.length}
-      score={0}
     >
       <Heading className='dark:text-zinc-950'>{question.name}</Heading>
       <Countdown time={timeLeft} duration={question.duration} />
@@ -90,7 +88,6 @@ export default function QuestionRunner({ session, advanceGame, stopGame }) {
         <Button
           color="dark"
           onClick={handleAdvance}
-          disabled={answerAvailable}
         >
           {timeLeft > 0 ? 'Show Answers' : 'Next Question'}
         </Button>

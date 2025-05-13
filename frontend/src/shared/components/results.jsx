@@ -27,6 +27,7 @@ import {
 import { Maths } from '@components/maths';
 import { Accordion } from './accordion';
 import { Text, Strong } from '@components/text';
+
 /***************************************************************
                       Card
 ***************************************************************/
@@ -60,7 +61,7 @@ export function PointsScoringSystem() {
   ];
 
   return (
-    <div className="mx-auto w-full divide-y divide-white/5 my-6 border border-white/5">
+    <div className="mx-auto w-full divide-y dark:divide-white/5 my-6 border border-zinc-950/5 dark:border-white/5  px-3">
       <Accordion title="Points Scoring System">
         <div className="p-6 rounded-lg border flex flex-col items-start space-y-4">
 

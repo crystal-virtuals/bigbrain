@@ -7,8 +7,7 @@ import { sessionAPI } from '@services/api';
 
 function SessionLayout() {
   const { sessionId } = useParams();
-  const { games, sessions, setSessions, advanceGame, stopGame } =
-    useOutletContext();
+  const { games, sessions, setSessions, advanceGame, stopGame } = useOutletContext();
   const [loading, setLoading] = useState(false);
   const session = sessions ? sessions[sessionId] : null;
 
@@ -39,7 +38,7 @@ function SessionLayout() {
 
   // Poll this specific session every second if active
   useEffect(() => {
-    if (!session || !session.active) return;
+    if (!session) return;
 
     const interval = setInterval(async () => {
       try {
@@ -51,7 +50,7 @@ function SessionLayout() {
       }
     }, 1000);
     return () => clearInterval(interval);
-  }, [sessionId, session?.active]);
+  }, [sessionId]);
 
   if (loading || !session) {
     return (

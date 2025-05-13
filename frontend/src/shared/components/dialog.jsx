@@ -1,5 +1,9 @@
 import * as Headless from '@headlessui/react';
-import { CheckIcon, ExclamationTriangleIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
+import {
+  CheckIcon,
+  ExclamationTriangleIcon,
+  InformationCircleIcon,
+} from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import { Button, ButtonClose } from './button';
 import { Text } from './text';
@@ -14,6 +18,30 @@ const sizes = {
   '3xl': 'sm:max-w-3xl',
   '4xl': 'sm:max-w-4xl',
   '5xl': 'sm:max-w-5xl',
+};
+
+const styles = {
+  // button color
+  color: {
+    error: 'red',
+    info: 'blue',
+    success: 'lime',
+    warning: 'amber',
+  },
+  // background color
+  background: {
+    error: 'bg-red-100',
+    info: 'bg-blue-100',
+    success: 'bg-green-100',
+    warning: 'bg-yellow-100',
+  },
+  // icon
+  icon: {
+    error: <ExclamationTriangleIcon className="size-6 text-red-600" />,
+    info: <InformationCircleIcon className="size-6 text-blue-600" />,
+    success: <CheckIcon className="size-6 text-green-600" />,
+    warning: <ExclamationTriangleIcon className="size-6 text-yellow-600" />,
+  },
 };
 
 export function Dialog({ size = 'lg', className, children, ...props }) {
@@ -81,51 +109,16 @@ export function DialogActions({ className, ...props }) {
   );
 }
 
-export function DialogIcon({ type = 'info' }) {
-  const backgroundColor = {
-    error: 'bg-red-100',
-    info: 'bg-blue-100',
-    success: 'bg-green-100',
-    warning: 'bg-yellow-100',
-  }[type];
-
+/***************************************************************
+                     Dialog with Icon
+***************************************************************/
+function DialogIcon({ type = 'info' }) {
   const classes = clsx(
     'mx-auto flex size-12 shrink-0 items-center justify-center rounded-full sm:mx-0 sm:size-10',
-    backgroundColor,
-  )
-
-  const icons = {
-    error: (
-      <ExclamationTriangleIcon
-        aria-hidden="true"
-        className="size-6 text-red-600"
-      />
-    ),
-    info: (
-      <InformationCircleIcon
-        aria-hidden="true"
-        className="size-6 text-blue-600"
-      />
-    ),
-    success: (
-      <CheckIcon
-        aria-hidden="true"
-        className="size-6 text-green-600"
-      />
-    ),
-    warning: (
-      <ExclamationTriangleIcon
-        aria-hidden="true"
-        className="size-6 text-yellow-600"
-      />
-    ),
-  }
-
-  return (
-    <div className={classes}>
-      {icons[type]}
-    </div>
+    styles.background[type] || styles.background.info
   );
+
+  return <div className={classes}>{styles.icon[type] || styles.icon.info}</div>;
 }
 
 export function DialogWithIcon({
@@ -135,18 +128,20 @@ export function DialogWithIcon({
   onConfirm = () => {},
   title,
   description,
+  body = null,
   confirmText,
   disabled = false,
   dismissable = true,
+  ...props
 }) {
   return (
     <>
-      <Headless.Dialog open={open} onClose={onClose} className="relative z-10">
+      <Headless.Dialog open={open} onClose={onClose} className="relative z-10" {...props}>
         <Headless.DialogBackdrop
           transition
           className={clsx(
-            "fixed inset-0 transition-opacity data-closed:opacity-0 data-enter:duration-500 data-enter:ease-out data-leave:duration-400 data-leave:ease-in",
-            'bg-zinc-950/25 dark:bg-zinc-950/50',
+            'fixed inset-0 transition-opacity data-closed:opacity-0 data-enter:duration-500 data-enter:ease-out data-leave:duration-400 data-leave:ease-in',
+            'bg-zinc-950/25 dark:bg-zinc-950/50'
           )}
         />
 
@@ -157,22 +152,23 @@ export function DialogWithIcon({
               className="relative transform overflow-hidden rounded-lg bg-white dark:bg-zinc-900 px-4 pt-5 pb-4 text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg sm:p-6 data-closed:sm:translate-y-0 data-closed:sm:scale-95"
             >
               {dismissable && (
-                <ButtonClose onClick={onClose} className="hidden sm:block" disabled={disabled}/>
+                <ButtonClose
+                  onClick={onClose}
+                  className="hidden sm:block"
+                  disabled={disabled}
+                />
               )}
               <div className="sm:flex sm:items-start">
-                <DialogIcon type={icon}/>
+                <DialogIcon type={icon} />
                 <div className="mt-3 text-center sm:mt-0 sm:ml-7 sm:text-left">
-                  <DialogTitle>
-                    {title}
-                  </DialogTitle>
-                  <DialogDescription>
-                    {description}
-                  </DialogDescription>
+                  <DialogTitle>{title}</DialogTitle>
+                  <DialogDescription>{description}</DialogDescription>
+                  {body && <DialogBody className="!mt-3">{body}</DialogBody>}
                 </div>
               </div>
               <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse gap-2">
                 <Button
-                  color="red"
+                  color={styles.color[icon] || styles.color.info}
                   type="button"
                   onClick={onConfirm}
                   disabled={disabled}
@@ -181,15 +177,17 @@ export function DialogWithIcon({
                 >
                   {confirmText || 'Confirm'}
                 </Button>
-                {dismissable && <Button
-                  plain
-                  type="button"
-                  onClick={onClose}
-                  disabled={disabled}
-                  className="mt-3 inline-flex w-full justify-center sm:mt-0 sm:w-auto "
-                >
-                  Cancel
-                </Button>}
+                {dismissable && (
+                  <Button
+                    plain
+                    type="button"
+                    onClick={onClose}
+                    disabled={disabled}
+                    className="mt-3 inline-flex w-full justify-center sm:mt-0 sm:w-auto "
+                  >
+                    Cancel
+                  </Button>
+                )}
               </div>
             </Headless.DialogPanel>
           </div>

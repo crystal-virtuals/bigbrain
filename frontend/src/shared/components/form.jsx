@@ -220,25 +220,25 @@ export function LabelTab({ type, label, children, invalid = false, ...props }) {
   // type is either 'correct' or 'false'
   const styles = {
     correct: {
-      text: 'text-white',
-      bg: 'bg-emerald-500',
+      text: 'text-correct-content dark:text-white',
+      bg: 'bg-correct dark:bg-emerald-500',
     },
     false: {
-      text: 'text-white',
-      bg: 'bg-error',
+      text: 'text-false-content dark:text-white',
+      bg: 'bg-false dark:bg-error',
     },
-    neutral: {
-      text: 'text-navy-content',
-      bg: 'bg-navy',
+    primary: {
+      text: 'text-primary-content',
+      bg: 'bg-primary',
     },
-    dark: {
-      text: 'text-white',
-      bg: 'bg-[#113034]',
+    secondary: {
+      text: 'text-navy-content dark:text-white',
+      bg: 'bg-navy dark:bg-[#113034]',
     },
   };
 
-  const bgColor = styles[type] ? styles[type].bg : styles.neutral.bg;
-  const textColor = styles[type] ? styles[type].text : styles.neutral.text;
+  const bgColor = styles[type] ? styles[type].bg : styles.primary.bg;
+  const textColor = styles[type] ? styles[type].text : styles.primary.text;
 
   const style = clsx(
     'relative rounded-t-md inline-block px-3 py-2 leading-none select-none',

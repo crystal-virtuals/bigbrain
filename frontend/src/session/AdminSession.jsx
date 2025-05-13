@@ -1,4 +1,4 @@
-import { NotFound } from '@pages/errors';
+import { NotFound } from '@/errors';
 import { useState } from 'react';
 import { useOutletContext, useParams } from 'react-router-dom';
 import Lobby from './Lobby';
@@ -25,8 +25,9 @@ function AdminSession() {
       await advanceGame(game.id);
     } catch (error) {
       console.error('Failed to advance game:', error);
+    } finally {
+      setLock(false);
     }
-    setLock(false);
   };
 
   const handleStopGame = async () => {
