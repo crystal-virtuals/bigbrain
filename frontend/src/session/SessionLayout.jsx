@@ -4,10 +4,11 @@ import { useMemo, useEffect, useState } from 'react';
 import { Outlet, useOutletContext, useParams } from 'react-router-dom';
 import { SessionNavbar as Navbar } from '@components/session/navbar';
 import { sessionAPI } from '@services/api';
+import { useInterval } from '@hooks/interval';
 
 function SessionLayout() {
   const { sessionId } = useParams();
-  const { games, sessions, setSessions, advanceGame, stopGame } = useOutletContext();
+  const { games, sessions, setSessions, advanceGame, stopGame, isMutating } = useOutletContext();
   const [loading, setLoading] = useState(false);
   const session = sessions ? sessions[sessionId] : null;
 
@@ -37,19 +38,21 @@ function SessionLayout() {
   }, [sessionId, session]);
 
   // Poll this specific session every second if active
+  useInterval(async () => {
+    if (!session || !session.active || isMutating) return;
+    const updated = await sessionAPI.getStatus(sessionId);
+    setSessions((prev) => ({ ...prev, [sessionId]: updated }));
+  }, session?.active ? 1000 : null);
+
+  // Get session status when the session is not active
   useEffect(() => {
-    if (!session || !session.active) return;
-    const interval = setInterval(async () => {
-      try {
-        const updated = await sessionAPI.getStatus(sessionId);
-        setSessions((prev) => ({ ...prev, [sessionId]: updated }));
-        console.log('Updated session:', updated);
-      } catch (err) {
-        console.warn(`Failed to poll session ${sessionId}:`, err);
-      }
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [sessionId, session?.active]);
+    if (!session || session.active) return;
+    const fetchSession = async () => {
+      const updated = await sessionAPI.getStatus(sessionId);
+      setSessions((prev) => ({ ...prev, [sessionId]: updated }));
+    };
+    fetchSession();
+  }, [session]);
 
   if (loading || !session) {
     return (
@@ -63,7 +66,7 @@ function SessionLayout() {
 
   return (
     <Layout navbar={<Navbar sessionId={sessionId} players={session.players} />}>
-      <Outlet context={{ session, game, advanceGame, stopGame }} />
+      <Outlet context={{ session, game, advanceGame, stopGame, isMutating }} />
     </Layout>
   );
 }

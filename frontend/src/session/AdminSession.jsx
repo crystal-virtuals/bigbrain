@@ -15,7 +15,7 @@ function getSessionState(session) {
 
 function AdminSession() {
   const { sessionId } = useParams();
-  const { session, game, advanceGame, stopGame } = useOutletContext();
+  const { session, game, advanceGame, stopGame, isMutating } = useOutletContext();
   const [lock, setLock] = useState(false);
 
   const handleAdvanceGame = async () => {
@@ -48,6 +48,7 @@ function AdminSession() {
     game,
     lock,
     setLock,
+    isMutating,
     advanceGame: handleAdvanceGame,
     stopGame: handleStopGame,
   };

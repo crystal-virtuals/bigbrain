@@ -15,8 +15,8 @@ import {
 ***************************************************************/
 function QuestionLayout({ children }) {
   return (
-    <div className="flex flex-1 items-center justify-center w-full h-full">
-      <div className="max-w-md w-full">{children}</div>
+    <div className="flex-1 flex flex-col items-center justify-center h-full">
+      {children}
     </div>
   );
 }
@@ -44,7 +44,7 @@ function QuestionHeader({ index, total, score }) {
 
 function QuestionBody({ children }) {
   return (
-    <div className="py-10 px-8 sm:p-8">
+    <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8">
       <div className="flex flex-col w-full h-full justify-between gap-y-6 items-center text-zinc-950 dark:text-zinc-950">
         {children}
       </div>
@@ -55,7 +55,7 @@ function QuestionBody({ children }) {
 export function Question({ index, total, score, children }) {
   return (
     <QuestionLayout>
-      <div className="overflow-hidden bg-base-100 drop-shadow-lg rounded-lg min-w-full">
+      <div className="overflow-hidden bg-base-100 drop-shadow-lg rounded-lg w-full max-w-3xl mx-auto">
         <QuestionHeader index={index} total={total} score={score} />
         <QuestionBody>{children}</QuestionBody>
       </div>
@@ -65,7 +65,7 @@ export function Question({ index, total, score, children }) {
 
 export function QuestionActions({ children }) {
   return (
-    <div className="flex flex-row items-center w-full mt-4 max-w-lg px-4 justify-between">
+    <div className="flex flex-row items-center w-full mt-4 max-w-lg px-4 justify-between shrink-0">
       {children}
     </div>
   );

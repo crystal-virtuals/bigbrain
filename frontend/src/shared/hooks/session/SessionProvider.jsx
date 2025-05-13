@@ -36,7 +36,17 @@ const SessionProvider = ({ children }) => {
   // Question methods
   const cacheQuestion = useCallback((question) => {
     setState(prev => {
-      const updatedQuestions = [...prev.questions, question];
+      // Check if the question already exists in the state
+      const existingQuestionIndex = prev.questions.findIndex(q => q.id === question.id);
+      let updatedQuestions;
+      if (existingQuestionIndex !== -1) {
+        // Update the existing question
+        updatedQuestions = [...prev.questions];
+        updatedQuestions[existingQuestionIndex] = question;
+      } else {
+        // Add the new question
+        updatedQuestions = [...prev.questions, question];
+      }
       localStorage.setItem('questions', JSON.stringify(updatedQuestions));
       return { ...prev, questions: updatedQuestions };
     });

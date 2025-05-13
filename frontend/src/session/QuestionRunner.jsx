@@ -5,7 +5,7 @@ import { Question, QuestionActions, QuestionAnswers } from '@components/session/
 import { useEffect, useState, useCallback} from 'react';
 import { useSession, useQuestionCountdown } from '@hooks/session';
 
-export default function QuestionRunner({ session, advanceGame, stopGame }) {
+export default function QuestionRunner({ session, advanceGame, stopGame, isMutating }) {
   const question = session.questions[session.position];
   const [touched, setTouched] = useState(false);
   const [selected, setSelected] = useState([]);
@@ -35,13 +35,14 @@ export default function QuestionRunner({ session, advanceGame, stopGame }) {
   }, [advanceGame]);
 
   useEffect(() => {
-    if (!answerAvailable) return;
-    const timeout = setTimeout(autoAdvance, 3000);
+    if (!answerAvailable || isMutating) return;
+    const timeout = setTimeout(autoAdvance, 3500);
     return () => clearTimeout(timeout);
-  }, [answerAvailable]);
+  }, [answerAvailable, isMutating]);
 
   // Handle advancing the game
   const handleAdvance = () => {
+    if (isMutating) return;
     if (timeLeft > 0) {
       showAnswers();
       stopCountdown();
@@ -82,14 +83,21 @@ export default function QuestionRunner({ session, advanceGame, stopGame }) {
         onSelect={handleAnswerSelect}
       />
       <QuestionActions>
-        <Button color="light" onClick={stopGame}>
+        <Button 
+          color="light"
+          onClick={stopGame}
+          disabled={isMutating}
+        >
           End Game
         </Button>
         <Button
           color="dark"
+          type='submit'
+          loading={isMutating}
+          disabled={isMutating}
           onClick={handleAdvance}
         >
-          {timeLeft > 0 ? 'Show Answers' : 'Next Question'}
+          {!answerAvailable ? 'Show Answers' : 'Next Question'}
         </Button>
       </QuestionActions>
     </Question>

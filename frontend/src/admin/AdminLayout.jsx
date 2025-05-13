@@ -21,6 +21,7 @@ function AdminLayout() {
   const [games, setGames] = useState([]);
   const [sessions, setSessions] = useState({});
   const [loading, setLoading] = useState(true);
+  const [isMutating, setIsMutating] = useState(false);
   const { user } = useAuth();
 
   // ---- Fetch all games and sessions on first render ----
@@ -107,40 +108,34 @@ function AdminLayout() {
   const advanceGame = async (gameId) => {
     const game = games.find((g) => isEqual(g, gameId));
     if (!game || !game.active) throw new Error('Game not found or inactive');
-
+    setIsMutating(true);
     const sessionId = game.active;
-
     try {
       const { position } = await gamesAPI.advance(gameId);
-      const session = await updateSessionState(
-        sessionId,
-        setSessions,
-        sessionAPI
-      );
+      const session = await updateSessionState(sessionId, setSessions, sessionAPI);
       updateGameState(games, setGames, gameId, session, sessionId);
-      return position; // return the sessionId
+      return position; // return the position
     } catch (error) {
       throw new Error(error.message || 'Failed to advance game.');
+    } finally {
+      setIsMutating(false);
     }
   };
 
   const stopGame = async (gameId) => {
     const game = games.find((g) => isEqual(g, gameId));
     if (!game || !game.active) throw new Error('Game not found or inactive');
-
+    setIsMutating(true);
     const sessionId = game.active;
-
     try {
       await gamesAPI.end(gameId);
-      const session = await updateSessionState(
-        sessionId,
-        setSessions,
-        sessionAPI
-      );
+      const session = await updateSessionState(sessionId, setSessions, sessionAPI);
       updateGameState(games, setGames, gameId, session, sessionId);
       return sessionId; // return the sessionId
     } catch (error) {
       throw new Error(error.message || 'Failed to end game.');
+    } finally {
+      setIsMutating(false);
     }
   };
 
@@ -148,6 +143,7 @@ function AdminLayout() {
     games,
     sessions,
     loading,
+    isMutating,
     setSessions,
     // Game management methods
     createGame,
