@@ -6,6 +6,7 @@ import { Heading } from '@components/heading';
 import { SidebarLayout } from '@components/sidebar-layout';
 import { useAuth } from '@hooks/auth';
 import { useOutletContext } from 'react-router-dom';
+import { Skeleton } from '@components/loading';
 
 function DashboardLayout({ user, children }) {
   return (
@@ -18,24 +19,28 @@ function DashboardLayout({ user, children }) {
   );
 }
 
-function DashboardHeading({ games, onCreate }) {
+function DashboardHeading({ loading, games, onCreate }) {
   return (
     <div className="flex w-full flex-wrap items-end justify-between gap-4">
       <Heading>Dashboard</Heading>
-      {!!games && <CreateGameButton onCreate={onCreate} />}
+      {!!games && <CreateGameButton onCreate={onCreate} disabled={loading}/>}
     </div>
   );
 }
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const { games, createGame, deleteGame } = useOutletContext();
+  const { loading, games, createGame, deleteGame } = useOutletContext();
 
   return (
     <DashboardLayout user={user}>
       <DashboardHeading games={games} onCreate={createGame} />
       <Divider className="my-6" />
-      <Games games={games} onDelete={deleteGame} onCreate={createGame}/>
+      {loading ? (
+        <Skeleton />
+      ) : (
+        <Games games={games} onDelete={deleteGame} onCreate={createGame}/>
+      )}
     </DashboardLayout>
   );
 }

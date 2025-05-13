@@ -1,14 +1,14 @@
-import { AuthLayout, Login, Logout, Register } from '@/auth';
-import { AppLayout } from '@/app';
 import { AdminLayout } from '@/admin';
+import { AppLayout } from '@/app';
+import { AuthLayout, Login, Logout, Register } from '@/auth';
 import { Dashboard } from '@/dashboard';
-import { GameLayout, EditGame } from '@/game';
-import { QuestionLayout, EditQuestion } from '@/question';
 import { NotFound } from '@/errors';
+import { EditGame, GameLayout } from '@/game';
+import { PlayerJoin, PlayerLayout, PlayerSession } from '@/player';
+import { EditQuestion, QuestionLayout } from '@/question';
+import { AdminSession, SessionLayout } from '@/session';
 import { Home, Landing } from '@pages/public';
-import { Outlet, Route, Routes } from 'react-router-dom';
-import { SessionLayout, AdminSession } from '@/session';
-import { PlayerLayout, PlayerSession, PlayerJoin } from '@/player';
+import { Route, Routes } from 'react-router-dom';
 
 function App() {
   return (
