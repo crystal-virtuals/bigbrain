@@ -17,9 +17,8 @@ export function useGamesApi() {
 
   // mutate (start/advance/end) a game
   const mutate = async (gameId, mutationType) => {
-    const response = await api.post(`/admin/game/${gameId}/mutate`, { mutationType });
-    const { status, sessionId, position } = response;
-
+    const { data } = await api.post(`/admin/game/${gameId}/mutate`, { mutationType });
+    const { status, sessionId, position } = data;
     return {
       sessionId: sessionId ?? null,
       position: position ?? -1,

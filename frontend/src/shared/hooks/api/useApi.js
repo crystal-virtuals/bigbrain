@@ -1,5 +1,5 @@
 import { InputError } from '@constants/errors';
-import { apiCall } from '@services/api';
+import { api } from '@services/api';
 import { useErrorBoundary } from 'react-error-boundary';
 
 export function useApi() {
@@ -7,7 +7,8 @@ export function useApi() {
 
   const request = async (method, url, payload) => {
     try {
-      return await apiCall(method, url, payload);
+      const result =  await api(method, url, payload);
+      return result ?? {};
     } catch (error) {
       // Let InputErrors be handled by the caller
       if (error instanceof InputError) {
@@ -15,7 +16,7 @@ export function useApi() {
       }
 
       showBoundary(error);
-      return null;
+      return {};
     }
   };
 

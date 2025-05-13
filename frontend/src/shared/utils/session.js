@@ -21,6 +21,16 @@ const endActiveSession = (game) => {
   };
 };
 
+/**
+ * Compare two session objects to check if they are equal.
+ */
+export const isSessionEqual = (a, b) => {
+  if (a.state !== b.state) return false;
+  if (a.data?.question?.id !== b.data?.question?.id) return false;
+  if (a.data?.answers?.length !== b.data?.answers?.length) return false;
+  return true;
+}
+
 /*
  * Fetch latest session status and update state.
  */
@@ -29,12 +39,17 @@ export const updateSessionState = async (
   setSessions,
   sessionAPI
 ) => {
-  const session = await sessionAPI.getStatus(sessionId);
-  setSessions((prev) => ({
-    ...prev,
-    [sessionId]: session,
-  }));
-  return session;
+  try {
+    const session = await sessionAPI.getStatus(sessionId);
+    setSessions((prev) => ({
+      ...prev,
+      [sessionId]: session,
+    }));
+    return session;
+  } catch (error) {
+    console.error("Error updating session state:", error);
+    throw error;
+  }
 };
 
 /**
