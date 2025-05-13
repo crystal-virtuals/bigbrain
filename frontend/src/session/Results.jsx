@@ -1,13 +1,12 @@
 import { Skeleton } from '@components/loading';
 import { useToast } from '@hooks/toast';
-import { useSessionApi } from '@hooks/api';
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { Heading } from '@components/heading';
 import { Breadcrumbs } from '@components/breadcrumbs';
 import { generateAdminPlayerResults } from '@utils/results';
 import { ResultsDashboard, PointsScoringSystem } from '@components/results';
-
+import { sessionAPI } from '@services/api';
 const breadcrumbs = [
   { label: 'Dashboard', link: '/dashboard' },
   { label: 'Results' },
@@ -19,7 +18,6 @@ export default function Results({ ...props }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const toastify = useToast();
-  const sessionAPI = useSessionApi();
 
   // Fetch the results of the game
   useEffect(() => {

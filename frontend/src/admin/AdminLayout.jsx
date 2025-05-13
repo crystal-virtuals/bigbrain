@@ -29,6 +29,7 @@ function AdminLayout() {
       try {
         // Step 1: Fetch all games
         const games = await gamesAPI.getGames();
+        setGames(games);
 
         // Step 2: Collect all active session IDs from each game
         const activeSessionIds = games
@@ -52,9 +53,6 @@ function AdminLayout() {
           ...prev,
           ...Object.fromEntries(activeSessionEntries),
         }));
-
-        // Step 5: Update games state
-        setGames(games);
       } finally {
         setLoading(false);
       }

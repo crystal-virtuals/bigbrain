@@ -37,8 +37,9 @@ function AdminSession() {
       await stopGame(game.id);
     } catch (error) {
       console.error('Failed to stop game:', error);
+    } finally {
+      setLock(false);
     }
-    setLock(false);
   };
 
   const sharedProps = {

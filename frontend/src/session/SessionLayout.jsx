@@ -38,8 +38,7 @@ function SessionLayout() {
 
   // Poll this specific session every second if active
   useEffect(() => {
-    if (!session) return;
-
+    if (!session || !session.active) return;
     const interval = setInterval(async () => {
       try {
         const updated = await sessionAPI.getStatus(sessionId);
@@ -50,12 +49,14 @@ function SessionLayout() {
       }
     }, 1000);
     return () => clearInterval(interval);
-  }, [sessionId]);
+  }, [sessionId, session?.active]);
 
   if (loading || !session) {
     return (
       <Layout navbar={<Navbar sessionId={sessionId} />}>
-        <Skeleton className="col-span-2 max-w-2xl" />
+        <div className='flex-1 flex flex-col items-center justify-center h-full'>
+          <Skeleton className='max-w-3xl' />
+        </div>
       </Layout>
     );
   }
