@@ -5,6 +5,7 @@ import axios from 'axios'
 import { BACKEND_PORT } from '@frontend/backend.config.json'
 import { getAuthToken } from './token.js'
 import { APIError } from '@constants/errors'
+import { InactiveSessionError } from '@constants/errors';
 
 export const DEFAULT_CONFIG = {
   baseURL: `http://localhost:${BACKEND_PORT}`,
@@ -12,6 +13,7 @@ export const DEFAULT_CONFIG = {
     'Content-Type': 'application/json'
   }
 }
+
 // Create an axios instance
 const instance = axios.create(DEFAULT_CONFIG);
 
@@ -29,12 +31,11 @@ instance.interceptors.request.use((config) => {
 // Intercept the response and return an Error object
 instance.interceptors.response.use(
   (response) => response.data,
-  (error) => {
-    return Promise.reject(APIError(error));
-  }
+  (error) => Promise.reject(APIError(error))
 );
 
-export const apiCall = (method, url, payload) => {
+
+export const api = (method, url, payload) => {
   method = method.toLowerCase();
   return instance({
     method,
@@ -44,18 +45,19 @@ export const apiCall = (method, url, payload) => {
   });
 };
 
-export const api = {
-  get: (url, payload) => apiCall('get', url, payload),
-  post: (url, payload) => apiCall('post', url, payload),
-  put: (url, payload) => apiCall('put', url, payload),
-  delete: (url, payload) => apiCall('delete', url, payload),
-};
 
 /***************************************************************
-                         Game API
+                Games and Sessions API (Admin)
 ***************************************************************/
-const mutateSession = async (gameId, mutationType) => {
-  const response  = await api.post(`/admin/game/${gameId}/mutate`, { mutationType });
+const request = {
+  get: (url, payload) => api('get', url, payload),
+  post: (url, payload) => api('post', url, payload),
+  put: (url, payload) => api('put', url, payload),
+  delete: (url, payload) => api('delete', url, payload),
+};
+
+const mutate = async (gameId, mutationType) => {
+  const response  = await request.post(`/admin/game/${gameId}/mutate`, { mutationType });
   const { status, sessionId, position } = response.data;
   return {
     sessionId: sessionId ?? null, // null for 'ended'
@@ -64,75 +66,73 @@ const mutateSession = async (gameId, mutationType) => {
   }
 };
 
-
-// get/update all games
 export const gamesAPI = {
-  getGames: () => api.get('/admin/games').then(res => res.games),
-  updateGames: (games) => api.put('/admin/games', { games }),
+  getGames: () => request.get('/admin/games').then(res => res.games),
+  updateGames: (games) => request.put('/admin/games', { games }),
+  start: (gameId) => mutate(gameId, 'START'),
+  advance: (gameId) => mutate(gameId, 'ADVANCE'),
+  end: (gameId) => mutate(gameId, 'END'),
 }
 
-// mutate (start/advance/end) a game
-export const gameAPI = {
-  // returns an object with sessionId, position, status
-  start: (gameId) => mutateSession(gameId, 'START'),
-  advance: (gameId) => mutateSession(gameId, 'ADVANCE'),
-  end: (gameId) => mutateSession(gameId, 'END'),
-};
-
-// get status/results of a game session
 export const sessionAPI = {
-  getStatus: (sessionId) => api.get(`/admin/session/${sessionId}/status`).then(res => res.results),
-  getResults: (sessionId) => api.get(`/admin/session/${sessionId}/results`).then(res => res.results),
-}
-
-
-/**
- * Fetch all games and their sessions
- * @returns { games: Array, sessions: Object }
- */
-export const fetchGamesAndSessions = async () => {
-  try {
-    // fetch the list of games
-    const games = await gamesAPI.getGames();
-
-    // collect all session IDs from each game
-    const sessionIds = games.flatMap(game => {
-      const ids = [];
-      if (game.active) ids.push(game.active);
-      if (game.oldSessions) ids.push(...game.oldSessions);
-      return ids;
-    })
-
-    // fetch the status of each session
-    const sessionEntries = await Promise.all(
-      sessionIds.map(async (sessionId) => {
-        try {
-          const sessionStatus = await sessionAPI.getStatus(sessionId);
-          return [sessionId, sessionStatus];
-        } catch (error) {
-          console.warn(`Failed to fetch session ${sessionId}:`, error);
-          return [sessionId, null];
-        }
-      })
-    );
-
-    // convert session entries to an object
-    const sessions = Object.fromEntries(sessionEntries);
-    return { games, sessions };
-  } catch (error) {
-    console.error('Error loading games and sessions:', error);
-    return { games: [], sessions: {} };
-  }
+  getStatus: (sessionId) => request.get(`/admin/session/${sessionId}/status`).then(res => res.results),
+  getResults: (sessionId) => request.get(`/admin/session/${sessionId}/results`).then(res => res.results),
 }
 
 /***************************************************************
                          Player API
 ***************************************************************/
+const STATE = {
+  LOADING: 'loading',
+  LOBBY: 'lobby',
+  QUESTION: 'question',
+  RESULTS: 'results',
+  ERROR: 'error',
+};
+
 export const playerAPI = {
-  joinSession: (sessionId, name) => api.post(`/play/join/${sessionId}`, { name }).then(res => res.playerId),
-  getStatus: (playerId) => api.get(`/play/${playerId}/status`).then(res => res.started),
-  getQuestion: (playerId) => api.get(`/play/${playerId}/question`).then(res => res.question),
-  getAnswers: (playerId) => api.get(`/play/${playerId}/answer`).then(res => res.answers),
-  putAnswers: (playerId, answers) => api.put(`/play/${playerId}/answer`, { answers: answers }),
-  getResults: (playerId) => api.get(`/play/${playerId}/results`),
+  joinSession: (sessionId, name) => request.post(`/play/join/${sessionId}`, { name }).then(res => res.playerId),
+  getStatus: (playerId) => request.get(`/play/${playerId}/status`).then(res => res.started),
+  getQuestion: (playerId) => request.get(`/play/${playerId}/question`).then(res => res.question),
+  getAnswers: (playerId) => request.get(`/play/${playerId}/answer`).then(res => res.answers),
+  putAnswers: (playerId, answers) => request.put(`/play/${playerId}/answer`, { answers: answers }),
+  getResults: (playerId) => request.get(`/play/${playerId}/results`),
+  getSession: (playerId) => getSession(playerId),
+}
+
+async function getSession(playerId) {
+  try {
+    const started = await playerAPI.getStatus(playerId);
+
+    // session not started (waiting in lobby)
+    if (!started) {
+      return { state: STATE.LOBBY, data: null };
+    }
+
+    // session started (in progress, question available)
+    const question = await playerAPI.getQuestion(playerId);
+
+    // see if answers are available
+    try {
+      // question and answers are available
+      const answers = await playerAPI.getAnswers(playerId);
+      return { state: STATE.QUESTION, data: { question, answers } };
+    } catch (answersError) {
+      // question is available but answers are not
+      if (answersError.message === 'Answers are not available yet') {
+        return { state: STATE.QUESTION, data: { question } };
+      }
+
+      throw answersError;
+    }
+  } catch (error) {
+    // inactive session (session finished)
+    if (error instanceof InactiveSessionError) {
+      const results = await playerAPI.getResults(playerId);
+      return { state: STATE.RESULTS, data: { results } };
+    }
+
+    // other errors
+    throw error;
+  }
 }

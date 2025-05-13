@@ -15,8 +15,8 @@ import {
 ***************************************************************/
 function QuestionLayout({ children }) {
   return (
-    <div className="flex-1 w-full h-full container mx-auto flex flex-col lg:flex-row gap-8 items-center justify-center lg:max-h-[60rem]">
-      <div className="flex-1 max-w-xl">{children}</div>
+    <div className="flex flex-1 items-center justify-center w-full h-full">
+      <div className="max-w-md w-full">{children}</div>
     </div>
   );
 }
@@ -33,9 +33,11 @@ function QuestionHeader({ index, total, score }) {
           </span>
         )}
       </div>
-      <div className="bg-green-50 text-success-content px-2 py-1 rounded-lg">
-        Score: <strong>{score}</strong>
-      </div>
+      {score && (
+        <div className="bg-green-50 text-success-content px-2 py-1 rounded-lg">
+          Score: <strong>{score}</strong>
+        </div>
+      )}
     </div>
   );
 }
@@ -53,7 +55,7 @@ function QuestionBody({ children }) {
 export function Question({ index, total, score, children }) {
   return (
     <QuestionLayout>
-      <div className="overflow-hidden bg-base-100 drop-shadow-lg rounded-lg">
+      <div className="overflow-hidden bg-base-100 drop-shadow-lg rounded-lg min-w-full">
         <QuestionHeader index={index} total={total} score={score} />
         <QuestionBody>{children}</QuestionBody>
       </div>

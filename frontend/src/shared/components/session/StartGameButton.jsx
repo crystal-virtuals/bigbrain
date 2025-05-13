@@ -4,14 +4,13 @@ import { DialogWithIcon } from '@components/dialog';
 import { useToast } from '@hooks/toast';
 import { useEffect, useState } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
-import { Text } from '@components/text';
 
 function StartButton({ game, onStart }) {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleClick = () => {
-    // if game has no questions, update dialog message
+    // if game has no questions, show alert
     if (!game.questions || game.questions.length === 0) {
       setIsOpen(true);
       return;
@@ -90,12 +89,8 @@ export default function StartGameButton({ game }) {
         open={isOpen}
         onClose={() => setIsOpen(false)}
         title="Game Started!"
-        description={
-          <div className="flex flex-col gap-2">
-            <Text>Share the link below with your friends.</Text>
-            <CopySessionId sessionId={sessionId} />
-          </div>
-        }
+        description='Share the link below with your friends.'
+        body={<CopySessionId sessionId={sessionId} />}
         confirmText={<>Lobby <span aria-hidden="true">&rarr;</span></>}
         onConfirm={() => {
           setIsOpen(false);

@@ -34,7 +34,7 @@ export const API_ERRORS = {
     message: 'Oops! Something went wrong. Please try again later.',
     details: {
       status: 500,
-      title: 'Error',
+      title: 'Internal Server Error',
       description: 'Sorry, something went wrong on our end. Please try again later.',
       redirectPath: '/home',
       redirectText: 'Back to home',
