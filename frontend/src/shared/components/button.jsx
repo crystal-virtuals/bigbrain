@@ -530,21 +530,15 @@ export function LinkToggle({
 }
 
 export function ButtonClose({ onClick, className, ...props }) {
-  const classes = clsx(
-    'absolute top-0 right-0 pt-4 pr-4',
-    'text-zinc-400 hover:text-zinc-500',
-  );
-
   return (
     <div className={clsx('absolute top-0 right-0 pt-4 pr-4', className)}>
       <Button
         plain
         onClick={onClick}
-        className={classes}
         {...props}
       >
         <span className="sr-only">Close</span>
-        <XMarkIcon aria-hidden="true" className="size-6" />
+        <XMarkIcon aria-hidden="true" className="size-6 stroke-2" />
       </Button>
     </div>
   );

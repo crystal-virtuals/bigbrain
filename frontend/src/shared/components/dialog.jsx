@@ -138,7 +138,6 @@ export function DialogWithIcon({
   confirmText,
   disabled = false,
   dismissable = true,
-  transparent = true,
 }) {
   return (
     <>
@@ -147,7 +146,7 @@ export function DialogWithIcon({
           transition
           className={clsx(
             "fixed inset-0 transition-opacity data-closed:opacity-0 data-enter:duration-500 data-enter:ease-out data-leave:duration-400 data-leave:ease-in",
-            transparent ? 'bg-zinc-950/25 dark:bg-zinc-950/50' : 'bg-zinc-500'
+            'bg-zinc-950/25 dark:bg-zinc-950/50',
           )}
         />
 

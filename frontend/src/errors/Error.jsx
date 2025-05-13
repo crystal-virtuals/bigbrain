@@ -15,7 +15,7 @@ export function ErrorFallback({ error, resetErrorBoundary }) {
         confirmText="Retry"
         title='Network Error'
         description={error.message}
-        transparent={false}
+        dismissable={false}
       />
     );
   }
