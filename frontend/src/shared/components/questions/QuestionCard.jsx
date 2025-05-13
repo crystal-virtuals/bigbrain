@@ -92,7 +92,7 @@ function QuestionHeader({ index, question }) {
   if (isEmptyString(question.name)) {
     return (
       <>
-        <Label>Question {index + 1}</Label>
+        <Label className='font-medium'>Question {index + 1}</Label>
         <Container>
           <Strong>Empty question. </Strong>
           <Link className="hover:text-accent hover:underline " to={url}>
@@ -115,7 +115,7 @@ function QuestionHeader({ index, question }) {
           />
         )}
         <div className="ml-2 flex flex-col justify-center">
-          <Label>Question {index + 1}</Label>
+          <Label className='font-medium'>Question {index + 1}</Label>
           <Container>{question.name}</Container>
         </div>
       </div>

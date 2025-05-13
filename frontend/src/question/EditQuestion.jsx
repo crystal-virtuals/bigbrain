@@ -10,7 +10,9 @@ function EditQuestion() {
   return (
     <>
       {/* Form errors */}
-      <FormErrors errors={errors} />
+      <div className="col-span-full">
+        <FormErrors errors={errors} className='' />
+      </div>
 
       {/* Question Form */}
       <EditQuestionForm

@@ -34,7 +34,7 @@ export default function MultipleChoice({ answers, setAnswers }) {
     <>
       <FieldGroup className="col-span-full">
         <LabelTab
-          type="dark"
+          type="secondary"
           label="Select the correct answer(s)"
           htmlFor="answers"
           invalid={!isValid()}

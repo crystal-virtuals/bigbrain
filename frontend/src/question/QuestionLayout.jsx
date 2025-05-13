@@ -35,7 +35,7 @@ function QuestionLayout() {
       </div>
 
       <Header title="Edit Game Question" />
-      <div className="grid grid-cols-1 gap-x-8 gap-y-8 py-10 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-x-8 gap-y-8 py-8 md:grid-cols-3">
         {
           isNullOrUndefined(game) || isNullOrUndefined(question) ? (
             <Skeleton className="col-span-2 max-w-2xl" />

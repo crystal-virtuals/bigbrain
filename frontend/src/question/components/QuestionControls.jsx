@@ -19,7 +19,7 @@ export function InputQuestionName ({ question, setQuestion }) {
   return (
     <Field className="col-span-full">
       <LabelTab
-        type="neutral"
+        type="primary"
         label="Question"
         htmlFor="name"
         invalid={isEmptyString(question.name)}
