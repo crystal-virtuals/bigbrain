@@ -12,3 +12,47 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model User {
+  // id            Int     @id @default(autoincrement())
+  email         String  @id
+  name          String?
+  password      String
+  sessionActive Boolean @default(false)
+  role          Role    @default(ADMIN)
+  games         Game[]
+}
+
+model Game {
+  id              Int           @id @default(autoincrement())
+  name            String
+  thumbnail       String?
+  questions       Json
+  owner           User          @relation(fields: [ownerEmail], references: [email], onDelete: Cascade)
+  ownerEmail      String
+  sessions        GameSession[]
+  activeSessionId String?
+
+  @@index([ownerEmail])
+}
+
+model GameSession {
+  id                         Int       @id @default(autoincrement())
+  game                       Game      @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  gameId                     Int
+  position                   Int       @default(-1)
+  isoTimeLastQuestionStarted DateTime?
+  players                    Json
+  questions                  Json
+  isActive                   Boolean   @default(true)
+  answerAvailable            Boolean   @default(false)
+  createdAt                  DateTime  @default(now())
+  updatedAt                  DateTime  @updatedAt
+
+  @@index([gameId])
+}

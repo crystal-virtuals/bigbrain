@@ -4,8 +4,8 @@ import express from 'express';
 import fs from 'fs';
 import swaggerUi from 'swagger-ui-express';
 
-import swaggerDocument from '../swagger.json';
-import { AccessError, InputError, } from './error';
+import swaggerDocument from "../swagger.json" assert { type: "json" };
+import { AccessError, InputError, } from './error.js';
 import {
   assertOwnsGame,
   assertOwnsSession,
@@ -20,12 +20,12 @@ import {
   mutateGame,
   playerJoin,
   register,
-  save,
+  // save,
   sessionResults,
   sessionStatus,
   submitAnswers,
   updateGamesFromAdmin
-} from './service';
+} from './service.js';
 
 const app = express();
 
@@ -36,7 +36,7 @@ app.use(bodyParser.json({ limit: '100mb', }));
 const catchErrors = fn => async (req, res) => {
   try {
     await fn(req, res);
-    save();
+    // save();
   } catch (err) {
     if (err instanceof InputError) {
       res.status(400).send({ error: err.message, });
@@ -54,7 +54,7 @@ const catchErrors = fn => async (req, res) => {
 ***************************************************************/
 
 const authed = fn => async (req, res) => {
-  const email = getEmailFromAuthorization(req.header('Authorization'));
+  const email = await getEmailFromAuthorization(req.header('Authorization'));
   await fn(req, res, email);
 };
 

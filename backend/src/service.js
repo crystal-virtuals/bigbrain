@@ -1,63 +1,64 @@
-import AsyncLock from "async-lock";
-import fs from "fs";
-import jwt from "jsonwebtoken";
-import { AccessError, InputError } from "./error";
+import AsyncLock from 'async-lock';
+// import fs from "fs";
+import jwt from 'jsonwebtoken';
+import { AccessError, InputError } from './error.js';
+import { prisma } from './prisma.js';
 
 const lock = new AsyncLock();
 
-const JWT_SECRET = "llamallamaduck";
-const DATABASE_FILE = "./database.json";
+const JWT_SECRET = 'llamallamaduck';
+// const DATABASE_FILE = "./database.json";
 
 /***************************************************************
                       State Management
 ***************************************************************/
 
-let admins = {};
+// let admins = {};
 let games = {};
 let sessions = {};
 
 const sessionTimeouts = {};
 
-const update = (admins, games, sessions) =>
-  new Promise((resolve, reject) => {
-    lock.acquire("saveData", () => {
-      try {
-        fs.writeFileSync(
-          DATABASE_FILE,
-          JSON.stringify(
-            {
-              admins,
-              games,
-              sessions,
-            },
-            null,
-            2
-          )
-        );
-        resolve();
-      } catch {
-        reject(new Error("Writing to database failed"));
-      }
-    });
-  });
+// const update = (admins, games, sessions) =>
+//   new Promise((resolve, reject) => {
+//     lock.acquire("saveData", () => {
+//       try {
+//         fs.writeFileSync(
+//           DATABASE_FILE,
+//           JSON.stringify(
+//             {
+//               admins,
+//               games,
+//               sessions,
+//             },
+//             null,
+//             2
+//           )
+//         );
+//         resolve();
+//       } catch {
+//         reject(new Error("Writing to database failed"));
+//       }
+//     });
+//   });
 
-export const save = () => update(admins, games, sessions);
-export const reset = () => {
-  update({}, {}, {});
-  admins = {};
-  games = {};
-  sessions = {};
-};
-
-try {
-  const data = JSON.parse(fs.readFileSync(DATABASE_FILE));
-  admins = data.admins;
-  games = data.games;
-  sessions = data.sessions;
-} catch {
-  console.log("WARNING: No database found, create a new one");
-  save();
-}
+// export const save = () => update(admins, games, sessions);
+// export const reset = () => {
+//   update({}, {}, {});
+//   admins = {};
+//   games = {};
+//   sessions = {};
+// };
+//
+// try {
+//   const data = JSON.parse(fs.readFileSync(DATABASE_FILE));
+//   admins = data.admins;
+//   games = data.games;
+//   sessions = data.sessions;
+// } catch {
+//   console.log("WARNING: No database found, create a new one");
+//   save();
+// }
 
 /***************************************************************
                       Helper Functions
@@ -71,17 +72,17 @@ const newPlayerId = (_) =>
 
 export const userLock = (callback) =>
   new Promise((resolve, reject) => {
-    lock.acquire("userAuthLock", callback(resolve, reject));
+    lock.acquire("userAuthLock", () => callback(resolve, reject));
   });
 
 export const gameLock = (callback) =>
   new Promise((resolve, reject) => {
-    lock.acquire("gameMutateLock", callback(resolve, reject));
+    lock.acquire("gameMutateLock", () => callback(resolve, reject));
   });
 
 export const sessionLock = (callback) =>
   new Promise((resolve, reject) => {
-    lock.acquire("sessionMutateLock", callback(resolve, reject));
+    lock.acquire("sessionMutateLock", () => callback(resolve, reject));
   });
 
 const copy = (x) => JSON.parse(JSON.stringify(x));
@@ -100,48 +101,53 @@ const generateId = (currentList, max = 999999999) => {
 /***************************************************************
                       Auth Functions
 ***************************************************************/
+import { Role } from '@prisma/client';
 
-export const getEmailFromAuthorization = (authorization) => {
+export const getEmailFromAuthorization = async (authorization) => {
   try {
-    const token = authorization.replace("Bearer ", "");
+    const token = authorization.replace('Bearer ', '');
     const { email } = jwt.verify(token, JWT_SECRET);
-    if (!(email in admins)) {
-      throw new AccessError("Invalid Token");
-    }
+     const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) throw new AccessError("Invalid token");
     return email;
   } catch {
-    throw new AccessError("Invalid token");
+    throw new AccessError('Invalid token');
   }
 };
 
 export const login = (email, password) =>
-  userLock((resolve, reject) => {
-    if (email in admins) {
-      if (admins[email].password === password) {
-        admins[email].sessionActive = true;
-        resolve(jwt.sign({ email }, JWT_SECRET, { algorithm: "HS256" }));
-      }
+  userLock(async (resolve, reject) => {
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user || user.password !== password) {
+      return reject(new InputError('Invalid username or password'));
     }
-    reject(new InputError("Invalid username or password"));
+    await prisma.user.update({
+      where: { email },
+      data: { sessionActive: true },
+    });
+    resolve(jwt.sign({ email }, JWT_SECRET, { algorithm: 'HS256' }));
   });
 
 export const logout = (email) =>
-  userLock((resolve, reject) => {
-    admins[email].sessionActive = false;
+  userLock(async (resolve, reject) => {
+    await prisma.user.update({
+      where: { email },
+      data: { sessionActive: false },
+    });
     resolve();
   });
 
 export const register = (email, password, name) =>
-  userLock((resolve, reject) => {
-    if (email in admins) {
-      return reject(new InputError("Email address already registered"));
-    }
-    admins[email] = {
-      name,
-      password,
-      sessionActive: true,
-    };
-    const token = jwt.sign({ email }, JWT_SECRET, { algorithm: "HS256" });
+  userLock(async (resolve, reject) => {
+    const existing = await prisma.user.findUnique({ where: { email } });
+    if (existing)
+      return reject(new InputError('Email address already registered'));
+
+    await prisma.user.create({
+      data: { email, password, name, sessionActive: true, role: Role.ADMIN },
+    });
+
+    const token = jwt.sign({ email }, JWT_SECRET, { algorithm: 'HS256' });
     resolve(token);
   });
 
@@ -152,9 +158,9 @@ export const register = (email, password, name) =>
 export const assertOwnsGame = (email, gameId) =>
   gameLock((resolve, reject) => {
     if (!(gameId in games)) {
-      return reject(new InputError("Invalid game ID"));
+      return reject(new InputError('Invalid game ID'));
     } else if (games[gameId].owner !== email) {
-      return reject(new InputError("Admin does not own this Game"));
+      return reject(new InputError('Admin does not own this Game'));
     } else {
       resolve();
     }
@@ -193,7 +199,7 @@ export const updateGamesFromAdmin = ({ gamesArrayFromRequest, email }) =>
         }
         if (gameFromRequest.owner !== email) {
           return reject(
-            new InputError("Cannot modify games owned by other admins")
+            new InputError('Cannot modify games owned by other admins')
           );
         }
       }
@@ -201,7 +207,10 @@ export const updateGamesFromAdmin = ({ gamesArrayFromRequest, email }) =>
       // Convert array to object format and update
       const newGames = {};
       gamesArrayFromRequest.forEach((gameFromRequest) => {
-        const gameIdFromRequest = gameFromRequest.id || gameFromRequest.gameId || gameFromRequest.gameID;
+        const gameIdFromRequest =
+          gameFromRequest.id ||
+          gameFromRequest.gameId ||
+          gameFromRequest.gameID;
         // If game has an ID and it exists in admin's games, use that ID
         // Otherwise generate a new ID
         const gameId =
@@ -228,17 +237,16 @@ export const updateGamesFromAdmin = ({ gamesArrayFromRequest, email }) =>
       });
 
       games = newGames;
-      save(); // Save to database after update
       resolve();
     } catch (error) {
-      reject(new Error("Failed to update games"));
+      reject(new Error('Failed to update games'));
     }
   });
 
 export const startGame = (gameId) =>
   gameLock((resolve, reject) => {
     if (gameHasActiveSession(gameId)) {
-      return reject(new InputError("Game already has active session"));
+      return reject(new InputError('Game already has active session'));
     } else {
       const id = newSessionId();
       sessions[id] = newSessionPayload(gameId);
@@ -250,7 +258,7 @@ export const advanceGame = (gameId) =>
   gameLock((resolve, reject) => {
     const session = getActiveSessionFromGameIdThrow(gameId);
     if (!session.active) {
-      return reject(new InputError("Cannot advance a game that is not active"));
+      return reject(new InputError('Cannot advance a game that is not active'));
     } else {
       const totalQuestions = session.questions.length;
       session.position += 1;
@@ -270,7 +278,7 @@ export const advanceGame = (gameId) =>
             session.answerAvailable = true;
           }, questionDuration * 1000);
         } catch (error) {
-          reject(new InputError("Question duration not found"));
+          reject(new InputError('Question duration not found'));
         }
       }
       resolve(session.position);
@@ -288,26 +296,26 @@ export const mutateGame = async ({ gameId, mutationType }) => {
   let result;
   try {
     switch (mutationType.toUpperCase()) {
-      case "START":
+      case 'START':
         const sessionId = await startGame(gameId);
-        result = { status: "started", sessionId };
+        result = { status: 'started', sessionId };
         break;
-      case "ADVANCE":
+      case 'ADVANCE':
         const position = await advanceGame(gameId);
-        result = { status: "advanced", position };
+        result = { status: 'advanced', position };
         break;
-      case "END":
+      case 'END':
         await endGame(gameId);
-        result = { status: "ended" };
+        result = { status: 'ended' };
         break;
       default:
-        throw new InputError("Invalid mutation type");
+        throw new InputError('Invalid mutation type');
     }
     return result;
   } catch (error) {
     throw error instanceof InputError
       ? error
-      : new Error("Failed to mutate game: " + error.message);
+      : new Error('Failed to mutate game: ' + error.message);
   }
 };
 
@@ -322,7 +330,7 @@ const gameHasActiveSession = (gameId) =>
 
 const getActiveSessionFromGameIdThrow = (gameId) => {
   if (!gameHasActiveSession(gameId)) {
-    throw new InputError("Game has no active session");
+    throw new InputError('Game has no active session');
   }
   const sessionId = getActiveSessionIdFromGameId(gameId);
   if (sessionId !== null) {
@@ -352,7 +360,7 @@ const getActiveSessionFromSessionId = (sessionId) => {
       return sessions[sessionId];
     }
   }
-  throw new InputError("Session ID is not an active session");
+  throw new InputError('Session ID is not an active session');
 };
 
 const sessionIdFromPlayerId = (playerId) => {
@@ -364,7 +372,7 @@ const sessionIdFromPlayerId = (playerId) => {
       return sessionId;
     }
   }
-  throw new InputError("Player ID does not refer to valid player id");
+  throw new InputError('Player ID does not refer to valid player id');
 };
 
 const newSessionPayload = (gameId) => ({
@@ -409,7 +417,7 @@ export const sessionResults = (sessionId) =>
   sessionLock((resolve, reject) => {
     const session = sessions[sessionId];
     if (session.active) {
-      return reject(new InputError("Cannot get results for active session"));
+      return reject(new InputError('Cannot get results for active session'));
     } else {
       resolve(Object.keys(session.players).map((pid) => session.players[pid]));
     }
@@ -418,11 +426,11 @@ export const sessionResults = (sessionId) =>
 export const playerJoin = (name, sessionId) =>
   sessionLock((resolve, reject) => {
     if (name === undefined) {
-      return reject(new InputError("Name must be supplied"));
+      return reject(new InputError('Name must be supplied'));
     } else {
       const session = getActiveSessionFromSessionId(sessionId);
       if (session.position >= 0) {
-        return reject(new InputError("Session has already begun"));
+        return reject(new InputError('Session has already begun'));
       } else {
         const id = newPlayerId();
         session.players[id] = newPlayerPayload(name, session.questions.length);
@@ -449,7 +457,7 @@ export const getQuestion = (playerId) =>
       sessionIdFromPlayerId(playerId)
     );
     if (session.position === -1) {
-      return reject(new InputError("Session has not started yet"));
+      return reject(new InputError('Session has not started yet'));
     } else {
       try {
         const question = session.questions.at(session.position);
@@ -460,7 +468,7 @@ export const getQuestion = (playerId) =>
         };
         resolve(questionWithSessionInfo);
       } catch (error) {
-        reject(new InputError("Question not found"));
+        reject(new InputError('Question not found'));
       }
     }
   });
@@ -471,15 +479,15 @@ export const getAnswers = (playerId) =>
       sessionIdFromPlayerId(playerId)
     );
     if (session.position === -1) {
-      return reject(new InputError("Session has not started yet"));
+      return reject(new InputError('Session has not started yet'));
     } else if (!session.answerAvailable) {
-      return reject(new InputError("Answers are not available yet"));
+      return reject(new InputError('Answers are not available yet'));
     } else {
       try {
         const answers = session.questions.at(session.position).correctAnswers;
         resolve(answers);
       } catch (error) {
-        reject(new InputError("Question not found"));
+        reject(new InputError('Question not found'));
       }
     }
   });
@@ -487,14 +495,14 @@ export const getAnswers = (playerId) =>
 export const submitAnswers = (playerId, answersFromRequest) =>
   sessionLock((resolve, reject) => {
     if (answersFromRequest === undefined || answersFromRequest.length === 0) {
-      return reject(new InputError("Answers must be provided"));
+      return reject(new InputError('Answers must be provided'));
     }
 
     const session = getActiveSessionFromSessionId(
       sessionIdFromPlayerId(playerId)
     );
     if (session.position === -1) {
-      return reject(new InputError("Session has not started yet"));
+      return reject(new InputError('Session has not started yet'));
     } else if (session.answerAvailable) {
       return reject(
         new InputError("Can't answer question once answer is available")
@@ -518,10 +526,10 @@ export const getResults = (playerId) =>
     const session = sessions[sessionIdFromPlayerId(playerId)];
     if (session.active) {
       return reject(
-        new InputError("Session is ongoing, cannot get results yet")
+        new InputError('Session is ongoing, cannot get results yet')
       );
     } else if (session.position === -1) {
-      return reject(new InputError("Session has not started yet"));
+      return reject(new InputError('Session has not started yet'));
     } else {
       resolve(session.players[playerId].answers);
     }
