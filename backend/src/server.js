@@ -4,7 +4,11 @@ import express from 'express';
 import fs from 'fs';
 import swaggerUi from 'swagger-ui-express';
 
-import swaggerDocument from "../swagger.json" assert { type: "json" };
+// import swaggerDocument from "../swagger.json" assert { type: "json" };
+import path from "path";
+const swaggerPath = path.join(process.cwd(), "swagger.json");
+const swaggerDocument = JSON.parse(fs.readFileSync(swaggerPath, "utf8"));
+
 import { AccessError, InputError, } from './error.js';
 import {
   assertOwnsGame,

@@ -13,11 +13,22 @@ const JWT_SECRET = 'llamallamaduck';
                       State Management
 ***************************************************************/
 
-// let admins = {};
-let games = {};
 let sessions = {};
 
 const sessionTimeouts = {};
+
+export const reset = async () => {
+  // clear in-memory runtime state
+  sessions = {};
+  for (const k of Object.keys(sessionTimeouts)) {
+    clearTimeout(sessionTimeouts[k]);
+    delete sessionTimeouts[k];
+  }
+
+  // clear database state
+  await prisma.game.deleteMany({});
+  await prisma.user.deleteMany({});
+};
 
 // const update = (admins, games, sessions) =>
 //   new Promise((resolve, reject) => {
@@ -72,17 +83,35 @@ const newPlayerId = (_) =>
 
 export const userLock = (callback) =>
   new Promise((resolve, reject) => {
-    lock.acquire("userAuthLock", () => callback(resolve, reject));
+    lock.acquire('userAuthLock', async () => {
+      try {
+        await callback(resolve, reject);
+      } catch (e) {
+        reject(e);
+      }
+    });
   });
 
 export const gameLock = (callback) =>
   new Promise((resolve, reject) => {
-    lock.acquire("gameMutateLock", () => callback(resolve, reject));
+    lock.acquire('gameMutateLock', async () => {
+      try {
+        await callback(resolve, reject);
+      } catch (e) {
+        reject(e);
+      }
+    });
   });
 
 export const sessionLock = (callback) =>
   new Promise((resolve, reject) => {
-    lock.acquire("sessionMutateLock", () => callback(resolve, reject));
+    lock.acquire('sessionMutateLock', async () => {
+      try {
+        await callback(resolve, reject);
+      } catch (e) {
+        reject(e);
+      }
+    });
   });
 
 const copy = (x) => JSON.parse(JSON.stringify(x));
@@ -107,8 +136,8 @@ export const getEmailFromAuthorization = async (authorization) => {
   try {
     const token = authorization.replace('Bearer ', '');
     const { email } = jwt.verify(token, JWT_SECRET);
-     const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) throw new AccessError("Invalid token");
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) throw new AccessError('Invalid token');
     return email;
   } catch {
     throw new AccessError('Invalid token');
@@ -156,10 +185,11 @@ export const register = (email, password, name) =>
 ***************************************************************/
 
 export const assertOwnsGame = (email, gameId) =>
-  gameLock((resolve, reject) => {
-    if (!(gameId in games)) {
+  gameLock(async (resolve, reject) => {
+    const game = await prisma.game.findUnique({ where: { id: gameId } });
+    if (!game) {
       return reject(new InputError('Invalid game ID'));
-    } else if (games[gameId].owner !== email) {
+    } else if (game.ownerEmail !== email) {
       return reject(new InputError('Admin does not own this Game'));
     } else {
       resolve();
@@ -167,28 +197,29 @@ export const assertOwnsGame = (email, gameId) =>
   });
 
 export const getGamesFromAdmin = (email) =>
-  gameLock((resolve, reject) => {
-    const filteredGames = Object.keys(games)
-      .filter((key) => games[key].owner === email)
-      .map((key) => {
-        const game = games[key] || {};
-        return {
-          ...(game || {}),
-          id: parseInt(key, 10),
-          active: getActiveSessionIdFromGameId(key),
-          oldSessions: getInactiveSessionsIdFromGameId(key),
-        };
-      });
+  gameLock(async (resolve, reject) => {
+    const allGames = await prisma.game.findMany({
+      where: { ownerEmail: email },
+    });
+    const filteredGames = allGames.map((game) => ({
+      id: game.id,
+      name: game.name,
+      owner: game.ownerEmail,
+      thumbnail: game.thumbnail ?? null,
+      questions: game.questions ?? null,
+      active: getActiveSessionIdFromGameId(game.id),
+      oldSessions: getInactiveSessionsIdFromGameId(game.id),
+    }));
     resolve(filteredGames);
   });
 
 export const updateGamesFromAdmin = ({ gamesArrayFromRequest, email }) =>
-  gameLock((resolve, reject) => {
+  gameLock(async (resolve, reject) => {
     try {
       // Get all existing game IDs owned by other admins
-      const otherAdminGameIds = Object.keys(games).filter(
-        (gameId) => games[gameId].owner !== email
-      );
+      // const otherAdminGameIds = Object.keys(games).filter(
+      //   (gameId) => games[gameId].owner !== email
+      // );
 
       // Verify all games in array belong to admin
       for (const gameFromRequest of gamesArrayFromRequest) {
@@ -204,39 +235,57 @@ export const updateGamesFromAdmin = ({ gamesArrayFromRequest, email }) =>
         }
       }
 
-      // Convert array to object format and update
-      const newGames = {};
-      gamesArrayFromRequest.forEach((gameFromRequest) => {
-        const gameIdFromRequest =
-          gameFromRequest.id ||
-          gameFromRequest.gameId ||
-          gameFromRequest.gameID;
-        // If game has an ID and it exists in admin's games, use that ID
-        // Otherwise generate a new ID
-        const gameId =
-          gameIdFromRequest &&
-          otherAdminGameIds.includes(gameIdFromRequest.toString()) === false
-            ? gameIdFromRequest.toString()
-            : generateId(Object.keys(games));
+      const existingGames = await prisma.game.findMany({
+        where: { ownerEmail: email },
+        select: { id: true },
+      });
+      const existingGameIds = existingGames.map((g) => g.id);
 
-        //
-        newGames[gameId] = {
-          owner: gameFromRequest.owner,
-          // Preserve active session ID & old sessions
-          active: getActiveSessionIdFromGameId(gameId),
-          oldSessions: getInactiveSessionsIdFromGameId(gameId),
-          ...gameFromRequest,
+      const requestsGameIds = gamesArrayFromRequest
+        .map((g) => g.id)
+        .filter((id) => id !== undefined && id !== null);
+
+      // Delete games that are not in the request
+      const gamesToDelete = existingGameIds.filter(
+        (id) => !requestsGameIds.includes(id)
+      );
+      if (gamesToDelete.length > 0) {
+        await prisma.game.deleteMany({
+          where: { id: { in: gamesToDelete }, ownerEmail: email },
+        });
+      }
+
+      for (const gameFromRequest of gamesArrayFromRequest) {
+        const gameId = gameFromRequest.id?.toString();
+
+        const gameData = {
+          name: gameFromRequest.name ?? '',
+          thumbnail: gameFromRequest.thumbnail ?? null,
+          questions: gameFromRequest.questions ?? null,
+          ownerEmail: email,
         };
-      });
 
-      // Only update games owned by this admin, preserve others
-      Object.keys(games).forEach((gameId) => {
-        if (games[gameId].owner !== email) {
-          newGames[gameId] = games[gameId];
+        if (!gameId) {
+          // create new
+          const created = await prisma.game.create({ data: gameData });
+          gameFromRequest.id = created.id;
+          continue;
         }
-      });
 
-      games = newGames;
+        // update existing owned by this user
+        const updated = await prisma.game.updateMany({
+          where: { id: gameId, ownerEmail: email },
+          data: gameData,
+        });
+
+        // if not found for this user, create it (treat as new)
+        if (updated.count === 0) {
+          await prisma.game.create({
+            data: { ...gameData, id: gameId },
+          });
+        }
+      }
+
       resolve();
     } catch (error) {
       reject(new Error('Failed to update games'));
@@ -244,12 +293,24 @@ export const updateGamesFromAdmin = ({ gamesArrayFromRequest, email }) =>
   });
 
 export const startGame = (gameId) =>
-  gameLock((resolve, reject) => {
+  gameLock(async (resolve, reject) => {
     if (gameHasActiveSession(gameId)) {
       return reject(new InputError('Game already has active session'));
     } else {
+      const game = await prisma.game.findUnique({ where: { id: gameId } });
+      if (!game) return reject(new InputError('Invalid game ID'));
+
       const id = newSessionId();
-      sessions[id] = newSessionPayload(gameId);
+      sessions[id] = {
+        id,
+        gameId,
+        position: -1,
+        isoTimeLastQuestionStarted: null,
+        players: {},
+        questions: copy(game.questions ?? []),
+        active: true,
+        answerAvailable: false,
+      };
       resolve(id);
     }
   });
@@ -375,15 +436,15 @@ const sessionIdFromPlayerId = (playerId) => {
   throw new InputError('Player ID does not refer to valid player id');
 };
 
-const newSessionPayload = (gameId) => ({
-  gameId,
-  position: -1,
-  isoTimeLastQuestionStarted: null,
-  players: {},
-  questions: copy(games[gameId].questions),
-  active: true,
-  answerAvailable: false,
-});
+// const newSessionPayload = (gameId) => ({
+//   gameId,
+//   position: -1,
+//   isoTimeLastQuestionStarted: null,
+//   players: {},
+//   questions: copy(games[gameId].questions),
+//   active: true,
+//   answerAvailable: false,
+// });
 
 const newPlayerPayload = (name, numQuestions) => ({
   name: name,
@@ -410,6 +471,7 @@ export const sessionStatus = (sessionId) => {
 };
 
 export const assertOwnsSession = async (email, sessionId) => {
+  if (!(sessionId in sessions)) throw new InputError('Invalid session ID');
   await assertOwnsGame(email, sessions[sessionId].gameId);
 };
 
