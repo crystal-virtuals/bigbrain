@@ -72,8 +72,8 @@ const singleSessionId = async () => {
 
 describe('Test the root path', () => {
 
-  beforeAll(() => {
-    reset();
+  beforeAll(async () => {
+    await reset();
   });
 
   beforeAll(() => {
