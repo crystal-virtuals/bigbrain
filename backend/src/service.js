@@ -7,7 +7,6 @@ import { prisma } from './prisma.js';
 const lock = new AsyncLock();
 
 const JWT_SECRET = 'llamallamaduck';
-// const DATABASE_FILE = "./database.json";
 
 /***************************************************************
                       State Management
@@ -29,47 +28,6 @@ export const reset = async () => {
   await prisma.game.deleteMany({});
   await prisma.user.deleteMany({});
 };
-
-// const update = (admins, games, sessions) =>
-//   new Promise((resolve, reject) => {
-//     lock.acquire("saveData", () => {
-//       try {
-//         fs.writeFileSync(
-//           DATABASE_FILE,
-//           JSON.stringify(
-//             {
-//               admins,
-//               games,
-//               sessions,
-//             },
-//             null,
-//             2
-//           )
-//         );
-//         resolve();
-//       } catch {
-//         reject(new Error("Writing to database failed"));
-//       }
-//     });
-//   });
-
-// export const save = () => update(admins, games, sessions);
-// export const reset = () => {
-//   update({}, {}, {});
-//   admins = {};
-//   games = {};
-//   sessions = {};
-// };
-//
-// try {
-//   const data = JSON.parse(fs.readFileSync(DATABASE_FILE));
-//   admins = data.admins;
-//   games = data.games;
-//   sessions = data.sessions;
-// } catch {
-//   console.log("WARNING: No database found, create a new one");
-//   save();
-// }
 
 /***************************************************************
                       Helper Functions

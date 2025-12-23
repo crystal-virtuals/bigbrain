@@ -2,13 +2,13 @@
                          API Calls
 ***************************************************************/
 import axios from 'axios'
-import { BACKEND_PORT } from '@frontend/backend.config.json'
+// import { BACKEND_PORT } from '@frontend/backend.config.json'
 import { getAuthToken } from './token.js'
 import { APIError } from '@constants/errors'
 import { InactiveSessionError } from '@constants/errors';
 
 export const DEFAULT_CONFIG = {
-  baseURL: `http://localhost:${BACKEND_PORT}`,
+  baseURL: import.meta.env.API_BASE_URL,
   headers: {
     'Content-Type': 'application/json'
   }
