@@ -53,12 +53,12 @@ function ErrorPage({ status, title, description, redirectPath, redirectText }) {
               </Text>
               {redirectPath && (
                 <div className="mt-10">
-                  <Link
-                    to={redirectPath}
+                  <a
+                    href={redirectPath}
                     className="text-sm/7 font-semibold text-pretty text-accent"
                   >
                     <span aria-hidden="true">&larr;</span> {redirectText}
-                  </Link>
+                  </a>
                 </div>
               )}
             </div>

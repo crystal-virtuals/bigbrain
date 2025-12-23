@@ -15,6 +15,8 @@ export default function AuthProvider({ children }) {
     console.log('Running useEffect to fetch user from localStorage');
     const token = localStorage.getItem('token');
     const loggedInUser = localStorage.getItem('user');
+    console.log('Token from localStorage:', token);
+    console.log('User from localStorage:', loggedInUser);
     if (token && loggedInUser) {
       setUser(JSON.parse(loggedInUser));
     } else {
@@ -29,32 +31,36 @@ export default function AuthProvider({ children }) {
       toastify.success({
         message: 'Successfully logged in',
         description: 'Welcome back!',
-      })
+      });
     } catch (error) {
       toastify.error({
         message: 'Invalid input',
         description: 'Please check your credentials and try again.',
-      })
+      });
       throw error;
     }
   };
 
   const register = async ({ email, password, name }) => {
     try {
-      const { token } = await api.post('/admin/auth/register', { email, password, name });
+      const { token } = await api.post('/admin/auth/register', {
+        email,
+        password,
+        name,
+      });
       loginUser(token, email, name);
       toastify.success({
         message: 'Successfully registered',
         description: `Welcome aboard, ${name}!`,
-      })
+      });
     } catch (error) {
       toastify.error({
         message: 'Invalid credentials',
         description: 'Please check your input and try again.',
-      })
+      });
       throw error;
     }
-  }
+  };
 
   const logout = async () => {
     await api.post('/admin/auth/logout');
@@ -62,15 +68,16 @@ export default function AuthProvider({ children }) {
     toastify.success({
       message: 'Successfully logged out',
       description: 'See you next time!',
-    })
-  }
+    });
+  };
 
   const loginUser = (token, email, name = '') => {
+    console.log('Setting user in localStorage and state');
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify({ email, name }));
     setUser({ email, name });
     navigate('/dashboard');
-  }
+  };
 
   const logoutUser = () => {
     localStorage.removeItem('token');
