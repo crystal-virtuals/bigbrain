@@ -2,3 +2,5 @@ node_modules
 database.json
 .DS_Store
 .vscode
+.env
+bigbrain-key.pem
