@@ -8,7 +8,7 @@ import { APIError } from '@constants/errors'
 import { InactiveSessionError } from '@constants/errors';
 
 export const DEFAULT_CONFIG = {
-  baseURL: import.meta.env.API_BASE_URL,
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   headers: {
     'Content-Type': 'application/json'
   }

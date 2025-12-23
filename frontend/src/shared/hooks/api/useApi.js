@@ -12,7 +12,7 @@ export function useApi() {
     } catch (error) {
       // Let InputErrors be handled by the caller
       if (error instanceof InputError) {
-      throw error;
+        throw error;
       }
       showBoundary(error);
       throw error; // re-throw after showing boundary
