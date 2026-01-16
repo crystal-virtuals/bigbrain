@@ -135,7 +135,7 @@ _[Vercel](https://en.wikipedia.org/wiki/Vercel) is a cloud platform as a service
    First, click on `Inspect Deployment` at the bottom of the page. You should end up on the `Deployment Details` page.
    If the build log mentions `npm ERR! code 1` go back to your project and click on the `Settings` tab. Then scroll down and change the Node version to 16. Afterwards, go back to the `Deployments` tab and click on the ellipsis button of your latest deployment. Then click `Redeploy`.
 
-7. Make your deployed url contain your zID. Go to `Project Settings` > `Domains` > `Edit`, and modify your domain name to include your zID, e.g. `z1234444-bigbrain-fe-deploy.vercel.app`.
+5. Make your deployed url contain your zID. Go to `Project Settings` > `Domains` > `Edit`, and modify your domain name to include your zID, e.g. `z1234444-bigbrain-fe-deploy.vercel.app`.
    <details close>
    <summary> Homepage > Project Menu > Settings </summary>
 
@@ -149,7 +149,7 @@ _[Vercel](https://en.wikipedia.org/wiki/Vercel) is a cloud platform as a service
 
    </details>
 
-8. Congratulations! You've now deployed your frontend onto the web...somewhat. If you navigate to your deployed url, you should see your frontend in action!
+6. Congratulations! You've now deployed your frontend onto the web...somewhat. If you navigate to your deployed url, you should see your frontend in action!
 
    However, as soon as you try to make api calls to backend, you'll start running into server errors. This is fine as backend deployment is optional and you will gain bonus marks if you successfully modified backend and deployed it.
 
@@ -158,6 +158,7 @@ _[Vercel](https://en.wikipedia.org/wiki/Vercel) is a cloud platform as a service
 Unlike the frontend, it could be hard to configure backend deployment. You will need to figure out how to use Vercel with Upstash for `key-value` storage and modify how backend handles database operations to use Upstash. It may also be necessary for you to add a `vercel.json` file to the backend repository to configure the deployment.
 
 You may find these resources helpful:
+
 - [Vercel Upstash Redis Integration](https://upstash.com/docs/redis/howto/vercelintegration#vercel-upstash-redis-integration)
 - [Upstash with Express.js](https://upstash.com/docs/workflow/quickstarts/express#express-js)
 - [Deploy express.js to vercel](https://vercel.com/guides/using-express-with-vercel)
@@ -167,6 +168,7 @@ You may find these resources helpful:
 1. Open [progress.csv](./progress.csv) and modify the `FE_DEPLOYED_URL` to your newly deployed site, e.g. https://z1234444-anything-you-want.vercel.app.
 
    **A reminder that the `FE_DEPLOYED_URL` must contain your zID exactly once.** You may need to go to Settings > Domains > and edit your deployed url to include your zID.
+
 2. You don't need to add `BE_DEPLOYED_URL` in `progress.csv` but you need to connect your deployed frontend with your deployed backend if you have deployed backend.
 
 ## Common Issues
@@ -181,23 +183,22 @@ You may find these resources helpful:
   ![image](assets/5.8.push.code.deployment.tab.png)
 
 - You can also check if Vercel has the correct files, by clicking on Your project > Source. Ensure that each file is as expected. Check for example if the `DEPLOYED_URL` was updated.
-![image](assets/5.4.debug-source.png)
-</details>
+  ![image](assets/5.4.debug-source.png)
+  </details>
 
-  <details close>
-  <summary> 2. Incorrect format for deployed URL </summary>
+    <details close>
+    <summary> 2. Incorrect format for deployed URL </summary>
 
 - Ensure the URL begins with `http` or `https`. Also check that it **doesn't** end with `/`.
-</details>
+  </details>
 
-  <details close>
-  <summary> 3. You've changed branches at some point </summary>
+    <details close>
+    <summary> 3. You've changed branches at some point </summary>
 
 - Go to Settings > Git. Scroll down to Production Branch and change the name of the branch.
 - Additionally if you go to the Deployments tab, you may see that it says Preview, like in the image below. For the latest deployment, click on the ellipse icon (three horizontal dots) on the very right and click 'Promote to production'.
 ![image](assets/5.9.deploy.preview.png)
 </details>
-
 
 ## Debugging tips
 
